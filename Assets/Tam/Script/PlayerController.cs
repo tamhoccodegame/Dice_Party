@@ -7,27 +7,34 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class PlayerController : MonoBehaviour
 {
+    [Header("Move")]
     public BoardNode currentNode;
     public int currentStep;
     private NavMeshAgent agent;
-    public bool isMoving = false;
+    private Animator animator;
     public bool waitingForChoice = false;
-    public bool eventTriggered = false; // Để tránh gọi event nhiều lần
 
+    [Space(20)]
+    [Header("ArrowDirection")]
     public GameObject arrowDirectionPrefab;
     public List<GameObject> spawnedArrows = new List<GameObject>();
+
+    [Space(20)]
+    [Header("CanMove")]
+    public bool isMyTurn = false;
 
     private Coroutine moveCoroutine;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
         agent.autoBraking = true;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && moveCoroutine == null)
+        if (Input.GetKeyDown(KeyCode.Space) && moveCoroutine == null && isMyTurn)
         {
             currentStep = 3;
             moveCoroutine = StartCoroutine(MoveToNextNode());
@@ -35,8 +42,25 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    public void StartTurn()
+    {
+        isMyTurn = true;
+    }
+
+    public void EndTurn()
+    {
+        isMyTurn = false;
+        GameManager.instance.NextTurn();
+    }
+
     IEnumerator MoveToNextNode()
     {
+        animator.CrossFade("RollDice", 0.25f);
+        yield return new WaitForSeconds(0.25f);
+        float animTime = animator.GetCurrentAnimatorStateInfo(0).length;
+        yield return new WaitForSeconds(animTime);
+
+        animator.CrossFade("Run", 0.25f);
         while (currentStep > 0)
         {
             if (currentNode.nextNodes.Count > 1)
@@ -56,7 +80,7 @@ public class PlayerController : MonoBehaviour
 
             agent.SetDestination(currentNode.transform.position);
 
-            while (Vector3.Distance(transform.position, currentNode.transform.position) > 1.8f)
+            while (Vector3.Distance(transform.position, currentNode.transform.position) > 1.7f)
             {
                 yield return null;
             }
@@ -64,11 +88,15 @@ public class PlayerController : MonoBehaviour
             currentStep--;
         }
         yield return null;
+        animator.CrossFade("Idle", 0.25f);
+        isMyTurn = false;
         TriggerNodeEvent();
         moveCoroutine = null;
+        EndTurn();
     }
     void ShowDirectionChoices()
     {
+        animator.CrossFade("Idle", 0.25f);
         ClearArrow();
         foreach (var next in currentNode.nextNodes)
         {
@@ -95,11 +123,11 @@ public class PlayerController : MonoBehaviour
 
     public void ChooseDirection(int index)
     {
+        animator.CrossFade("Run", 0.25f);
         ClearArrow();
         Debug.Log("Bạn chọn hướng: " + (index + 1));
         currentNode = currentNode.nextNodes[index];
         waitingForChoice = false; // Hủy trạng thái chờ chọn hướng
-        isMoving = true;
         agent.SetDestination(currentNode.transform.position);
     }
 
