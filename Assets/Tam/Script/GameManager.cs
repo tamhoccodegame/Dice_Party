@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -14,6 +15,8 @@ public class GameManager : MonoBehaviour
     public Vector3 camOffset;
     public Transform currentFollowTarget;
     private Coroutine changeCamCoroutine;
+
+    public TextMeshProUGUI turnNotifyText;
 
     public enum GameState
     {
@@ -46,6 +49,8 @@ public class GameManager : MonoBehaviour
     void StartFirstTurn()
     {
         currentPlayerIndex = 0;
+        turnNotifyText.text = $"{playerController[currentPlayerIndex].name}'s Turn";
+        turnNotifyText.gameObject.SetActive(true);
         playerController[currentPlayerIndex].StartTurn();
     }
 
@@ -62,6 +67,8 @@ public class GameManager : MonoBehaviour
 
         currentPlayerIndex++;
         if (currentPlayerIndex >= playerController.Count) currentPlayerIndex = 0;
+        turnNotifyText.text = $"{playerController[currentPlayerIndex].name}'s Turn";
+        turnNotifyText.gameObject.SetActive(true);
 
         Vector3 newTarget = playerController[currentPlayerIndex].transform.position + camOffset;
 
@@ -80,6 +87,7 @@ public class GameManager : MonoBehaviour
         cam.transform.position = newTarget;
         cam.GetComponent<CinemachineBrain>().enabled = true;
 
+       
         playerController[currentPlayerIndex].StartTurn();
         changeCamCoroutine = null;
     }

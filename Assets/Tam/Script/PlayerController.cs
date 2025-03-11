@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -23,6 +23,12 @@ public class PlayerController : MonoBehaviour
     [Header("CanMove")]
     public bool isMyTurn = false;
 
+    [Space(20)]
+    [Header("Dice and Step")]
+    public GameObject dicePrefab;
+    private Dice activeDice;
+    public TextMeshPro stepText;
+
     private Coroutine moveCoroutine;
 
     void Start()
@@ -36,7 +42,10 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && moveCoroutine == null && isMyTurn)
         {
-            currentStep = 3;
+            currentStep = Random.Range(1, 5);
+            stepText.gameObject.SetActive(true);
+            stepText.text = currentStep.ToString();
+            activeDice.DestroySelf();
             moveCoroutine = StartCoroutine(MoveToNextNode());
         }
 
@@ -45,6 +54,7 @@ public class PlayerController : MonoBehaviour
     public void StartTurn()
     {
         isMyTurn = true;
+        activeDice = Instantiate(dicePrefab, transform.position + new Vector3(0, 3.5f, 0), Quaternion.identity).GetComponent<Dice>();
     }
 
     public void EndTurn()
@@ -57,6 +67,7 @@ public class PlayerController : MonoBehaviour
     {
         animator.CrossFade("RollDice", 0.25f);
         yield return new WaitForSeconds(0.25f);
+        stepText.gameObject.SetActive(false);
         float animTime = animator.GetCurrentAnimatorStateInfo(0).length;
         yield return new WaitForSeconds(animTime);
 
