@@ -65,11 +65,9 @@ public class BreakableWindow : MonoBehaviour {
         // Kiểm tra và khởi tạo AudioSource nếu cần
         if (breakingAudioSource == null)
         {
-            breakingAudioSource = GetComponent<AudioSource>();
-            if (breakingAudioSource == null)
-            {
-                breakingAudioSource = gameObject.AddComponent<AudioSource>();
-            }
+            GameObject audioObject = new GameObject("BreakingSoundAudioSource");
+            audioObject.transform.parent = transform;
+            breakingAudioSource = audioObject.AddComponent<AudioSource>();
         }
 
         // Kiểm tra xem breakingSound có bị mất giá trị không
@@ -103,32 +101,33 @@ public class BreakableWindow : MonoBehaviour {
 
             if (isLeftBreakable)
             {
-                SetBreakable(leftTiles[i]);
-                SetSolid(rightTiles[i]);
+                SetTileBreakable(leftTiles[i]);
+                SetTileSolid(rightTiles[i]);
             }
             else
             {
-                SetBreakable(rightTiles[i]);
-                SetSolid(leftTiles[i]);
+                SetTileBreakable(rightTiles[i]);
+                SetTileSolid(leftTiles[i]);
             }
 
             Debug.Log($"Hàng {i}: {(isLeftBreakable ? "Trái vỡ - Phải cứng" : "Phải vỡ - Trái cứng")}");
         }
     }
-    void SetBreakable(GameObject tile)
+
+    void SetTileBreakable(GameObject tile)
     {
-        tile.AddComponent<BreakableWindow>(); // Thêm script phá kính
+        // Không thêm component BreakableWindow nữa
         tile.GetComponent<Collider>().enabled = false; // Tắt Collider để không thể đứng lên
         tile.GetComponent<MeshRenderer>().material.color = Color.red; // Đổi màu để dễ kiểm tra
+        // Bạn có thể cần thêm một flag hoặc component khác để đánh dấu tile này là có thể vỡ
     }
-    void SetSolid(GameObject tile)
+
+    void SetTileSolid(GameObject tile)
     {
-        if (tile.GetComponent<BreakableWindow>() != null)
-        {
-            Destroy(tile.GetComponent<BreakableWindow>()); // Xóa script phá kính nếu có
-        }
+        // Không xóa component BreakableWindow nữa
         tile.GetComponent<Collider>().enabled = true; // Đảm bảo kính cứng có Collider
         tile.GetComponent<MeshRenderer>().material.color = Color.green; // Đổi màu để dễ kiểm tra
+        // Nếu có flag hoặc component đánh dấu là có thể vỡ, hãy đảm bảo loại bỏ nó
     }
 
 
@@ -311,7 +310,7 @@ public class BreakableWindow : MonoBehaviour {
         {
             if (breakingAudioSource != null)
             {
-                breakingAudioSource.Play();
+                breakingAudioSource.PlayOneShot(breakingSound);
                 Debug.Log("Phát âm thanh kính vỡ!");
             }
             else
