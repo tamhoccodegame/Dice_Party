@@ -5,8 +5,10 @@ using UnityEngine;
 [AddComponentMenu("Breakable Windows/Breakable Window")]
 [RequireComponent(typeof(AudioSource))]
 public class BreakableWindow : MonoBehaviour {
+    public GameObject[] leftTiles;
+    public GameObject[] rightTiles;
 
-    
+
     [Tooltip("Layer should be TransparentFX or your own layer for breakable windows.")]
     public LayerMask layer;
     [Range(2,25)]
@@ -34,7 +36,7 @@ public class BreakableWindow : MonoBehaviour {
 
     [Space]
     public AudioClip breakingSound;
-
+    public AudioSource breakingAudioSource;
 
     [HideInInspector]
     public bool isBroken = false;
@@ -53,12 +55,82 @@ public class BreakableWindow : MonoBehaviour {
         {
             bakeVertices();
             bakeSplinters();
+            GenerateBreakableTiles();
             allreadyCalculated = true;
         }
 
-        if (transform.rotation.eulerAngles.x != 0 || transform.rotation.eulerAngles.z != 0)
+        if (transform.rotation.eulerAngles.x != 90 || transform.rotation.eulerAngles.z != 0)
             Debug.LogWarning("Warning: Window must not be rotated around x and z!");
+
+        // Kiểm tra và khởi tạo AudioSource nếu cần
+        if (breakingAudioSource == null)
+        {
+            breakingAudioSource = GetComponent<AudioSource>();
+            if (breakingAudioSource == null)
+            {
+                breakingAudioSource = gameObject.AddComponent<AudioSource>();
+            }
+        }
+
+        // Kiểm tra xem breakingSound có bị mất giá trị không
+        if (breakingSound == null)
+        {
+            Debug.LogWarning("breakingSound is null in Start()!");
+        }
+        else
+        {
+            breakingAudioSource.clip = breakingSound;
+        }
     }
+
+    void GenerateBreakableTiles()
+    {
+        if (leftTiles == null || rightTiles == null)
+        {
+            Debug.LogError("leftTiles or rightTiles is null!");
+            return; // Dừng hàm nếu mảng là null
+        }
+
+        for (int i = 0; i < leftTiles.Length; i++)
+        {
+            if (leftTiles[i] == null || rightTiles[i] == null)
+            {
+                Debug.LogError($"leftTiles[{i}] or rightTiles[{i}] is null!");
+                continue; // Bỏ qua phần tử null và tiếp tục vòng lặp
+            }
+
+            bool isLeftBreakable = Random.value > 0.5f;
+
+            if (isLeftBreakable)
+            {
+                SetBreakable(leftTiles[i]);
+                SetSolid(rightTiles[i]);
+            }
+            else
+            {
+                SetBreakable(rightTiles[i]);
+                SetSolid(leftTiles[i]);
+            }
+
+            Debug.Log($"Hàng {i}: {(isLeftBreakable ? "Trái vỡ - Phải cứng" : "Phải vỡ - Trái cứng")}");
+        }
+    }
+    void SetBreakable(GameObject tile)
+    {
+        tile.AddComponent<BreakableWindow>(); // Thêm script phá kính
+        tile.GetComponent<Collider>().enabled = false; // Tắt Collider để không thể đứng lên
+        tile.GetComponent<MeshRenderer>().material.color = Color.red; // Đổi màu để dễ kiểm tra
+    }
+    void SetSolid(GameObject tile)
+    {
+        if (tile.GetComponent<BreakableWindow>() != null)
+        {
+            Destroy(tile.GetComponent<BreakableWindow>()); // Xóa script phá kính nếu có
+        }
+        tile.GetComponent<Collider>().enabled = true; // Đảm bảo kính cứng có Collider
+        tile.GetComponent<MeshRenderer>().material.color = Color.green; // Đổi màu để dễ kiểm tra
+    }
+
 
     private void bakeVertices(bool trianglesToo = false)
     {
@@ -199,21 +271,26 @@ public class BreakableWindow : MonoBehaviour {
     {
         if (isBroken == false)
         {
-            if (allreadyCalculated == true)
+            // Phát âm thanh
+            PlayBreakingSound();
+
+            if (preCalculate)
             {
                 splinterParent.SetActive(true);
                 if (addTorques)
                 {
-                    for (int i = 0; i < splinters.Count; i++)
+                    foreach (GameObject splinter in splinters)
                     {
-                        splinters[i].GetComponent<Rigidbody>().AddTorque(new Vector3(Random.value > 0.5f ? Random.value * 50 : -Random.value * 50, Random.value > 0.5f ? Random.value * 50 : -Random.value * 50, Random.value > 0.5f ? Random.value * 50 : -Random.value * 50));
+                        splinter.GetComponent<Rigidbody>().AddTorque(new Vector3(
+                            Random.value > 0.5f ? Random.value * 50 : -Random.value * 50,
+                            Random.value > 0.5f ? Random.value * 50 : -Random.value * 50,
+                            Random.value > 0.5f ? Random.value * 50 : -Random.value * 50));
                     }
                 }
             }
             else
             {
-                bakeVertices();
-                bakeSplinters();
+                GenerateBreakableTiles();
             }
 
             Physics.IgnoreLayerCollision(layer.value, layer.value, true);
@@ -221,17 +298,34 @@ public class BreakableWindow : MonoBehaviour {
             Destroy(GetComponent<MeshRenderer>());
             Destroy(GetComponent<MeshFilter>());
 
-            isBroken = true;            
-        }
-
-        if (breakingSound != null)
-        {
-            GetComponent<AudioSource>().clip = breakingSound;
-            GetComponent<AudioSource>().Play();
+            isBroken = true;
         }
 
         return splinters.ToArray();
     }
+
+    // Hàm riêng để đảm bảo âm thanh được phát đúng cách
+    private void PlayBreakingSound()
+    {
+        if (breakingSound != null)
+        {
+            if (breakingAudioSource != null)
+            {
+                breakingAudioSource.Play();
+                Debug.Log("Phát âm thanh kính vỡ!");
+            }
+            else
+            {
+                Debug.LogError("breakingAudioSource is null!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Chưa có âm thanh kính vỡ!");
+        }
+    }
+
+
 
 
     void OnCollisionEnter(Collision col)
