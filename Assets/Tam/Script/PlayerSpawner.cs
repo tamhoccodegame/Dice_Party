@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using UnityEngine;
 
 public class PlayerSpawner : NetworkBehaviour
@@ -12,17 +12,27 @@ public class PlayerSpawner : NetworkBehaviour
     {
         networkManager = FindFirstObjectByType<NetworkManager>();
     }
-        
+
     public override void Spawned()
     {
         if (!Object.HasStateAuthority) return;
-        Debug.Log(networkManager.GetAllPlayers().Count);
-        Vector3 spawnPosition = new Vector3(70, 0, 90);
+
+        Vector3 baseSpawnPosition = new Vector3(70, 0, 90);
+        int index = 0;
+
         foreach (var player in networkManager.GetAllPlayers())
         {
-            Runner.Spawn(playerPrefabs[Random.Range(0, playerPrefabs.Length)], spawnPosition, Quaternion.identity);
+            Vector3 spawnPosition = baseSpawnPosition + new Vector3(index * 3, 0, 0); // Tạo khoảng cách giữa players
+            index++;
+
+            Runner.Spawn(playerPrefabs[Random.Range(0, playerPrefabs.Length)], spawnPosition, Quaternion.identity, player, (runner, obj) => {
+                obj.GetComponent<NetworkObject>().AssignInputAuthority(player);
+            });
+
+            Debug.Log($"Spawned player {player} với InputAuthority: {player}");
         }
     }
+
 
     // Update is called once per frame
     void Update()

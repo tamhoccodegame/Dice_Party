@@ -75,6 +75,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 35605f004662b0645af57da750ad4040, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3794269428224664925}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 35605f004662b0645af57da750ad4040, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8663478987385893353}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 35605f004662b0645af57da750ad4040, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8979980477152368548}
   m_SourcePrefab: {fileID: 100100000, guid: 35605f004662b0645af57da750ad4040, type: 3}
 --- !u!1 &1410115114858327706 stripped
 GameObject:
@@ -93,4 +99,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3bfab7798c4f264b98e4a137d49592f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: {fileID: 0}
+--- !u!114 &-8663478987385893353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1410115114858327706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 1842310992
+  ObjectInterest: 1
+  Flags: 1
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 3794269428224664925}
+  - {fileID: 8979980477152368548}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &8979980477152368548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1410115114858327706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0

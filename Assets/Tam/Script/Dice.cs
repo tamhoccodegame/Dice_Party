@@ -1,7 +1,8 @@
+using Fusion;
 using TMPro;
 using UnityEngine;
 
-public class Dice : MonoBehaviour
+public class Dice : NetworkBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -15,8 +16,13 @@ public class Dice : MonoBehaviour
         transform.Rotate(new Vector3(90, 90, 90) * 10f * Time.deltaTime);    
     }
 
+    public override void FixedUpdateNetwork()
+    {
+        transform.Rotate(new Vector3(90, 90, 90) * 10f * Runner.DeltaTime);
+    }
+
     public void DestroySelf()
     {
-        Destroy(gameObject);
+        Runner.Despawn(GetComponent<NetworkObject>());
     }
 }

@@ -1,27 +1,27 @@
-﻿using System.Collections;
+﻿using Fusion;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [Header("Move")]
     public BoardNode currentNode;
-    public int currentStep;
+    [Networked] public int currentStep { get; set; }
     private NavMeshAgent agent;
     private Animator animator;
-    public bool waitingForChoice = false;
+    [Networked] public bool waitingForChoice { get; set; }
 
     [Space(20)]
     [Header("ArrowDirection")]
     public GameObject arrowDirectionPrefab;
     public List<GameObject> spawnedArrows = new List<GameObject>();
 
-    [Space(20)]
     [Header("CanMove")]
-    public bool isMyTurn = false;
+    bool isMyTurn => TurnManager.instance.currentPlayerRef == Runner.LocalPlayer;
 
     [Space(20)]
     [Header("Dice and Step")]
@@ -30,37 +30,76 @@ public class PlayerController : MonoBehaviour
     public TextMeshPro stepText;
 
     private Coroutine moveCoroutine;
+    private bool isPressed;
 
-    void Start()
+    public override void Spawned()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         agent.autoBraking = true;
+        currentNode = FindFirstObjectByType<BoardNode>();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && moveCoroutine == null && isMyTurn)
+        if (Input.GetKeyDown(KeyCode.Space) && isMyTurn && moveCoroutine == null)
         {
+            isPressed = true;
+        }
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (isPressed)
+        {
+            isPressed = false;
             currentStep = Random.Range(1, 5);
             stepText.gameObject.SetActive(true);
             stepText.text = currentStep.ToString();
-            activeDice.DestroySelf();
-            moveCoroutine = StartCoroutine(MoveToNextNode());
-        }
 
+            if (activeDice != null) activeDice.DestroySelf();
+
+            RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host
+        }
     }
 
     public void StartTurn()
     {
-        isMyTurn = true;
-        activeDice = Instantiate(dicePrefab, transform.position + new Vector3(0, 3.5f, 0), Quaternion.identity).GetComponent<Dice>();
+        if (HasStateAuthority)
+        {
+            RPC_ShowDice();
+        }
     }
 
     public void EndTurn()
     {
-        isMyTurn = false;
-        GameManager.instance.NextTurn();
+        if (HasStateAuthority)
+        {
+            TurnManager.instance.NextTurn();
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ShowDice()
+    {
+        if (activeDice != null || !Object.HasStateAuthority) return;
+
+        activeDice = Runner.Spawn(dicePrefab, transform.position + new Vector3(0, 3.5f, 0), Quaternion.identity).GetComponent<Dice>();
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestMove(int steps)
+    {
+        if (!HasStateAuthority) return;
+        RPC_Move(steps);
+    }
+
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_Move(int steps)
+    {
+        currentStep = steps;
+        moveCoroutine = StartCoroutine(MoveToNextNode());
     }
 
     IEnumerator MoveToNextNode()
@@ -76,13 +115,10 @@ public class PlayerController : MonoBehaviour
         {
             if (currentNode.nextNodes.Count > 1)
             {
-                // Đợi người chơi chọn hướng nếu có nhiều hơn một lựa chọn
                 waitingForChoice = true;
                 ShowDirectionChoices();
-                while (waitingForChoice) // Chờ người chơi chọn hướng
-                {
-                    yield return null;
-                }
+
+                while (waitingForChoice) yield return null;
             }
             else
             {
@@ -98,33 +134,34 @@ public class PlayerController : MonoBehaviour
 
             currentStep--;
         }
-        yield return null;
+
         animator.CrossFade("Idle", 0.25f);
-        isMyTurn = false;
         TriggerNodeEvent();
         moveCoroutine = null;
         EndTurn();
     }
+
     void ShowDirectionChoices()
     {
         animator.CrossFade("Idle", 0.25f);
         ClearArrow();
-        foreach (var next in currentNode.nextNodes)
+        for (int i = 0; i < currentNode.nextNodes.Count; i++)
         {
+            BoardNode next = currentNode.nextNodes[i];
             Vector3 midPoint = (currentNode.transform.position + next.transform.position) / 2;
             midPoint.y = arrowDirectionPrefab.transform.position.y;
+
             ArrowPointer arrow = Instantiate(arrowDirectionPrefab, midPoint, Quaternion.identity).GetComponent<ArrowPointer>();
             arrow.transform.rotation = Quaternion.LookRotation((next.transform.position - currentNode.transform.position), Vector3.up);
-            arrow.Setup(this, currentNode.nextNodes.IndexOf(next));
+            arrow.Setup(this, i);
             spawnedArrows.Add(arrow.gameObject);
         }
-        // Giả lập hiển thị UI chọn hướng
+
         Debug.Log("Nhấn 1, 2, 3 để chọn hướng!");
     }
 
     void ClearArrow()
     {
-        if (spawnedArrows.Count <= 0) return;
         foreach (var go in spawnedArrows)
         {
             Destroy(go);
@@ -138,14 +175,13 @@ public class PlayerController : MonoBehaviour
         ClearArrow();
         Debug.Log("Bạn chọn hướng: " + (index + 1));
         currentNode = currentNode.nextNodes[index];
-        waitingForChoice = false; // Hủy trạng thái chờ chọn hướng
+        waitingForChoice = false;
         agent.SetDestination(currentNode.transform.position);
     }
 
     void TriggerNodeEvent()
     {
         Debug.Log("Gọi sự kiện của node: " + currentNode.name);
-        currentNode.ProcessNode(); // Giả sử BoardNode có hàm này
+        currentNode.ProcessNode();
     }
-
 }
