@@ -16,7 +16,7 @@ public class TurnManager : NetworkBehaviour
     public Camera cam;
     public Vector3 camOffset;
     private Vector3 targetCamPosition; // Vị trí camera cần đến
-    private float cameraLerpSpeed = 6f; // Tốc độ Lerp (tùy chỉnh)
+    private float cameraLerpSpeed = 4f; // Tốc độ Lerp (tùy chỉnh)
 
     private bool isCameraMoving; // Không dùng Networked nữa
 
@@ -108,7 +108,15 @@ public class TurnManager : NetworkBehaviour
 
     void UpdateTurnUI()
     {
-        turnNotifyText.text = $"{playerController[currentPlayerIndex].name}'s Turn";
+        if(currentPlayerRef == Runner.LocalPlayer)
+        {
+            turnNotifyText.text = "Your Turn";
+        }
+        else
+        {
+            turnNotifyText.text = $"{playerController[currentPlayerIndex].name}'s Turn";
+        }
+
         turnNotifyText.gameObject.SetActive(true);
     }
 

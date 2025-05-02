@@ -20,7 +20,6 @@ public class PlayerController : NetworkBehaviour
     public GameObject arrowDirectionPrefab;
     public List<GameObject> spawnedArrows = new List<GameObject>();
 
-    [Header("CanMove")]
     bool isMyTurn => TurnManager.instance.currentPlayerRef == Runner.LocalPlayer;
 
     [Space(20)]
@@ -57,7 +56,11 @@ public class PlayerController : NetworkBehaviour
             stepText.gameObject.SetActive(true);
             stepText.text = currentStep.ToString();
 
-            if (activeDice != null) activeDice.DestroySelf();
+            if (activeDice != null)
+            {
+                activeDice.DestroySelf();
+                activeDice = null;
+            }
 
             RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host
         }
@@ -90,7 +93,6 @@ public class PlayerController : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestMove(int steps)
     {
-        if (!HasStateAuthority) return;
         RPC_Move(steps);
     }
 

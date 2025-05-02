@@ -23,6 +23,12 @@ public class Dice : NetworkBehaviour
 
     public void DestroySelf()
     {
-        Runner.Despawn(GetComponent<NetworkObject>());
+        RPC_DestroySelf();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_DestroySelf()
+    {
+        Destroy(gameObject);
     }
 }
