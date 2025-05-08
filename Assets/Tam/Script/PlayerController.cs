@@ -2,16 +2,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : NetworkBehaviour
 {
+    [Header("Stat")]
+    public float moveSpeed;
+    public float rotationSpeed;
+
     [Header("Move")]
     public BoardNode currentNode;
     [Networked] public int currentStep { get; set; }
-    private NavMeshAgent agent;
+    private CharacterController controller;
     private Animator animator;
     [Networked] public bool waitingForChoice { get; set; }
 
@@ -33,9 +38,8 @@ public class PlayerController : NetworkBehaviour
 
     public override void Spawned()
     {
-        agent = GetComponent<NavMeshAgent>();
+        controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
-        agent.autoBraking = true;
         currentNode = FindFirstObjectByType<BoardNode>();
     }
 
@@ -63,6 +67,15 @@ public class PlayerController : NetworkBehaviour
             }
 
             RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host
+        }
+
+        Vector3 direction = (currentNode.transform.position - transform.position).normalized;
+        direction.y = 0;
+        if (direction != Vector3.zero) // Tránh lỗi khi direction là zero
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            Quaternion newRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
+            transform.rotation = newRotation;
         }
     }
 
@@ -127,10 +140,12 @@ public class PlayerController : NetworkBehaviour
                 currentNode = currentNode.nextNodes[0];
             }
 
-            agent.SetDestination(currentNode.transform.position);
-
-            while (Vector3.Distance(transform.position, currentNode.transform.position) > 1.7f)
+            while (Vector3.Distance(transform.position, currentNode.transform.position) > 1.3f)
             {
+                Vector3 direction = (currentNode.transform.position - transform.position).normalized;
+                Vector3 movement = direction * moveSpeed * Runner.DeltaTime;
+
+                controller.Move(movement);
                 yield return null;
             }
 
@@ -178,7 +193,7 @@ public class PlayerController : NetworkBehaviour
         Debug.Log("Bạn chọn hướng: " + (index + 1));
         currentNode = currentNode.nextNodes[index];
         waitingForChoice = false;
-        agent.SetDestination(currentNode.transform.position);
+        //Move
     }
 
     void TriggerNodeEvent()

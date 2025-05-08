@@ -90,17 +90,16 @@ public class TurnManager : NetworkBehaviour
     {
         if (!HasStateAuthority) return;
 
-        currentPlayerIndex = (currentPlayerIndex + 1) % playerController.Count;
-        currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
-
-        RPC_NextTurn(currentPlayerIndex, currentPlayerRef);
+        RPC_NextTurn();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_NextTurn(int newIndex, PlayerRef newPlayerRef)
+    public void RPC_NextTurn()
     {
-        currentPlayerIndex = newIndex;
-        currentPlayerRef = newPlayerRef;
+
+        currentPlayerIndex = (currentPlayerIndex + 1) % playerController.Count;
+        currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
+
         playerController[currentPlayerIndex].StartTurn();
         UpdateTurnUI();
         StartFollowTarget();
