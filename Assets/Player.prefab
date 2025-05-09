@@ -2833,10 +2833,8 @@ GameObject:
   - component: {fileID: -5833059894958035310}
   - component: {fileID: 336875461704232483}
   - component: {fileID: 5673406980010025986}
-  - component: {fileID: 1723543133382975127}
-  - component: {fileID: 2450850399698432518}
   m_Layer: 0
-  m_Name: C05
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2879,7 +2877,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 7466400ba5d940d882bbb7dee5ef9201, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -2916,15 +2914,13 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 4085858273
+  SortKey: 1749944299
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -1359556976780472910}
   - {fileID: 336875461704232483}
-  - {fileID: 1723543133382975127}
-  - {fileID: 2450850399698432518}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &336875461704232483
 MonoBehaviour:
@@ -2974,36 +2970,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &1723543133382975127
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2591654762118859964}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7050caa888943444bc5334fdd96e0c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hair: {fileID: 5616962125916618925}
-  color: {fileID: 8536833452002015234}
-  bodypart: {fileID: 2766755286650585113}
---- !u!114 &2450850399698432518
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2591654762118859964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b8d48cade35023408dfbd668f812fb2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hair: {fileID: 5616962125916618925}
-  color: {fileID: 8536833452002015234}
-  bodypart: {fileID: 2766755286650585113}
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0

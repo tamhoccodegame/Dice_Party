@@ -21,10 +21,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     private List<PlayerRef> players = new List<PlayerRef>();
     public event Action onPlayerListChange;
 
+    public static CustomData customData;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         instance = this;
+        customData = GetComponent<CustomData>();
         sessionNameInput.onValueChanged.AddListener(UpdateSessionName);
     }
 

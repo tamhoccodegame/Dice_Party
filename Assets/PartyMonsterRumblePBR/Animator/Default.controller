@@ -22,32 +22,6 @@ AnimatorController:
     m_IKPass: 0
     m_SyncedLayerAffectsTiming: 0
     m_Controller: {fileID: 9100000}
---- !u!1102 &1102043540083233572
-AnimatorState:
-  serializedVersion: 6
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Idle02
-  m_Speed: 1
-  m_CycleOffset: 0
-  m_Transitions: []
-  m_StateMachineBehaviours: []
-  m_Position: {x: 50, y: 50, z: 0}
-  m_IKOnFeet: 0
-  m_WriteDefaultValues: 1
-  m_Mirror: 0
-  m_SpeedParameterActive: 0
-  m_MirrorParameterActive: 0
-  m_CycleOffsetParameterActive: 0
-  m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 31bf5bc6cdb44bb58db60b63e07bf429, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
 --- !u!1102 &1102566695410236018
 AnimatorState:
   serializedVersion: 6
@@ -100,14 +74,14 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
---- !u!1102 &1102791408949158890
+--- !u!1102 &1102723177257384404
 AnimatorState:
   serializedVersion: 6
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Idle03
+  m_Name: RollDice
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -120,7 +94,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: c0f625d054c544b7b4033de672c03175, type: 3}
+  m_Motion: {fileID: 7400000, guid: c3e32176ced6478082661c6c296f19b2, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -139,17 +113,11 @@ AnimatorStateMachine:
     m_State: {fileID: 1102566695410236018}
     m_Position: {x: 300, y: 24, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: 1102043540083233572}
-    m_Position: {x: 300, y: 84, z: 0}
-  - serializedVersion: 1
-    m_State: {fileID: 1102791408949158890}
-    m_Position: {x: 300, y: 144, z: 0}
-  - serializedVersion: 1
     m_State: {fileID: 1102587808605333776}
-    m_Position: {x: 520, y: 80, z: 0}
+    m_Position: {x: 520, y: -20, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: 6874665835886827424}
-    m_Position: {x: 520, y: 20, z: 0}
+    m_State: {fileID: 1102723177257384404}
+    m_Position: {x: 520, y: 280, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []

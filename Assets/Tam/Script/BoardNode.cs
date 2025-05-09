@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 
-public class BoardNode : MonoBehaviour
+public class BoardNode : NetworkBehaviour
 {
     public List<BoardNode> nextNodes;
     public enum EventType
@@ -25,9 +26,16 @@ public class BoardNode : MonoBehaviour
         
     }
 
-    public void ProcessNode()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestProcessNode(PlayerRef player)
     {
-        switch(eventType)
+        RPC_ProcessNode(player);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_ProcessNode(PlayerRef player)
+    {
+        switch (eventType)
         {
             case EventType.Key:
                 Debug.Log("Add Key");

@@ -2,14 +2,21 @@
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class HostLobby : NetworkBehaviour
 {
-    public TextMeshProUGUI playerListText;  // UI để hiển thị danh sách người chơi
     private NetworkManager networkManager;
+
+    public Transform[] avatarStandingPosition;
+    public GameObject[] playerPrefabs;
+
+    public Transform playerSlotTemplate;
+    public Transform playerSlotContainer;
 
     private void Awake()
     {
@@ -18,32 +25,66 @@ public class HostLobby : NetworkBehaviour
 
     public override void Spawned()
     {
-        Invoke(nameof(UpdatePlayerList),0.5f);
+        Invoke(nameof(RPC_UpdatePlayerList),0.5f);
         networkManager.onPlayerListChange += NetworkManager_onPlayerListChange;
     }
 
     private void NetworkManager_onPlayerListChange()
     {
-        UpdatePlayerList();
+        RPC_RequestUpdatePlayerList();
     }
 
-    void UpdatePlayerList()
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    void RPC_RequestUpdatePlayerList()
     {
-        List<PlayerRef> players = networkManager.GetAllPlayers();
-        Debug.Log(players.Count);
-        players.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
-
-        playerListText.text = "Player: \n";
-        foreach (PlayerRef player in players)
+        if (!HasStateAuthority)
         {
-            playerListText.text += $"Player {player.PlayerId} \n";
+            RPC_UpdatePlayerList();
         }
     }
 
-    public void StartGame()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_UpdatePlayerList()
     {
-        Runner.LoadScene("BoardScene");
+        List<PlayerRef> players = networkManager.GetAllPlayers();
+       
+        players.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
+
+        foreach (PlayerRef player in players)
+        {
+            var avatar = Runner.Spawn(playerPrefabs[player.PlayerId - 1], 
+                                            avatarStandingPosition[player.PlayerId - 1].position, 
+                                            Quaternion.identity, player);
+            avatar.GetComponent<CharacterController>().enabled = false;
+            avatar.GetComponent<PlayerController>().enabled = false;
+            avatar.GetComponent<PlayerSetup>().enabled = false;
+
+            PlayerCustom playerCustom = avatar.GetComponent<PlayerCustom>();
+            playerCustom.enabled = true;
+
+            var p = Instantiate(playerSlotTemplate, playerSlotContainer);
+            p.gameObject.SetActive(true);
+            p.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = player.PlayerId.ToString();
+
+            //Lần lượt gán các event cho tương tác với playercustom
+            //p.transform.Find("NextButton").GetComponent<Button>().onClick.AddListener(() => { playerCustom.NextHair(); });
+        }
     }
+
+    public async void StartGame()
+    {
+        PlayerCustom[] playerCustoms = FindObjectsOfType<PlayerCustom>();
+        foreach (PlayerCustom playerCustom in playerCustoms)
+        {
+            playerCustom.RPC_ApplyCustom();
+        }
+
+        await Task.Delay(1000);
+
+        await Runner.LoadScene("BoardScene");
+    }
+
+    
    
 }
 

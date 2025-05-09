@@ -15,6 +15,8 @@ public class PlayerController : NetworkBehaviour
 
     [Header("Move")]
     public BoardNode currentNode;
+    public BoardNode toMoveNode;
+
     [Networked] public int currentStep { get; set; }
     private CharacterController controller;
     private Animator animator;
@@ -69,7 +71,7 @@ public class PlayerController : NetworkBehaviour
             RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host
         }
 
-        Vector3 direction = (currentNode.transform.position - transform.position).normalized;
+        Vector3 direction = (currentNode.nextNodes[0].transform.position - transform.position).normalized;
         direction.y = 0;
         if (direction != Vector3.zero) // Tránh lỗi khi direction là zero
         {
@@ -137,18 +139,20 @@ public class PlayerController : NetworkBehaviour
             }
             else
             {
-                currentNode = currentNode.nextNodes[0];
+                toMoveNode = currentNode.nextNodes[0];
             }
 
-            while (Vector3.Distance(transform.position, currentNode.transform.position) > 1.3f)
+            while (Vector3.Distance(transform.position, toMoveNode.transform.position) > 1.3f)
             {
-                Vector3 direction = (currentNode.transform.position - transform.position).normalized;
+                Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
                 Vector3 movement = direction * moveSpeed * Runner.DeltaTime;
 
                 controller.Move(movement);
+
                 yield return null;
             }
 
+            currentNode = toMoveNode;
             currentStep--;
         }
 
@@ -191,7 +195,7 @@ public class PlayerController : NetworkBehaviour
         animator.CrossFade("Run", 0.25f);
         ClearArrow();
         Debug.Log("Bạn chọn hướng: " + (index + 1));
-        currentNode = currentNode.nextNodes[index];
+        toMoveNode = currentNode.nextNodes[index];
         waitingForChoice = false;
         //Move
     }
@@ -199,6 +203,6 @@ public class PlayerController : NetworkBehaviour
     void TriggerNodeEvent()
     {
         Debug.Log("Gọi sự kiện của node: " + currentNode.name);
-        currentNode.ProcessNode();
+        currentNode.RPC_RequestProcessNode(Runner.LocalPlayer);
     }
 }

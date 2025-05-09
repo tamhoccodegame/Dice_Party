@@ -4,8 +4,7 @@ using UnityEngine;
 public class PlayerSpawner : NetworkBehaviour
 {
     private NetworkManager networkManager;
-
-    public GameObject[] playerPrefabs;
+    public GameObject playerPrefab;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -25,11 +24,10 @@ public class PlayerSpawner : NetworkBehaviour
             Vector3 spawnPosition = baseSpawnPosition + new Vector3(index * 3, 0, 0); // Tạo khoảng cách giữa players
             index++;
 
-            Runner.Spawn(playerPrefabs[Random.Range(0, playerPrefabs.Length)], spawnPosition, Quaternion.identity, player, (runner, obj) => {
+            Runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player, (runner, obj) =>
+            {
                 obj.GetComponent<NetworkObject>().AssignInputAuthority(player);
             });
-
-            Debug.Log($"Spawned player {player} với InputAuthority: {player}");
         }
     }
 
@@ -37,7 +35,7 @@ public class PlayerSpawner : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     private void OnDestroy()
     {
