@@ -1,74 +1,110 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Car : MonoBehaviour
 {
     [Header("Car Settings")]
     public float moveSpeed = 10f;               // Tốc độ di chuyển cơ bản
     public float boostedSpeed = 20f;            // Tốc độ khi nhấn Shift
-    public float turnSpeed = 50f;               // Tốc độ xoay khi rẽ trái/phải
-    public float acceleration = 5f;             // Thời gian để đạt đến tốc độ mong muốn
-    public float turnSmoothTime = 0.2f;         // Thời gian làm mượt khi chuyển hướng
+    public float turnSpeed = 50f;               // Tốc độ xoay
+    public float acceleration = 5f;             // Thời gian làm mượt tốc độ
 
     [Header("Wheels")]
-    public Transform frontLeftWheel;            // Transform của bánh trước bên trái
-    public Transform frontRightWheel;           // Transform của bánh trước bên phải
-    public Transform rearLeftWheel;             // Transform của bánh sau bên trái
-    public Transform rearRightWheel;            // Transform của bánh sau bên phải
+    public Transform frontLeftWheel;            // Bánh trước trái
+    public Transform frontRightWheel;           // Bánh trước phải
+    public Transform rearLeftWheel;             // Bánh sau trái
+    public Transform rearRightWheel;            // Bánh sau phải
 
-    [Header("Steering Settings")]
-    public Transform frontLeftSteerPivot;       // Pivot để rẽ của bánh trước trái
-    public Transform frontRightSteerPivot;      // Pivot để rẽ của bánh trước phải
-    public float maxSteerAngle = 30f;           // Góc rẽ tối đa của bánh trước
-    public float wheelSpinSpeed = 360f;         // Tốc độ quay của bánh xe
+    [Header("Steering")]
+    public Transform frontLeftSteerPivot;       // Pivot rẽ bánh trước trái
+    public Transform frontRightSteerPivot;      // Pivot rẽ bánh trước phải
+    public float maxSteerAngle = 30f;           // Góc rẽ tối đa
+    public float wheelSpinSpeed = 360f;         // Tốc độ quay bánh
 
-    private float currentSpeed;                 // Tốc độ hiện tại của xe (mượt hơn)
-    private float velocity = 0f;                // Biến tạm dùng cho SmoothDamp
-    private bool isBoosting = false;            // Cờ kiểm tra có đang tăng tốc không
+    private float currentSpeed = 0f;            // Tốc độ hiện tại
+    private float velocity = 0f;                // Dùng cho SmoothDamp
     private Rigidbody rb;                       // Rigidbody của xe
+    private bool isBoosting = false;            // Cờ kiểm tra tăng tốc
 
     private void Start()
     {
-        // Gán rigidbody từ object xe
-        rb = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>(); // Lấy Rigidbody
+
+        // Chống xe bị nghiêng khi va chạm
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+        // Làm mượt vật lý
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+
+        // Ngăn vật thể xuyên qua ground khi di chuyển nhanh
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
     }
+
 
     private void Update()
     {
         HandleMovement();   // Điều khiển xe
-        RotateWheels();     // Xoay bánh xe
+        RotateWheels();     // Quay bánh xe
         SteerWheels();      // Rẽ bánh xe
     }
 
+    void FixedUpdate()
+    {
+        // Xoá nghiêng trục Z và X mỗi khung
+        Vector3 currentRotation = transform.eulerAngles;
+        currentRotation.z = 0;
+        currentRotation.x = 0;
+        transform.eulerAngles = currentRotation;
+
+        // Giữ xe không chìm xuống: kiểm tra nếu xe dưới mặt đất thì đẩy lên
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1f))
+        {
+            if (hit.collider.CompareTag("Ground"))
+            {
+                float distanceToGround = hit.distance;
+                float minHeight = 0.5f; // khoảng cách tối thiểu từ thân xe đến mặt đất
+
+                if (distanceToGround < minHeight)
+                {
+                    // Đẩy xe nhẹ lên để tránh chìm
+                    rb.MovePosition(rb.position + Vector3.up * (minHeight - distanceToGround));
+                }
+            }
+        }
+    }
+
+
     void HandleMovement()
     {
-        // Nhận input tăng/giảm tốc độ (W/S)
-        float vertical = Input.GetAxis("Vertical");
+        float vertical = Input.GetAxis("Vertical"); // Nhận input W/S
+        float horizontal = Input.GetAxis("Horizontal"); // Nhận input A/D
 
-        // Kiểm tra nếu nhấn Shift thì tăng tốc
+        // Kiểm tra có tăng tốc không
         isBoosting = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         float targetSpeed = vertical * (isBoosting ? boostedSpeed : moveSpeed);
 
-        // Làm mượt tốc độ xe
+        // Làm mượt tốc độ thay đổi
         currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref velocity, acceleration * Time.deltaTime);
 
-        // Nhận input rẽ trái/phải (A/D)
-        float horizontal = Input.GetAxis("Horizontal");
+        // Di chuyển xe bằng MovePosition
+        Vector3 movement = transform.forward * currentSpeed * Time.deltaTime;
+        rb.MovePosition(rb.position + movement);
 
-        // Xoay thân xe
-        transform.Rotate(Vector3.up, horizontal * turnSpeed * Time.deltaTime);
+        // Tính góc xoay theo input A/D
+        float turn = horizontal * turnSpeed * Time.deltaTime;
 
-        // Di chuyển xe theo hướng đang quay
-        transform.Translate(Vector3.forward * currentSpeed * Time.deltaTime);
+        // Tạo quaternion quay mới từ góc
+        Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
 
-       
+        // Quay xe bằng MoveRotation để không bị rung
+        rb.MoveRotation(rb.rotation * turnRotation);
     }
 
     void RotateWheels()
     {
-        // Tính toán góc quay của bánh xe dựa theo tốc độ hiện tại
+        // Quay bánh xe dựa theo tốc độ
         float rotationAmount = currentSpeed * wheelSpinSpeed * Time.deltaTime;
 
-        // Xoay từng bánh xe theo chiều chạy
         frontLeftWheel.Rotate(Vector3.right, rotationAmount);
         frontRightWheel.Rotate(Vector3.right, rotationAmount);
         rearLeftWheel.Rotate(Vector3.right, rotationAmount);
@@ -77,13 +113,10 @@ public class Car : MonoBehaviour
 
     void SteerWheels()
     {
-        // Lấy input rẽ trái/phải (A/D)
         float horizontal = Input.GetAxis("Horizontal");
-
-        // Tính góc cần rẽ
         float steerAngle = maxSteerAngle * horizontal;
 
-        // Tạo góc quay mượt cho trục bánh trước
+        // Rẽ bánh trước mượt
         Quaternion targetRotation = Quaternion.Euler(0, steerAngle, 0);
         frontLeftSteerPivot.localRotation = Quaternion.Lerp(frontLeftSteerPivot.localRotation, targetRotation, Time.deltaTime * 5f);
         frontRightSteerPivot.localRotation = Quaternion.Lerp(frontRightSteerPivot.localRotation, targetRotation, Time.deltaTime * 5f);
@@ -93,23 +126,8 @@ public class Car : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            // Lấy hướng va chạm trung bình từ các điểm tiếp xúc
-            Vector3 averageNormal = Vector3.zero;
-            foreach (ContactPoint contact in collision.contacts)
-            {
-                averageNormal += contact.normal;
-            }
-            averageNormal.Normalize();
-
-            // Đẩy ngược theo mặt tiếp xúc, loại bỏ trục Y để không bị chìm
-            Vector3 horizontalPushDir = Vector3.ProjectOnPlane(-averageNormal, Vector3.up).normalized;
-
-            // Xác định lực đẩy dựa vào có boost hay không
-            float forceMagnitude = isBoosting ? 20f : 10f;
-
-            // Áp dụng lực đẩy về phía ngược lại
-            rb.AddForce(horizontalPushDir * forceMagnitude, ForceMode.Impulse);
+            // Không làm gì - Rigidbody và Collider sẽ tự xử lý va chạm
+            // Bạn có thể thêm hiệu ứng hoặc âm thanh tại đây nếu cần
         }
     }
-
 }
