@@ -9,6 +9,7 @@ public class NetworkSpawner : NetworkBehaviour
 
     public override void Spawned()
     {
+        if(Object.HasStateAuthority)
         Runner.Spawn(obj, Vector3.zero, Quaternion.identity, Runner.LocalPlayer);
     }
 }

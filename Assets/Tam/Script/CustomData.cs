@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CustomData : MonoBehaviour
 {
-    public int hairIndex { get; set; }
-    public int colorIndex { get; set; }
-    public int bodyPartIndex { get; set; }    
+    public int hairIndex { get; set; } = 0;
+    public int colorIndex { get; set; } = 0;
+    public int bodyPartIndex { get; set; } = 0;  
 }

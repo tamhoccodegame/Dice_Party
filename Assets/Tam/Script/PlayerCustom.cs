@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
@@ -9,9 +9,9 @@ public class PlayerCustom : NetworkBehaviour
     public Transform color;
     public Transform bodypart;
 
-    int currentHairIndex = 0;
-    int currentColorIndex = 0;
-    int currentBodypartIndex = 0;
+    public int currentHairIndex = 0;
+    public int currentColorIndex = 0;
+    public int currentBodypartIndex = 0;
 
     public override void Spawned()
     {
@@ -42,20 +42,27 @@ public class PlayerCustom : NetworkBehaviour
             }
         }
 
+        //Apply Local
         ApplyHair(currentColorIndex);
         ApplyColor(currentColorIndex);
         ApplyBodypart(currentBodypartIndex);
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestApplyCustom()
+    public void RPC_RequestApplyCustom(int hairIndex, int colorIndex, int bodypartIndex)
     {
-        RPC_ApplyCustom();
+        Debug.Log($"ID {Runner.LocalPlayer.PlayerId}: Tôi gửi yêu cầu Apply lên host rồi!");
+        RPC_ApplyCustom(hairIndex, colorIndex, bodypartIndex);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_ApplyCustom()
+    public void RPC_ApplyCustom(int hairIndex, int colorIndex, int bodypartIndex)
     {
+        Debug.Log($"Host nhận thông tin: hairIndex:{hairIndex} colorIndex:{colorIndex} bodypartIndex:{bodypartIndex}");
+        ApplyHair(hairIndex);
+        ApplyColor(colorIndex);
+        ApplyBodypart(bodypartIndex);
+
         CustomData customData = NetworkManager.customData;
         if (customData != null)
         {
@@ -65,7 +72,6 @@ public class PlayerCustom : NetworkBehaviour
         }
     }
 
-    [ContextMenu("NextHair")]
     public void NextHair()
     {
         if (!Object.HasInputAuthority) return;
@@ -74,7 +80,6 @@ public class PlayerCustom : NetworkBehaviour
         ApplyHair(currentHairIndex);
     }
 
-    [ContextMenu("PrevHair")]
     public void PrevHair()
     {
         if (!Object.HasInputAuthority) return;
@@ -86,8 +91,6 @@ public class PlayerCustom : NetworkBehaviour
 
     public void ApplyHair(int index)
     {
-        if (!Object.HasInputAuthority) return;
-
         currentHairIndex = Mathf.Clamp(index, 0, hair.childCount - 1);
 
         for (int i = 0; i < hair.childCount; i++)
@@ -96,7 +99,6 @@ public class PlayerCustom : NetworkBehaviour
         }
     }
 
-    [ContextMenu("NextColor")]
     public void NextColor()
     {
         if (!Object.HasInputAuthority) return;
@@ -105,7 +107,6 @@ public class PlayerCustom : NetworkBehaviour
         ApplyColor(currentColorIndex);
     }
 
-    [ContextMenu("PrevColor")]
     public void PrevColor()
     {
         if (!Object.HasInputAuthority) return;
@@ -117,8 +118,6 @@ public class PlayerCustom : NetworkBehaviour
 
     public void ApplyColor(int index)
     {
-        if (!Object.HasInputAuthority) return;
-
         currentColorIndex = Mathf.Clamp(index, 0, color.childCount - 1);
 
         for (int i = 0; i < color.childCount; i++)
@@ -127,7 +126,6 @@ public class PlayerCustom : NetworkBehaviour
         }
     }
 
-    [ContextMenu("NextBodypart")]
     public void NextBodypart()
     {
         if (!Object.HasInputAuthority) return;
@@ -136,7 +134,6 @@ public class PlayerCustom : NetworkBehaviour
         ApplyBodypart(currentBodypartIndex);
     }
 
-    [ContextMenu("PrevBodypart")]
     public void PrevBodypart()
     {
         if (!Object.HasInputAuthority) return;
@@ -148,8 +145,6 @@ public class PlayerCustom : NetworkBehaviour
 
     public void ApplyBodypart(int index)
     {
-        if (!Object.HasInputAuthority) return;
-
         currentBodypartIndex = Mathf.Clamp(index, 0, bodypart.childCount - 1);
 
         for (int i = 0; i < bodypart.childCount; i++)

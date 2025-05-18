@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public static NetworkManager instance;
-    private NetworkRunner runner;
+    public static NetworkRunner runnerInstance;
 
     public TMP_InputField sessionNameInput;
     private string sessionName;
@@ -43,8 +43,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public async void HostSever()
     {
-        runner = gameObject.AddComponent<NetworkRunner>();
-        runner.ProvideInput = true;
+        runnerInstance = gameObject.AddComponent<NetworkRunner>();
+        runnerInstance.ProvideInput = true;
 
         var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex + 1);
         var sceneInfo = new NetworkSceneInfo();
@@ -53,7 +53,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
         }
 
-        await runner.StartGame(new StartGameArgs()
+        await runnerInstance.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Host,
             SessionName = sessionName,
@@ -67,7 +67,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public async void LoadScene(string sceneName)
     {
-        await runner.LoadScene(sceneName);
+        await runnerInstance.LoadScene(sceneName);
         TriggerSceneLoaded();
     }
 
@@ -79,8 +79,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public async void JoinSever()
     {
-        runner = gameObject.AddComponent<NetworkRunner>();
-        await runner.StartGame(new StartGameArgs
+        runnerInstance = gameObject.AddComponent<NetworkRunner>();
+        await runnerInstance.StartGame(new StartGameArgs
         {
             GameMode = GameMode.Client,
             SessionName = sessionName,
