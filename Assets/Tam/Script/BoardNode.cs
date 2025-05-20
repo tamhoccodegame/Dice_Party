@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BoardNode : NetworkBehaviour
 {
+    public bool isStartNode = false;
     public List<BoardNode> nextNodes;
     public enum EventType
     {

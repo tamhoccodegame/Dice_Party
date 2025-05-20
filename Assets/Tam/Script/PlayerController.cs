@@ -39,8 +39,9 @@ public class PlayerController : NetworkBehaviour
     public override void Spawned()
     {
         controller = GetComponent<CharacterController>();
+        controller.enabled = true;
         animator = GetComponent<Animator>();
-        currentNode = FindFirstObjectByType<BoardNode>();
+        currentNode = GameObject.Find("Dice (7)").GetComponent<BoardNode>();
     }
 
     void Update()
@@ -69,7 +70,7 @@ public class PlayerController : NetworkBehaviour
             RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host
         }
 
-        Vector3 direction = (currentNode.nextNodes[0].transform.position - transform.position).normalized;
+        Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
         direction.y = 0;
         if (direction != Vector3.zero) // Tránh lỗi khi direction là zero
         {
@@ -100,7 +101,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (activeDice != null || !Object.HasStateAuthority) return;
 
-        activeDice = Runner.Spawn(dicePrefab, transform.position + new Vector3(0, 3.5f, 0), Quaternion.identity).GetComponent<Dice>();
+        activeDice = Runner.Spawn(dicePrefab, transform.position + new Vector3(0, 5f, 0), Quaternion.identity).GetComponent<Dice>();
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -140,7 +141,7 @@ public class PlayerController : NetworkBehaviour
                 toMoveNode = currentNode.nextNodes[0];
             }
 
-            while (Vector3.Distance(transform.position, toMoveNode.transform.position) > 1.3f)
+            while (Vector3.Distance(transform.position, toMoveNode.transform.position) > 0.5f)
             {
                 Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
                 Vector3 movement = direction * moveSpeed * Runner.DeltaTime;

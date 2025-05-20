@@ -15,7 +15,7 @@ public class PlayerSpawner : NetworkBehaviour
     public override void Spawned()
     {
         if (!Object.HasStateAuthority) return;
-        BoardNode spawn = FindFirstObjectByType<BoardNode>();
+        BoardNode spawn = GameObject.Find("Dice (7)").GetComponent<BoardNode>();
 
         Vector3 baseSpawnPosition = spawn.transform.position;
 
