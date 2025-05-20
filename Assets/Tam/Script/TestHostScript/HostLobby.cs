@@ -24,16 +24,21 @@ public class HostLobby : NetworkBehaviour
 
     public override void Spawned()
     {
+        if (Object.HasStateAuthority)
+        {
+            EnsureReadyStatusInit();
+            UpdatePlayerList();
+        }
+        else
+        {
+            RPC_RequestUpdatePlayerList();
+        }
         networkManager.onPlayerListChange += NetworkManager_onPlayerListChange;
     }
 
     public async void StartGame()
     {
-        PlayerCustom[] playerCustoms = FindObjectsOfType<PlayerCustom>();
-        foreach (PlayerCustom p in playerCustoms)
-        {
-            p.RPC_RequestApplyCustom(p.currentHairIndex, p.currentColorIndex, p.currentBodypartIndex);
-        }
+        RequestApplyCustom();
 
         await Task.Delay(1000);
         Debug.Log("Runner: " + Runner);
@@ -49,10 +54,13 @@ public class HostLobby : NetworkBehaviour
             EnsureReadyStatusInit();
             UpdatePlayerList();
         }
+        else
+        {
+            RPC_RequestUpdatePlayerList();
+        }
     }
     public void OnClickSetReady(bool ready)
     {
-        // Gọi RPC, truyền tham số bình thường
         PlayerRef player = Runner.LocalPlayer;
         RPC_RequestSetReady(player, ready);
     }
@@ -60,22 +68,15 @@ public class HostLobby : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestSetReady(PlayerRef player, bool ready)
     {
-        RPC_SetReady(player, ready);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SetReady(PlayerRef player, bool ready)
-    {
         readyStatus.Set(player, ready);
         foreach (var kvp in readyStatus)
         {
             Debug.Log($"Player: {kvp.Key} Ready: {kvp.Value}");
         }
 
-        if(Object.HasStateAuthority) 
-        UpdatePlayerList();
+        if (Object.HasStateAuthority)
+            UpdatePlayerList();
     }
-
 
     void EnsureReadyStatusInit()
     {
@@ -89,6 +90,11 @@ public class HostLobby : NetworkBehaviour
         }
     }
 
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    void RPC_RequestUpdatePlayerList()
+    {
+        RPC_UpdatePlayerList();
+    }
 
     void UpdatePlayerList()
     {
@@ -103,6 +109,7 @@ public class HostLobby : NetworkBehaviour
 
         foreach (PlayerRef player in players)
         {
+            //Spawn Avatar (model 3D)
             if (!spawnedAvatars.ContainsKey(player))
             {
                 var avatar = Runner.Spawn(playerPrefabs[0],
@@ -111,23 +118,24 @@ public class HostLobby : NetworkBehaviour
                 spawnedAvatars.Add(player, avatar);
             }
 
+            //Spawn Slot UI cho Player
             var p = Instantiate(playerSlotTemplate, playerSlotContainer);
             p.gameObject.SetActive(true);
             p.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = player.PlayerId.ToString();
 
             PlayerSlotUI playerSlotUI = p.GetComponent<PlayerSlotUI>();
+            bool isReady = readyStatus.Get(player);
             var readyPanel = playerSlotUI.readyPanel;
-            readyPanel.SetActive(readyStatus.Get(player));
+            readyPanel.SetActive(isReady);
 
-            if (Runner.LocalPlayer == player) continue;
-
-            if(readyPanel.activeSelf)
-                readyPanel.transform.Find("Ready_Button").gameObject.SetActive(false);
-
-            playerSlotUI.unreadyPanel.SetActive(true);
-            playerSlotUI.afterJoinPanel.SetActive(false);
-            playerSlotUI.adjustAppearancePanel.SetActive(false);
-            playerSlotUI.customizePanel.SetActive(false);
+            if (Runner.LocalPlayer != player)
+            {
+                playerSlotUI.unreadyButton.SetActive(false);
+                playerSlotUI.unreadyPanel.SetActive(!isReady);
+                playerSlotUI.adjustAppearancePanel.SetActive(false);
+                playerSlotUI.afterJoinPanel.SetActive(false);
+                playerSlotUI.customizePanel.SetActive(false);
+            }
         }
 
         if (Object.HasStateAuthority)
@@ -141,7 +149,6 @@ public class HostLobby : NetworkBehaviour
         if (Object.HasStateAuthority) return;
 
         List<PlayerRef> players = networkManager.GetAllPlayers();
-
         players.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
 
         foreach (Transform child in playerSlotContainer)
@@ -157,21 +164,18 @@ public class HostLobby : NetworkBehaviour
             p.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = player.PlayerId.ToString();
 
             PlayerSlotUI playerSlotUI = p.GetComponent<PlayerSlotUI>();
+            bool isReady = readyStatus.Get(player);
             var readyPanel = playerSlotUI.readyPanel;
-            readyPanel.SetActive(readyStatus.Get(player));
+            readyPanel.SetActive(isReady);
 
-            if (Runner.LocalPlayer == player) continue;
-
-            if (readyPanel.activeSelf)
-                readyPanel.transform.Find("Ready_Button").gameObject.SetActive(false);
-
-            playerSlotUI.unreadyPanel.SetActive(true);
-            playerSlotUI.afterJoinPanel.SetActive(false);
-            playerSlotUI.adjustAppearancePanel.SetActive(false);
-            playerSlotUI.customizePanel.SetActive(false);
-
-            //Lần lượt gán các event cho tương tác với playercustom
-            //p.transform.Find("NextButton").GetComponent<Button>().onClick.AddListener(() => { playerCustom.NextHair(); });
+            if(Runner.LocalPlayer != player)
+            {
+                playerSlotUI.unreadyButton.SetActive(false);
+                playerSlotUI.unreadyPanel.SetActive(!isReady);
+                playerSlotUI.adjustAppearancePanel.SetActive(false);
+                playerSlotUI.afterJoinPanel.SetActive(false);
+                playerSlotUI.customizePanel.SetActive(false);
+            }
         }
     }
     #endregion
@@ -227,7 +231,7 @@ public class HostLobby : NetworkBehaviour
     {
         var playerCustoms = FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None);
         foreach (var p in playerCustoms)
-            if (p.HasInputAuthority) p.RPC_RequestApplyCustom(p.currentHairIndex, p.currentColorIndex, p.currentBodypartIndex);
+            if (p.HasInputAuthority) p.RequestApplyCustom(p.currentHairIndex, p.currentColorIndex, p.currentBodypartIndex);
     }
     #endregion
 }

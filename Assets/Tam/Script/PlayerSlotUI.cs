@@ -9,5 +9,6 @@ public class PlayerSlotUI : MonoBehaviour
     public GameObject customizePanel;
     public GameObject adjustAppearancePanel;
     public GameObject unreadyPanel;
+    public GameObject unreadyButton;
     public GameObject readyPanel;
 }

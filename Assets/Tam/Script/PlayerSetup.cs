@@ -18,17 +18,14 @@ public class PlayerSetup : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_RequestUpdateCustom(int hairIndex, int colorIndex, int bodyPartIndex)
     {
-        if(Object.HasInputAuthority)
         RPC_UpdateCustom(hairIndex, colorIndex, bodyPartIndex);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_UpdateCustom(int hairIndex, int colorIndex, int bodyPartIndex)
     {
-        CustomData data = NetworkManager.customData;
         for (int i = 0; i < hair.childCount; i++)
         {
-            //Debug.Log(i);
             hair.GetChild(i).gameObject.SetActive(i == hairIndex);
         }
         for (int i = 0; i < color.childCount; i++)

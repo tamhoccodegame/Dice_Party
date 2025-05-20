@@ -41,11 +41,18 @@ public class PlayerCustom : NetworkBehaviour
                 break;
             }
         }
+    }
 
-        //Apply Local
-        ApplyHair(currentColorIndex);
-        ApplyColor(currentColorIndex);
-        ApplyBodypart(currentBodypartIndex);
+    public void RequestApplyCustom(int hairIndex, int colorIndex, int bodypartIndex)
+    {
+        CustomData customData = NetworkManager.customData;
+        if (customData != null)
+        {
+            customData.hairIndex = currentHairIndex;
+            customData.colorIndex = currentColorIndex;
+            customData.bodyPartIndex = currentBodypartIndex;
+        }
+        RPC_RequestApplyCustom(hairIndex, colorIndex, bodypartIndex);       
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -63,13 +70,7 @@ public class PlayerCustom : NetworkBehaviour
         ApplyColor(colorIndex);
         ApplyBodypart(bodypartIndex);
 
-        CustomData customData = NetworkManager.customData;
-        if (customData != null)
-        {
-            customData.hairIndex = currentHairIndex;
-            customData.colorIndex = currentColorIndex;
-            customData.bodyPartIndex = currentBodypartIndex;
-        }
+        
     }
 
     public void NextHair()

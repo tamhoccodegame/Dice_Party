@@ -45,6 +45,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         runnerInstance = gameObject.AddComponent<NetworkRunner>();
         runnerInstance.ProvideInput = true;
+        runnerInstance.AddCallbacks(this);
 
         var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex + 1);
         var sceneInfo = new NetworkSceneInfo();
@@ -80,6 +81,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public async void JoinSever()
     {
         runnerInstance = gameObject.AddComponent<NetworkRunner>();
+        runnerInstance.AddCallbacks(this);
         await runnerInstance.StartGame(new StartGameArgs
         {
             GameMode = GameMode.Client,
@@ -120,7 +122,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
     {
-       
+        SceneManager.LoadScene("UI_StartScene");
     }
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
@@ -133,7 +135,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-        
+        SceneManager.LoadScene("UI_StartScene");
     }
 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
