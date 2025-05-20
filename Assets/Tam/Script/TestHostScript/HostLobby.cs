@@ -43,7 +43,7 @@ public class HostLobby : NetworkBehaviour
         await Task.Delay(1000);
         Debug.Log("Runner: " + Runner);
 
-        await NetworkManager.runnerInstance.LoadScene("BoardScene");
+        await NetworkManager.runnerInstance.LoadScene("TuanSceneMap");
     }
 
     #region UpdatePlayerListUI

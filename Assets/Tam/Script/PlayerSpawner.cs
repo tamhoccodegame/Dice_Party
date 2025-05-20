@@ -15,14 +15,13 @@ public class PlayerSpawner : NetworkBehaviour
     public override void Spawned()
     {
         if (!Object.HasStateAuthority) return;
+        BoardNode spawn = FindFirstObjectByType<BoardNode>();
 
-        Vector3 baseSpawnPosition = new Vector3(70, 0, 90);
-        int index = 0;
+        Vector3 baseSpawnPosition = spawn.transform.position;
 
         foreach (var player in networkManager.GetAllPlayers())
         {
-            Vector3 spawnPosition = baseSpawnPosition + new Vector3(index * 3, 0, 0); // Tạo khoảng cách giữa players
-            index++;
+            Vector3 spawnPosition = baseSpawnPosition;
 
             Runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player, (runner, obj) =>
             {
