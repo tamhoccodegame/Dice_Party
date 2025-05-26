@@ -75,7 +75,7 @@ public class Player2D : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F) && boomPrefab != null && boomSpawnPoint != null)
         {
-            GameObject newBoom = Instantiate(boomPrefab, transform.position, Quaternion.identity);
+            GameObject newBoom = Instantiate(boomPrefab, transform.position, Quaternion.identity);  
             Boom boomScript = newBoom.GetComponent<Boom>();
             if (boomScript != null)
             {
