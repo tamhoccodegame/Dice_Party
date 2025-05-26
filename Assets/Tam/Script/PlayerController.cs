@@ -42,6 +42,7 @@ public class PlayerController : NetworkBehaviour
         controller.enabled = true;
         animator = GetComponent<Animator>();
         currentNode = GameObject.Find("Dice (7)").GetComponent<BoardNode>();
+        toMoveNode = currentNode.nextNodes[0];
     }
 
     void Update()
@@ -202,6 +203,7 @@ public class PlayerController : NetworkBehaviour
     void TriggerNodeEvent()
     {
         Debug.Log("Gọi sự kiện của node: " + currentNode.name);
-        currentNode.RPC_RequestProcessNode(Runner.LocalPlayer);
+        if(HasStateAuthority)
+        currentNode.RPC_ProcessNode(Runner.LocalPlayer);
     }
 }

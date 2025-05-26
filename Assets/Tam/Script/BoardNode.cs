@@ -27,12 +27,6 @@ public class BoardNode : NetworkBehaviour
         
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestProcessNode(PlayerRef player)
-    {
-        RPC_ProcessNode(player);
-    }
-
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_ProcessNode(PlayerRef player)
     {
