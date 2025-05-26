@@ -5,26 +5,31 @@ using UnityEngine;
 
 public class Inventory
 {
-    public Action<List<ItemSO>> onInventoryChange;
+    public Action<List<Item>> onInventoryChange;
+    public Action<GameObject> onItemUsed;
 
-    private List<ItemSO> items = new List<ItemSO>();
+    private List<Item> items = new List<Item>();
 
-    public void AddItem(ItemSO newItem)
+    public void UseItem(Item item)
+    {
+        RemoveItem(item);
+        onItemUsed?.Invoke(ItemAssets.instance.GetPrefab(item.itemType));
+    }
+
+    public void AddItem(Item newItem)
     {
         items.Add(newItem);
         onInventoryChange?.Invoke(items);
     }
 
-    public void RemoveItem(ItemSO item)
+    public void RemoveItem(Item item)
     {
         items.Remove(item);
         onInventoryChange?.Invoke(items);
     }
 
-    public List<ItemSO> GetAllItems()
+    public List<Item> GetAllItems()
     {
         return items;
     }
-    
-
 }

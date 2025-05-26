@@ -12,20 +12,25 @@ public class UIInventory : MonoBehaviour
     public Transform itemSlotTemplate;
     public Transform itemSlotContainer;
 
+    private void Awake()
+    {
+        inventory = new Inventory();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        inventory = new Inventory();
         inventory.onInventoryChange += OnInventoryChange;
         RefreshUI(inventory.GetAllItems());
+        inventory.AddItem(new Item { itemType = Item.ItemType.ElectricGun });
     }
 
-    void OnInventoryChange(List<ItemSO> items)
+    void OnInventoryChange(List<Item> items)
     {
         RefreshUI(items);
     }
 
-    void RefreshUI(List<ItemSO> items)
+    void RefreshUI(List<Item> items)
     {
         foreach(Transform child in itemSlotContainer)
         {
@@ -33,13 +38,17 @@ public class UIInventory : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach(ItemSO item in items)
+        foreach(Item item in items)
         {
             RectTransform itemSlot = Instantiate(itemSlotTemplate, itemSlotContainer).GetComponent<RectTransform>();
-
-            itemSlot.Find("Name").GetComponent<TextMeshProUGUI>().text = item.itemName;
-            itemSlot.Find("Image").GetComponent<Image>().sprite = item.itemSprite;
+            itemSlot.gameObject.SetActive(true);
             //Y như mọi lần
+            itemSlot.GetComponent<Image>().sprite = ItemAssets.instance.GetSprite(item.itemType);
+            itemSlot.GetComponent<Button>().onClick.RemoveAllListeners();
+            itemSlot.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                inventory.UseItem(item);
+            });
         }
     }
 
