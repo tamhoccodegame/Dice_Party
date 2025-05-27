@@ -2831,11 +2831,11 @@ GameObject:
   - component: {fileID: 9105315542713420924}
   - component: {fileID: -1359556976780472910}
   - component: {fileID: -5833059894958035310}
-  - component: {fileID: 336875461704232483}
   - component: {fileID: 5673406980010025986}
   - component: {fileID: 2450850399698432518}
+  - component: {fileID: 4076572559471206847}
   m_Layer: 3
-  m_Name: C05
+  m_Name: BoardGameCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2921,31 +2921,9 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -1359556976780472910}
-  - {fileID: 336875461704232483}
   - {fileID: 2450850399698432518}
+  - {fileID: 4076572559471206847}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &336875461704232483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2591654762118859964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca431270257b189438d30d8c26bdc7e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3
-  rotationSpeed: 5
-  currentNode: {fileID: 0}
-  toMoveNode: {fileID: 0}
-  _currentStep: 0
-  _waitingForChoice: 0
-  arrowDirectionPrefab: {fileID: 9035063740964656231, guid: e788408d93fc4df4c869f756e543deab, type: 3}
-  spawnedArrows: []
-  dicePrefab: {fileID: 1410115114858327706, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
-  stepText: {fileID: 6770067897922902656}
 --- !u!143 &5673406980010025986
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2987,6 +2965,28 @@ MonoBehaviour:
   hair: {fileID: 5616962125916618925}
   color: {fileID: 8536833452002015234}
   bodypart: {fileID: 2766755286650585113}
+--- !u!114 &4076572559471206847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0e1f0a1304070f42b048a3e9f9ea9a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 10
+  rotationSpeed: 20
+  currentNode: {fileID: 0}
+  toMoveNode: {fileID: 0}
+  _currentStep: 0
+  _waitingForChoice: 0
+  arrowDirectionPrefab: {fileID: 9035063740964656231, guid: e788408d93fc4df4c869f756e543deab, type: 3}
+  spawnedArrows: []
+  dicePrefab: {fileID: 1410115114858327706, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+  stepText: {fileID: 6770067897922902656}
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0

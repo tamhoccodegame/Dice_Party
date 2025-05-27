@@ -8,7 +8,7 @@ using UnityEngine;
 public class TurnManager : NetworkBehaviour
 {
     public static TurnManager instance;
-    public List<PlayerController> playerController;
+    public List<BoardGameController> playerController;
     [Networked] public int currentPlayerIndex { get; set; }
     [Networked] public PlayerRef currentPlayerRef { get; set; }
 
@@ -39,7 +39,7 @@ public class TurnManager : NetworkBehaviour
     {
         cam = Camera.main;
 
-        playerController = FindObjectsByType<PlayerController>(FindObjectsSortMode.InstanceID).ToList();
+        playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
 
         if (HasStateAuthority)
         {

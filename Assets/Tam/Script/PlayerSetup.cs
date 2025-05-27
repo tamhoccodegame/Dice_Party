@@ -12,6 +12,7 @@ public class PlayerSetup : NetworkBehaviour
     public override void Spawned()
     {
         CustomData data = NetworkManager.customData;
+        if(data != null) 
         RPC_RequestUpdateCustom(data.hairIndex, data.colorIndex, data.bodyPartIndex);
     }
 

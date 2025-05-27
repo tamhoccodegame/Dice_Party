@@ -8,7 +8,7 @@ public class PlayerItemHandler : MonoBehaviour
     public GameObject currentItem;
 
     private Animator animator;
-    private PlayerController controller;
+    private BoardGameController controller;
     public bool isUsingItem = false;
 
     public Transform handTransform;
@@ -21,7 +21,7 @@ public class PlayerItemHandler : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        controller = GetComponent<PlayerController>();
+        controller = GetComponent<BoardGameController>();
         inventory = UIInventory.inventory;
         inventory.onItemUsed += OnItemUsed;
     }

@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerController : NetworkBehaviour
+public class BoardGameController : NetworkBehaviour
 {
     [Header("Stat")]
     public float moveSpeed;
