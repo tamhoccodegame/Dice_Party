@@ -2,94 +2,141 @@
 
 public class Player2D : MonoBehaviour
 {
-    public float moveSpeed = 5f;            // Tốc độ di chuyển trái/phải
-    public float jumpForce = 7f;            // Lực nhảy khi nhấn Space
-    public float fallMultiplier = 2.5f;     // Hệ số rơi nhanh khi nhấn nhảy và đang rơi
-    public float lowJumpMultiplier = 2f;    // Hệ số rơi nhẹ hơn khi nhả nút Space sớm
+    public float moveSpeed = 5f;         // Tốc độ di chuyển trái/phải
+    public float jumpForce = 7f;         // Lực nhảy
+    public int maxHealth = 100;          // Máu tối đa
+    private int currentHealth;           // Máu hiện tại
 
-    private Rigidbody2D rb;                 // Thành phần vật lý
-    private Animator animator;              // Thành phần animator
-    private bool isGrounded = false;        // Kiểm tra có đang chạm đất không
-    private bool facingRight = true;        // Hướng mặt hiện tại (true = phải)
+    private Rigidbody2D rb;              // Thành phần vật lý
+    private Animator animator;           // Thành phần animation
+    private bool isGrounded;             // Đang đứng trên mặt đất?
+    private bool facingRight = true;     // Hướng nhân vật
+    private bool isDead = false;         // Đã chết?
+
+    public GameObject boomPrefab;        // Prefab quả bom
+    public Transform boomSpawnPoint;     // Vị trí đặt bom
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();       // Gán Rigidbody2D
-        animator = GetComponent<Animator>();    // Gán Animator
-        rb.freezeRotation = true;               // Ngăn Rigidbody2D xoay vòng
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        rb.freezeRotation = true;            // Không xoay nhân vật
+        currentHealth = maxHealth;           // Gán máu ban đầu
     }
 
     void Update()
     {
-        float moveInput = Input.GetAxisRaw("Horizontal"); // Nhận input trái/phải
+        if (isDead) return;
 
-        rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y); // Cập nhật vận tốc theo trục X
+        HandleMovement();        // Di chuyển ngang
+        HandleJump();            // Nhảy
+        HandleIdle();            // Đứng yên
+        HandleDropBomb();        // Thả bomb
+        ApplyExtraGravity();     // Tăng lực hút khi rơi
+    }
 
-        animator.SetFloat("IsRun", Mathf.Abs(moveInput)); // Cập nhật trạng thái chạy
+    private void HandleMovement()
+    {
+        float moveInput = Input.GetAxisRaw("Horizontal");
+        rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
+        animator.SetFloat("IsRun", Mathf.Abs(moveInput));
 
-        // Lật mặt nhân vật nếu đổi hướng
         if (moveInput > 0 && !facingRight)
         {
-            Flip(); // Quay mặt sang phải
+            Flip();
         }
         else if (moveInput < 0 && facingRight)
         {
-            Flip(); // Quay mặt sang trái
-        }
-
-        // Nhảy khi nhấn Space và đang đứng đất
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce); // Nhảy lên
-            animator.SetBool("IsJumping", true);                 // Bật animation Jump
-            isGrounded = false;                                  // Đánh dấu đang trên không
-        }
-
-        // Tăng tốc rơi nếu đang rơi xuống hoặc nhả nút Space
-        if (rb.velocity.y < 0)
-        {
-            // Nếu đang rơi xuống thì tăng tốc rơi mạnh hơn (hút đất)
-            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
-        }
-        else if (rb.velocity.y > 0 && !Input.GetKey(KeyCode.Space))
-        {
-            // Nếu đang đi lên mà nhả Space thì giảm độ cao, không "bay"
-            rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
-        }
-
-        // Nếu không di chuyển và đang chạm đất → đứng yên (Idle)
-        if (moveInput == 0 && isGrounded)
-        {
-            animator.SetFloat("IsRun", 0);             // Ngưng chạy
-            animator.SetBool("IsJumping", false);      // Ngưng nhảy → Idle
+            Flip();
         }
     }
 
-    // Lật mặt nhân vật bằng cách đảo chiều scale X
+    private void HandleJump()
+    {
+        // Chỉ cho phép nhảy khi đang đứng trên mặt đất
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            animator.SetBool("IsJumping", true);
+            isGrounded = false; // Không còn trên mặt đất nữa
+        }
+    }
+
+    private void HandleIdle()
+    {
+        if (Input.GetAxisRaw("Horizontal") == 0 && isGrounded)
+        {
+            animator.SetFloat("IsRun", 0);
+            animator.SetBool("IsJumping", false);
+        }
+    }
+
+    private void HandleDropBomb()
+    {
+        if (Input.GetKeyDown(KeyCode.F) && boomPrefab != null && boomSpawnPoint != null)
+        {
+            GameObject newBoom = Instantiate(boomPrefab, transform.position, Quaternion.identity);  
+            Boom boomScript = newBoom.GetComponent<Boom>();
+            if (boomScript != null)
+            {
+                boomScript.owner = this.gameObject; // Gán người thả bom
+            }
+        }
+    }
+
     private void Flip()
     {
-        facingRight = !facingRight; // Đảo hướng mặt
+        facingRight = !facingRight;
         Vector3 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;
     }
 
-    // Kiểm tra va chạm với mặt đất → cho phép nhảy lại
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isGrounded = true;                        // Đã chạm đất
-            animator.SetBool("IsJumping", false);     // Ngắt animation Jump
+            isGrounded = true;                            // Khi tiếp đất → cho nhảy lại
+            animator.SetBool("IsJumping", false);         // Tắt trạng thái nhảy
         }
     }
 
-    // Khi rời khỏi mặt đất thì không được nhảy nữa
-    private void OnCollisionExit2D(Collision2D collision)
+    /// <summary>
+    /// ➕ Lực hút xuống để không bị bay bổng khi nhảy
+    /// </summary>
+    private void ApplyExtraGravity()
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (rb.velocity.y < 0) // Đang rơi
         {
-            isGrounded = false; // Rời khỏi mặt đất → không cho nhảy tiếp
+            // Tăng lực rơi để không bị bay lơ lửng
+            rb.velocity += Vector2.up * Physics2D.gravity.y * 2f * Time.deltaTime;
         }
+        else if (rb.velocity.y > 0 && !Input.GetKey(KeyCode.Space))
+        {
+            // Đang nhảy lên nhưng đã nhả nút → giảm bay
+            rb.velocity += Vector2.up * Physics2D.gravity.y * 1.5f * Time.deltaTime;
+        }
+    }
+
+    public void TakeDamage(int amount)
+    {
+        if (isDead) return;
+
+        currentHealth -= amount;
+        Debug.Log("Player mất máu: " + amount + " | Còn lại: " + currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        isDead = true;
+        animator.SetTrigger("IsDead");     // Bật animation chết
+        rb.velocity = Vector2.zero;        // Dừng di chuyển
+        rb.isKinematic = true;             // Tắt vật lý
+        GetComponent<Collider2D>().enabled = false; // Tùy chọn: tắt va chạm
     }
 }
