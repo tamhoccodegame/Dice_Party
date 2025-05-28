@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Fusion;
-using UnityEditor.Animations;
+﻿using Fusion;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]

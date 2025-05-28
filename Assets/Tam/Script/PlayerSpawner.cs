@@ -23,10 +23,7 @@ public class PlayerSpawner : NetworkBehaviour
         {
             Vector3 spawnPosition = baseSpawnPosition;
 
-            Runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player, (runner, obj) =>
-            {
-                obj.GetComponent<NetworkObject>().AssignInputAuthority(player);
-            });
+            Runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
         }
     }
 

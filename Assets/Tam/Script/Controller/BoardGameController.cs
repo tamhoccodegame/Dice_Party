@@ -62,13 +62,13 @@ public class BoardGameController : NetworkBehaviour
             stepText.gameObject.SetActive(true);
             stepText.text = currentStep.ToString();
 
-            if (activeDice != null)
-            {
-                activeDice.DestroySelf();
-                activeDice = null;
-            }
-
-            RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host
+            //if (activeDice != null)
+            //{
+            //    activeDice.DestroySelf();
+            //    activeDice = null;
+            //}
+            
+            RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host 
         }
 
         Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
@@ -105,9 +105,10 @@ public class BoardGameController : NetworkBehaviour
         activeDice = Runner.Spawn(dicePrefab, transform.position + new Vector3(0, 5f, 0), Quaternion.identity).GetComponent<Dice>();
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     private void RPC_RequestMove(int steps)
     {
+        Debug.Log($"Nhận request move với step = {steps}");
         RPC_Move(steps);
     }
 
@@ -116,8 +117,11 @@ public class BoardGameController : NetworkBehaviour
     private void RPC_Move(int steps)
     {
         currentStep = steps;
-        moveCoroutine = StartCoroutine(MoveToNextNode());
+
+        if (HasStateAuthority)
+            moveCoroutine = StartCoroutine(MoveToNextNode());
     }
+
 
     IEnumerator MoveToNextNode()
     {

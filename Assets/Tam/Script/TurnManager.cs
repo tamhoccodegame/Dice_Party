@@ -96,7 +96,6 @@ public class TurnManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_NextTurn()
     {
-
         currentPlayerIndex = (currentPlayerIndex + 1) % playerController.Count;
         currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
 
