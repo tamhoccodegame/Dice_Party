@@ -41,7 +41,7 @@ public class TurnManager : NetworkBehaviour
 
         playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
 
-        if (HasStateAuthority)
+        if (Object.HasStateAuthority)
         {
             RPC_StartFirstTurn();
         }
@@ -80,8 +80,12 @@ public class TurnManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     void RPC_StartFirstTurn()
     {
-        currentPlayerIndex = 0;
-        currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
+        if (Object.HasStateAuthority)
+        {
+            currentPlayerIndex = 0;
+            currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
+        }
+       
         UpdateTurnUI();
         StartFollowTarget();
     }
@@ -96,8 +100,11 @@ public class TurnManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_NextTurn()
     {
-        currentPlayerIndex = (currentPlayerIndex + 1) % playerController.Count;
-        currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
+        if (Object.HasStateAuthority)
+        {
+            currentPlayerIndex = 0;
+            currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
+        }
 
         playerController[currentPlayerIndex].StartTurn();
         UpdateTurnUI();
@@ -120,11 +127,17 @@ public class TurnManager : NetworkBehaviour
 
     void StartFollowTarget()
     {
-        RPC_StartFollowTarget();
+        RPC_RequestFollowTarget();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.All)] // Chạy trên tất cả client
-    void RPC_StartFollowTarget()
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)] // Chạy trên tất cả client
+    void RPC_RequestFollowTarget()
+    {
+        if(!Object.HasStateAuthority) RPC_FollowTarget();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_FollowTarget()
     {
         Debug.Log("RPC_StartFollowTarget gọi trên client: " + Runner.LocalPlayer);
         if (!isCameraMoving) StartCoroutine(ChangeFollowTarget());

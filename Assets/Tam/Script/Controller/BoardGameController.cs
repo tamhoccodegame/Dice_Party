@@ -62,13 +62,14 @@ public class BoardGameController : NetworkBehaviour
             stepText.gameObject.SetActive(true);
             stepText.text = currentStep.ToString();
 
-            //if (activeDice != null)
-            //{
-            //    activeDice.DestroySelf();
-            //    activeDice = null;
-            //}
-            
-            RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host 
+            if (activeDice != null)
+            {
+                activeDice.DestroySelf();
+                activeDice = null;
+            }
+
+            if (Object.HasInputAuthority)
+                RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host 
         }
 
         Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
@@ -83,18 +84,21 @@ public class BoardGameController : NetworkBehaviour
 
     public void StartTurn()
     {
-        if (HasStateAuthority)
+        if (Object.HasInputAuthority)
         {
-            RPC_ShowDice();
+            RPC_RequestShowDice();
         }
     }
 
     public void EndTurn()
     {
-        if (HasStateAuthority)
-        {
-            TurnManager.instance.NextTurn();
-        }
+        TurnManager.instance.NextTurn();
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestShowDice()
+    {
+        RPC_ShowDice();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -105,10 +109,9 @@ public class BoardGameController : NetworkBehaviour
         activeDice = Runner.Spawn(dicePrefab, transform.position + new Vector3(0, 5f, 0), Quaternion.identity).GetComponent<Dice>();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestMove(int steps)
     {
-        Debug.Log($"Nhận request move với step = {steps}");
         RPC_Move(steps);
     }
 
@@ -117,10 +120,13 @@ public class BoardGameController : NetworkBehaviour
     private void RPC_Move(int steps)
     {
         currentStep = steps;
+        stepText.gameObject.SetActive(true);
+        stepText.text = steps.ToString();
 
-        if (HasStateAuthority)
+        if (HasStateAuthority && moveCoroutine == null)
             moveCoroutine = StartCoroutine(MoveToNextNode());
     }
+
 
 
     IEnumerator MoveToNextNode()
@@ -134,17 +140,17 @@ public class BoardGameController : NetworkBehaviour
         animator.CrossFade("Run", 0.25f);
         while (currentStep > 0)
         {
-            if (currentNode.nextNodes.Count > 1)
-            {
-                waitingForChoice = true;
-                ShowDirectionChoices();
+            //if (currentNode.nextNodes.Count > 1)
+            //{
+            //    waitingForChoice = true;
+            //    ShowDirectionChoices();
 
-                while (waitingForChoice) yield return null;
-            }
-            else
-            {
-                toMoveNode = currentNode.nextNodes[0];
-            }
+            //    while (waitingForChoice) yield return null;
+            //}
+            //else
+            //{
+            toMoveNode = currentNode.nextNodes[0];
+            //}
 
             while (Vector3.Distance(transform.position, toMoveNode.transform.position) > 0.5f)
             {
@@ -207,7 +213,7 @@ public class BoardGameController : NetworkBehaviour
     void TriggerNodeEvent()
     {
         Debug.Log("Gọi sự kiện của node: " + currentNode.name);
-        if(HasStateAuthority)
-        currentNode.RPC_ProcessNode(Runner.LocalPlayer);
+        if (HasStateAuthority)
+            currentNode.RPC_ProcessNode(Runner.LocalPlayer);
     }
 }
