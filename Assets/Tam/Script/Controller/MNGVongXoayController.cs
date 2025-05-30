@@ -7,22 +7,16 @@ public class MNGVongXoayController : NetworkBehaviour
     private CharacterController controller;
     private Animator animator;
 
-    public float moveSpeed;
-    public float rotationSpeed;
-    public float jumpForce;
+    public float moveSpeed = 5f;
+    public float rotationSpeed = 10f;
+    public float jumpForce = 5f;
     public float gravity = -9.81f;
     public float verticalVelocity;
 
-    private float horizontalInput;
-    private float verticalInput;
+    [Networked] private Vector2 moveInput { get; set; }
+    [Networked] private bool jumpRequest { get; set; }
 
-    private bool isJumpPressed = false;
     public string currentAnim;
-
-    private void Start()
-    {
-        
-    }
 
     public override void Spawned()
     {
@@ -31,24 +25,33 @@ public class MNGVongXoayController : NetworkBehaviour
         animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
+        if (!Object.HasInputAuthority) return;
 
-        if (Input.GetKeyDown(KeyCode.Space) && controller.isGrounded && !isJumpPressed)
-        {
-            isJumpPressed = true;
-        }
+        // Collect input on client
+        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        bool jump = Input.GetKeyDown(KeyCode.Space);
+
+        // Send input to host
+        RPC_SendInput(input, jump);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_SendInput(Vector2 input, bool jump)
+    {
+        moveInput = input;
+        if (jump) jumpRequest = true;
     }
 
     public override void FixedUpdateNetwork()
     {
+        if (!Object.HasStateAuthority) return;
+
         // Gravity
         if (controller.isGrounded && verticalVelocity < 0)
         {
-            verticalVelocity = -2f; // Đảm bảo dính mặt đất
+            verticalVelocity = -2f;
         }
         else
         {
@@ -56,25 +59,26 @@ public class MNGVongXoayController : NetworkBehaviour
         }
 
         // Jump
-        if (isJumpPressed && controller.isGrounded)
+        if (jumpRequest && controller.isGrounded)
         {
             ChangeAnim("Jump");
             verticalVelocity = jumpForce;
-            isJumpPressed = false; // Reset sau khi nhảy
         }
+        jumpRequest = false; // reset jump request
 
-       Vector3 movement = new Vector3(horizontalInput, verticalVelocity, verticalInput);
-
+        // Movement
+        Vector3 movement = new Vector3(moveInput.x, verticalVelocity, moveInput.y);
         controller.Move(movement * moveSpeed * Runner.DeltaTime);
 
-        // Xoay hướng
-        Vector3 moveDirection = new Vector3(horizontalInput, 0, verticalInput);
+        // Rotation
+        Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
         if (moveDirection.magnitude > 0)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
         }
 
+        // Animation
         if (controller.isGrounded)
         {
             if (moveDirection.magnitude > 0) ChangeAnim("Run");
@@ -91,7 +95,7 @@ public class MNGVongXoayController : NetworkBehaviour
 
     public void Die()
     {
-        if(Object.HasInputAuthority)
-        VongXoayManager.instance.RequestUpdateLive(Runner.LocalPlayer);
+        if (Object.HasInputAuthority)
+            VongXoayManager.instance.RequestUpdateLive(Runner.LocalPlayer);
     }
 }

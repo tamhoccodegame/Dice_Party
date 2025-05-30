@@ -13,7 +13,7 @@ public class Dice : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(new Vector3(90, 90, 90) * 10f * Time.deltaTime);    
+        transform.Rotate(new Vector3(90, 90, 90) * 10f * Time.deltaTime);
     }
 
     public override void FixedUpdateNetwork()
@@ -21,7 +21,18 @@ public class Dice : NetworkBehaviour
         transform.Rotate(new Vector3(90, 90, 90) * 10f * Runner.DeltaTime);
     }
 
-    public void DestroySelf()
+    public void RequestDestroyDice()
+    {
+        if (Object.HasStateAuthority)
+            RPC_DestroySelf();
+        else
+        {
+            RPC_RequestDestroyDice();
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    void RPC_RequestDestroyDice()
     {
         RPC_DestroySelf();
     }

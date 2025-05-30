@@ -113,9 +113,9 @@ public class TurnManager : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
-            currentPlayerIndex = 0;
+            currentPlayerIndex = (currentPlayerIndex + 1) % playerController.Count;
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
-            if (currentPlayerIndex >= playerController.Count - 1)
+            if (currentPlayerIndex == 0)
                 Runner.LoadScene("MNG3");
         }
 

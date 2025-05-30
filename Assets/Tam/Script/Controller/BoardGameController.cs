@@ -68,7 +68,7 @@ public class BoardGameController : NetworkBehaviour
 
             if (activeDice != null)
             {
-                activeDice.DestroySelf();
+                activeDice.RequestDestroyDice();
                 activeDice = null;
             }
 

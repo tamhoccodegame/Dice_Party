@@ -41,24 +41,34 @@ public class VongXoayManager : NetworkBehaviour
             }
         }
 
-        RPC_UpdateUILive();
+        RequestUpdateLive(Runner.LocalPlayer);
     }
 
     public void RequestUpdateLive(PlayerRef player)
     {
-        if (Object.HasStateAuthority) 
+        if (Object.HasStateAuthority)
+            UpdateLive(player);
+        else
+            RPC_RequestUpdateLive(player);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RequestUpdateLive(PlayerRef player)
+    {
         UpdateLive(player);
     }
 
     private void UpdateLive(PlayerRef player)
     {
-        if(playerLives.TryGet(player, out int value))
-        playerLives.Set(player, value - 1);
+        if (playerLives.TryGet(player, out int value))
+            playerLives.Set(player, value - 1);
 
-        if(playerLives[player] <= 0 && !playerRanks.Contains(player))
+        if (playerLives[player] <= 0 && !playerRanks.Contains(player))
             playerRanks.Add(player);
 
-        RPC_UpdateUILive();
+        if (Object.HasStateAuthority)
+            RPC_UpdateUILive();
+
         bool isOver = CheckGameOver();
         if (isOver)
         {
@@ -66,19 +76,21 @@ public class VongXoayManager : NetworkBehaviour
 
             if (Object.HasStateAuthority)
             {
-                PlayerRef firstRankRef = playerRanks[playerRanks.Count - 1];
-                //PlayerRef secondRankRef = playerRanks[playerRanks.Count - 2];
-                
-                RPC_SpawnRewardAvatar(firstRankRef);
+                PlayerRef firstRankRef = playerRanks[1];
+                PlayerRef secondRankRef = playerRanks[0];
+
+                RPC_SpawnRewardAvatar(firstRankRef, secondRankRef);
             }
         }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SpawnRewardAvatar(PlayerRef firstRank)
+    public void RPC_SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRef)
     {
         Runner.Spawn(playerRewardPrefab, firstRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
         firstRankName.text = firstRank.PlayerId.ToString();
+        Runner.Spawn(playerRewardPrefab, secondRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
+        secondRankName.text = firstRank.PlayerId.ToString();
     }
 
     void ShowGameOverPanel()
@@ -88,7 +100,7 @@ public class VongXoayManager : NetworkBehaviour
 
     bool CheckGameOver()
     {
-        return playerLives.Count(kvp => kvp.Value == 0) >= playerLives.Count();
+        return playerLives.All(kvp => kvp.Value <= 0);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
