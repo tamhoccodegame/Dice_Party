@@ -17,6 +17,9 @@ public class VongXoayManager : NetworkBehaviour
     [UnitySerializeField]
     public NetworkLinkedList<PlayerRef> playerRanks => default;
 
+    [Networked]
+    public bool isGameOver { get; set; } = false;
+
     [Header("Avatar Standing Position")]
     public Transform firstRankPosition;
     public Transform secondRankPosition;
@@ -33,11 +36,12 @@ public class VongXoayManager : NetworkBehaviour
     public override void Spawned()
     {
         instance = this;
+
         if (Object.HasStateAuthority)
         {
             foreach (var player in NetworkManager.instance.GetAllPlayers())
             {
-                playerLives.Set(player, 3); // Sử dụng Set an toàn hơn
+                playerLives.Set(player, 3);
             }
         }
 
@@ -47,50 +51,59 @@ public class VongXoayManager : NetworkBehaviour
     public void RequestUpdateLive(PlayerRef player)
     {
         if (Object.HasStateAuthority)
+        {
+            if (isGameOver) return;
             UpdateLive(player);
+        }
         else
+        {
             RPC_RequestUpdateLive(player);
+        }
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestUpdateLive(PlayerRef player)
     {
+        if (isGameOver) return;
         UpdateLive(player);
     }
 
     private void UpdateLive(PlayerRef player)
     {
+        if (isGameOver) return;
+
         if (playerLives.TryGet(player, out int value))
+        {
             playerLives.Set(player, value - 1);
+        }
 
         if (playerLives[player] <= 0 && !playerRanks.Contains(player))
+        {
             playerRanks.Add(player);
+        }
 
         if (Object.HasStateAuthority)
-            RPC_UpdateUILive();
-
-        bool isOver = CheckGameOver();
-        if (isOver)
         {
+            RPC_UpdateUILive();
+        }
+
+        if (CheckGameOver())
+        {
+            isGameOver = true;
             ShowGameOverPanel();
 
-            if (Object.HasStateAuthority)
+            if (Object.HasStateAuthority && playerRanks.Count >= 2)
             {
-                PlayerRef firstRankRef = playerRanks[1];
-                PlayerRef secondRankRef = playerRanks[0];
-
+                PlayerRef firstRankRef = playerRanks[^1]; // Người cuối cùng chết (Top 1)
+                PlayerRef secondRankRef = playerRanks[0]; // Người chết trước nó (Top 2)
                 RPC_SpawnRewardAvatar(firstRankRef, secondRankRef);
             }
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRef)
+    bool CheckGameOver()
     {
-        Runner.Spawn(playerRewardPrefab, firstRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
-        firstRankName.text = firstRank.PlayerId.ToString();
-        Runner.Spawn(playerRewardPrefab, secondRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
-        secondRankName.text = firstRank.PlayerId.ToString();
+        return playerLives.All(kvp => kvp.Value <= 0);
     }
 
     void ShowGameOverPanel()
@@ -98,9 +111,15 @@ public class VongXoayManager : NetworkBehaviour
         gameOverPanel.SetActive(true);
     }
 
-    bool CheckGameOver()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank)
     {
-        return playerLives.All(kvp => kvp.Value <= 0);
+        // Spawn phần thưởng avatar cho người chơi ở vị trí xếp hạng
+        Runner.Spawn(playerRewardPrefab, firstRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
+        firstRankName.text = firstRank.PlayerId.ToString();
+
+        Runner.Spawn(playerRewardPrefab, secondRankPosition.position, playerRewardPrefab.transform.rotation, secondRank);
+        secondRankName.text = secondRank.PlayerId.ToString();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -109,11 +128,11 @@ public class VongXoayManager : NetworkBehaviour
         int index = 0;
         foreach (var kvp in playerLives)
         {
-            int lives = kvp.Value;
-
-            // Hiển thị lên UI
-            playerTextUI[index].text = lives.ToString();
-            index++;
+            if (index < playerTextUI.Length)
+            {
+                playerTextUI[index].text = kvp.Value.ToString();
+                index++;
+            }
         }
     }
 }

@@ -95,6 +95,8 @@ public class MNGVongXoayController : NetworkBehaviour
 
     public void Die()
     {
+        if (VongXoayManager.instance.isGameOver) return;
+
         if (Object.HasInputAuthority)
             VongXoayManager.instance.RequestUpdateLive(Runner.LocalPlayer);
     }
