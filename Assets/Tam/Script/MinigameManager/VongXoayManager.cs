@@ -17,26 +17,22 @@ public class VongXoayManager : NetworkBehaviour
     [Networked]
     [Capacity(4)]
     [UnitySerializeField]
-    public NetworkLinkedList<int> playerRanks => default;
+    public NetworkLinkedList<PlayerRef> playerRanks => default;
 
-    public Dictionary<int, Transform> avatarStandingPosition = new Dictionary<int, Transform>();
+    [Header("Avatar Standing Position")]
+    public Transform firstRankPosition;
+    public Transform secondRankPosition;
 
-    public GameObject firstRankCamRT;
-    public GameObject secondRankCamRT;
-
-    public Vector3 cameraOffset;
+    public GameObject playerRewardPrefab;
 
     public TextMeshProUGUI[] playerTextUI;
 
-    [Header("GameOverPanel")]
+    [Header("Game Over Panel")]
     public GameObject gameOverPanel;
     public TextMeshProUGUI firstRankText;
     public TextMeshProUGUI firstRankName;
     public TextMeshProUGUI secondRankText;
     public TextMeshProUGUI secondRankName;
-
-    [Header("AvatarPosition")]
-    public Transform[] avatarPositions;
 
     public override void Spawned()
     {
@@ -49,21 +45,7 @@ public class VongXoayManager : NetworkBehaviour
             }
         }
 
-        RegisterPlayer();
-
         RPC_UpdateUILive();
-    }
-
-
-    public void RegisterPlayer()
-    {
-        List<PlayerRef> players = NetworkManager.instance.GetAllPlayers();
-
-        for (int i = 0; i < players.Count; i++)
-        {
-            int playerId = players[i].PlayerId;
-            avatarStandingPosition[playerId] = avatarPositions[i];
-        }
     }
 
     public void RequestUpdateLive(PlayerRef player)
@@ -77,30 +59,29 @@ public class VongXoayManager : NetworkBehaviour
         if(playerLives.TryGet(player, out int value))
         playerLives.Set(player, value - 1);
 
-        if(playerLives[player] <= 0 && !playerRanks.Contains(player.PlayerId))
-            playerRanks.Add(player.PlayerId);
+        if(playerLives[player] <= 0 && !playerRanks.Contains(player))
+            playerRanks.Add(player);
 
         RPC_UpdateUILive();
         bool isOver = CheckGameOver();
         if (isOver)
         {
             ShowGameOverPanel();
-            int firstRankRef = playerRanks[playerRanks.Count - 1];
-            //PlayerRef secondRankRef = playerRanks[playerRanks.Count - 2];
 
-            Transform firstRankPos = avatarStandingPosition[firstRankRef];
-            //Vector3 secondRankPos = playerObjects[secondRankRef].transform.position;
-
-            var firstCam = Instantiate(firstRankCamRT, firstRankPos.position, Quaternion.identity, firstRankPos);
-            //var secondCam = Instantiate(secondRankCamRT, secondRankPos, Quaternion.identity);
-
-            firstCam.transform.localPosition = cameraOffset;
-            firstCam.transform.rotation = Quaternion.Euler(0, 180, 0);
-
-            //secondCam.transform.localPosition = cameraOffset;
-            //secondCam.transform.rotation = Quaternion.Euler(0, 180, 0);
-
+            if (Object.HasStateAuthority)
+            {
+                PlayerRef firstRankRef = playerRanks[playerRanks.Count - 1];
+                //PlayerRef secondRankRef = playerRanks[playerRanks.Count - 2];
+                
+                RPC_SpawnRewardAvatar(firstRankRef);
+            }
         }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_SpawnRewardAvatar(PlayerRef firstRank)
+    {
+        Runner.Spawn(playerRewardPrefab, firstRankPosition.position, Quaternion.identity, firstRank);
     }
 
     void ShowGameOverPanel()
