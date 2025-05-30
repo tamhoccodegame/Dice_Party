@@ -9,6 +9,16 @@ public class PlayerSetup : NetworkBehaviour
     public Transform color;
     public Transform bodypart;
 
+
+    private void Start()
+    {
+        if (!Object.HasInputAuthority) return;
+
+        CustomData data = NetworkManager.customData;
+        if (data != null)
+            RPC_RequestUpdateCustom(data.hairIndex, data.colorIndex, data.bodyPartIndex);
+    }
+
     public override void Spawned()
     {
         if (!Object.HasInputAuthority) return;

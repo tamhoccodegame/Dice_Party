@@ -5,6 +5,7 @@ public class PlayerSpawner : NetworkBehaviour
 {
     private NetworkManager networkManager;
     public GameObject playerPrefab;
+    public Transform spawnPosition;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -15,15 +16,10 @@ public class PlayerSpawner : NetworkBehaviour
     public override void Spawned()
     {
         if (!Object.HasStateAuthority) return;
-        BoardNode spawn = GameObject.Find("Dice (7)").GetComponent<BoardNode>();
-
-        Vector3 baseSpawnPosition = spawn.transform.position;
 
         foreach (var player in networkManager.GetAllPlayers())
         {
-            Vector3 spawnPosition = baseSpawnPosition;
-
-            Runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+            Runner.Spawn(playerPrefab, spawnPosition.position, Quaternion.identity, player);
         }
     }
 

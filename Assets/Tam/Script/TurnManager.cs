@@ -93,6 +93,8 @@ public class TurnManager : NetworkBehaviour
     public void NextTurn()
     {
         if (!HasStateAuthority) return;
+        if (currentPlayerIndex >= playerController.Count - 1)
+            Runner.LoadScene("MNG3");
 
         RPC_NextTurn();
     }

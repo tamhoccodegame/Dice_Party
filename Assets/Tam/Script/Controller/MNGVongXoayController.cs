@@ -21,9 +21,7 @@ public class MNGVongXoayController : NetworkBehaviour
 
     private void Start()
     {
-        controller = GetComponent<CharacterController>();
-        controller.enabled = true;
-        animator = GetComponent<Animator>();
+        
     }
 
     public override void Spawned()
@@ -89,5 +87,11 @@ public class MNGVongXoayController : NetworkBehaviour
         if (animName == currentAnim) return;
         currentAnim = animName;
         animator.CrossFade(animName, blendTime);
+    }
+
+    public void Die()
+    {
+        if(Object.HasInputAuthority)
+        VongXoayManager.instance.RequestUpdateLive(Runner.LocalPlayer);
     }
 }

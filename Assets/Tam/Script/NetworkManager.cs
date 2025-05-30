@@ -16,7 +16,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public TMP_InputField sessionNameInput;
     private string sessionName;
 
-    public TextMeshProUGUI playerListText;  // UI để hiển thị danh sách người chơi
     public event Action onSceneLoaded;
     private List<PlayerRef> players = new List<PlayerRef>();
     public event Action onPlayerListChange;
