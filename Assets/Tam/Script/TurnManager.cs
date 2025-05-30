@@ -84,19 +84,28 @@ public class TurnManager : NetworkBehaviour
         {
             currentPlayerIndex = 0;
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
+            playerController[currentPlayerIndex].StartTurn();
         }
-       
         UpdateTurnUI();
         StartFollowTarget();
     }
 
-    public void NextTurn()
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RequestNextTurn()
     {
-        if (!HasStateAuthority) return;
-        if (currentPlayerIndex >= playerController.Count - 1)
-            Runner.LoadScene("MNG3");
-
         RPC_NextTurn();
+    }
+
+    public void RequestNextTurn()
+    {
+        if (Object.HasStateAuthority)
+        {
+            RPC_NextTurn();
+        }
+        else
+        {
+            RPC_RequestNextTurn();
+        }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -106,6 +115,8 @@ public class TurnManager : NetworkBehaviour
         {
             currentPlayerIndex = 0;
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
+            if (currentPlayerIndex >= playerController.Count - 1)
+                Runner.LoadScene("MNG3");
         }
 
         playerController[currentPlayerIndex].StartTurn();

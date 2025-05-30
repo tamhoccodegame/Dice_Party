@@ -132,7 +132,7 @@ public class BoardGameController : NetworkBehaviour
 
     public void EndTurn()
     {
-        TurnManager.instance.NextTurn();
+        TurnManager.instance.RequestNextTurn();
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
