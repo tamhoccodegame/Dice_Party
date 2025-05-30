@@ -1,5 +1,4 @@
 ﻿using Fusion;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -33,8 +32,13 @@ public class BoardGameController : NetworkBehaviour
     private Dice activeDice;
     public TextMeshPro stepText;
 
-    private Coroutine moveCoroutine;
     private bool isPressed;
+
+    // State Machine
+    private enum MoveState { Idle, Rolling, WaitingForAnim, Moving }
+    private MoveState moveState = MoveState.Idle;
+
+    private float animTimer = 0f;
 
     public override void Spawned()
     {
@@ -47,7 +51,7 @@ public class BoardGameController : NetworkBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isMyTurn && moveCoroutine == null)
+        if (Input.GetKeyDown(KeyCode.Space) && isMyTurn && moveState == MoveState.Idle)
         {
             isPressed = true;
         }
@@ -69,16 +73,52 @@ public class BoardGameController : NetworkBehaviour
             }
 
             if (Object.HasInputAuthority)
-                RPC_RequestMove(currentStep); // ⬅️ Gửi yêu cầu đến host 
+                RPC_RequestMove(currentStep);
         }
 
-        Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
-        direction.y = 0;
-        if (direction != Vector3.zero) // Tránh lỗi khi direction là zero
+        // Handle rotation
+        if (moveState == MoveState.Moving)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            Quaternion newRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
-            transform.rotation = newRotation;
+            Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
+            direction.y = 0;
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                Quaternion newRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
+                transform.rotation = newRotation;
+            }
+
+            Vector3 moveDir = direction * moveSpeed * Runner.DeltaTime;
+            controller.Move(moveDir);
+
+            if (Vector3.Distance(transform.position, toMoveNode.transform.position) <= 0.5f)
+            {
+                currentNode = toMoveNode;
+                currentStep--;
+
+                if (currentStep > 0)
+                {
+                    toMoveNode = currentNode.nextNodes[0];
+                }
+                else
+                {
+                    moveState = MoveState.Idle;
+                    animator.CrossFade("Idle", 0.25f);
+                    TriggerNodeEvent();
+                    EndTurn();
+                }
+            }
+        }
+
+        // Handle animation wait
+        if (moveState == MoveState.WaitingForAnim)
+        {
+            animTimer -= Runner.DeltaTime;
+            if (animTimer <= 0f)
+            {
+                animator.CrossFade("Run", 0.25f);
+                moveState = MoveState.Moving;
+            }
         }
     }
 
@@ -115,7 +155,6 @@ public class BoardGameController : NetworkBehaviour
         RPC_Move(steps);
     }
 
-
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_Move(int steps)
     {
@@ -123,53 +162,13 @@ public class BoardGameController : NetworkBehaviour
         stepText.gameObject.SetActive(true);
         stepText.text = steps.ToString();
 
-        if (HasStateAuthority && moveCoroutine == null)
-            moveCoroutine = StartCoroutine(MoveToNextNode());
-    }
-
-
-
-    IEnumerator MoveToNextNode()
-    {
-        animator.CrossFade("RollDice", 0.25f);
-        yield return new WaitForSeconds(0.25f);
-        stepText.gameObject.SetActive(false);
-        float animTime = animator.GetCurrentAnimatorStateInfo(0).length;
-        yield return new WaitForSeconds(animTime);
-
-        animator.CrossFade("Run", 0.25f);
-        while (currentStep > 0)
+        if (HasStateAuthority && moveState == MoveState.Idle)
         {
-            //if (currentNode.nextNodes.Count > 1)
-            //{
-            //    waitingForChoice = true;
-            //    ShowDirectionChoices();
-
-            //    while (waitingForChoice) yield return null;
-            //}
-            //else
-            //{
-            toMoveNode = currentNode.nextNodes[0];
-            //}
-
-            while (Vector3.Distance(transform.position, toMoveNode.transform.position) > 0.5f)
-            {
-                Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
-                Vector3 movement = direction * moveSpeed * Runner.DeltaTime;
-
-                controller.Move(movement);
-
-                yield return null;
-            }
-
-            currentNode = toMoveNode;
-            currentStep--;
+            animator.CrossFade("RollDice", 0.25f);
+            animTimer = 0.25f + animator.GetCurrentAnimatorStateInfo(0).length;
+            stepText.gameObject.SetActive(false);
+            moveState = MoveState.WaitingForAnim;
         }
-
-        animator.CrossFade("Idle", 0.25f);
-        TriggerNodeEvent();
-        moveCoroutine = null;
-        EndTurn();
     }
 
     void ShowDirectionChoices()
@@ -207,7 +206,6 @@ public class BoardGameController : NetworkBehaviour
         Debug.Log("Bạn chọn hướng: " + (index + 1));
         toMoveNode = currentNode.nextNodes[index];
         waitingForChoice = false;
-        //Move
     }
 
     void TriggerNodeEvent()

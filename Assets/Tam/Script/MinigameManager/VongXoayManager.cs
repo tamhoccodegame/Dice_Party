@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Fusion;
 using TMPro;
 using UnityEngine;
@@ -29,9 +27,7 @@ public class VongXoayManager : NetworkBehaviour
 
     [Header("Game Over Panel")]
     public GameObject gameOverPanel;
-    public TextMeshProUGUI firstRankText;
     public TextMeshProUGUI firstRankName;
-    public TextMeshProUGUI secondRankText;
     public TextMeshProUGUI secondRankName;
 
     public override void Spawned()
@@ -81,7 +77,8 @@ public class VongXoayManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_SpawnRewardAvatar(PlayerRef firstRank)
     {
-        Runner.Spawn(playerRewardPrefab, firstRankPosition.position, Quaternion.identity, firstRank);
+        Runner.Spawn(playerRewardPrefab, firstRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
+        firstRankName.text = firstRank.PlayerId.ToString();
     }
 
     void ShowGameOverPanel()

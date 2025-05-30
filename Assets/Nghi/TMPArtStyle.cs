@@ -52,16 +52,16 @@ public class TMPArtStyle : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         if (blinkOnAwake) isBlinking = true;
     }
 
-    void OnValidate()
-    {
-        if (tmp == null) tmp = GetComponent<TMP_Text>();
-        if (tmpMaterialInstance == null && tmp != null)
-        {
-            tmpMaterialInstance = new Material(tmp.fontSharedMaterial);
-            tmp.fontMaterial = tmpMaterialInstance;
-        }
-        ApplyStyle();
-    }
+    //void OnValidate()
+    //{
+    //    if (tmp == null) tmp = GetComponent<TMP_Text>();
+    //    if (tmpMaterialInstance == null && tmp != null)
+    //    {
+    //        tmpMaterialInstance = new Material(tmp.fontSharedMaterial);
+    //        tmp.fontMaterial = tmpMaterialInstance;
+    //    }
+    //    ApplyStyle();
+    //}
 
     void Update()
     {
