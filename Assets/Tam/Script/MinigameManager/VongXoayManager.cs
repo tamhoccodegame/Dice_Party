@@ -50,9 +50,10 @@ public class VongXoayManager : NetworkBehaviour
 
     public void RequestUpdateLive(PlayerRef player)
     {
+        if (isGameOver) return;
+
         if (Object.HasStateAuthority)
         {
-            if (isGameOver) return;
             UpdateLive(player);
         }
         else
@@ -64,7 +65,6 @@ public class VongXoayManager : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestUpdateLive(PlayerRef player)
     {
-        if (isGameOver) return;
         UpdateLive(player);
     }
 
@@ -95,8 +95,8 @@ public class VongXoayManager : NetworkBehaviour
             if (Object.HasStateAuthority && playerRanks.Count >= 2)
             {
                 PlayerRef firstRankRef = playerRanks[^1]; // Người cuối cùng chết (Top 1)
-                PlayerRef secondRankRef = playerRanks[0]; // Người chết trước nó (Top 2)
-                RPC_SpawnRewardAvatar(firstRankRef, secondRankRef);
+                PlayerRef secondRankRef = playerRanks[^2]; // Người chết trước nó (Top 2)
+                SpawnRewardAvatar(firstRankRef, secondRankRef);
             }
         }
     }
@@ -111,8 +111,7 @@ public class VongXoayManager : NetworkBehaviour
         gameOverPanel.SetActive(true);
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank)
+    public void SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank)
     {
         // Spawn phần thưởng avatar cho người chơi ở vị trí xếp hạng
         Runner.Spawn(playerRewardPrefab, firstRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
