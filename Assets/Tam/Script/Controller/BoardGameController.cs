@@ -49,10 +49,12 @@ public class BoardGameController : NetworkBehaviour
         animator = GetComponent<Animator>();
 
         string currentNodeName = null;
+
         BoardGameData gameData = BoardGameData.instance;
         if (gameData.playerCurrentNode.Count > 0)
         {
             currentNodeName = gameData.GetNode(Runner.LocalPlayer);
+            Debug.Log(currentNodeName);
 
         }
 
@@ -166,6 +168,10 @@ public class BoardGameController : NetworkBehaviour
         foreach(var player in players)
         {
             PlayerRef playerRef = player.GetComponent<NetworkObject>().InputAuthority;
+            string currentNodeName = player.currentNode.name;
+
+            boardGameData.UpdateNode(playerRef, currentNodeName);
+            Debug.Log("Updated Board Game Data");
         }
 
         TurnManager.instance.RequestNextTurn();

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using Fusion;
 using TMPro;
 using UnityEngine;
@@ -89,6 +90,8 @@ public class VongXoayManager : NetworkBehaviour
 
         if (CheckGameOver())
         {
+            if(Object.HasStateAuthority) StartCoroutine(ReturnToBoard());
+
             isGameOver = true;
             ShowGameOverPanel();
 
@@ -99,6 +102,12 @@ public class VongXoayManager : NetworkBehaviour
                 SpawnRewardAvatar(firstRankRef, secondRankRef);
             }
         }
+    }
+
+    IEnumerator ReturnToBoard()
+    {
+        yield return new WaitForSeconds(3f);
+        Runner.LoadScene("TuanSceneMap");
     }
 
     bool CheckGameOver()

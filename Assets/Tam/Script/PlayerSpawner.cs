@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerSpawner : NetworkBehaviour
 {
@@ -17,10 +18,24 @@ public class PlayerSpawner : NetworkBehaviour
     {
         if (!Object.HasStateAuthority) return;
 
-        foreach (var player in networkManager.GetAllPlayers())
+        BoardGameData boardGameData = BoardGameData.instance;
+        bool isBoardScene = SceneManager.GetActiveScene().name == "TuanSceneMap";
+
+
+        if (boardGameData != null && boardGameData.playerCurrentNode.Count > 0 && isBoardScene)
         {
-            Runner.Spawn(playerPrefab, spawnPosition.position, Quaternion.identity, player);
+            Transform spawnPosition1 = GameObject.Find(boardGameData.GetNode(Runner.LocalPlayer)).transform;
+
+            foreach (var player in networkManager.GetAllPlayers())
+            {
+                Runner.Spawn(playerPrefab, spawnPosition1.position, Quaternion.identity, player);
+            }
         }
+        else
+            foreach (var player in networkManager.GetAllPlayers())
+            {
+                Runner.Spawn(playerPrefab, spawnPosition.position, Quaternion.identity, player);
+            }
     }
 
 

@@ -7,16 +7,28 @@ public class BoardGameData : MonoBehaviour
 {
     public static BoardGameData instance;
 
-    [Networked]
-    [Capacity(4)]
-    [UnitySerializeField]
-    public Dictionary<PlayerRef, string> playerCurrentNode => default;
+    public Dictionary<PlayerRef, string> playerCurrentNode = new Dictionary<PlayerRef, string>();
+
+    private void Awake()
+    {
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     public void UpdateNode(PlayerRef player, string nodeName)
     {
-        if (playerCurrentNode.ContainsKey(player))
+        if (!playerCurrentNode.ContainsKey(player))
         {
             playerCurrentNode[player] = nodeName;
+        }
+        else
+        {
+            playerCurrentNode.Add(player, nodeName);
+        }
+
+        foreach (var kvp in playerCurrentNode)
+        {
+            Debug.Log($"{kvp.Key} {kvp.Value}");
         }
     }
 
