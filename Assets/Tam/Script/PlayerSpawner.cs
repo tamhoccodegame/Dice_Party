@@ -24,10 +24,9 @@ public class PlayerSpawner : NetworkBehaviour
 
         if (boardGameData != null && boardGameData.playerCurrentNode.Count > 0 && isBoardScene)
         {
-            Transform spawnPosition1 = GameObject.Find(boardGameData.GetNode(Runner.LocalPlayer)).transform;
-
             foreach (var player in networkManager.GetAllPlayers())
             {
+                Transform spawnPosition1 = GameObject.Find(boardGameData.GetNode(player)).transform;
                 Runner.Spawn(playerPrefab, spawnPosition1.position, Quaternion.identity, player);
             }
         }

@@ -19,11 +19,11 @@ public class BoardGameData : MonoBehaviour
     {
         if (!playerCurrentNode.ContainsKey(player))
         {
-            playerCurrentNode[player] = nodeName;
+            playerCurrentNode.Add(player, nodeName);
         }
         else
         {
-            playerCurrentNode.Add(player, nodeName);
+            playerCurrentNode[player] = nodeName;
         }
 
         foreach (var kvp in playerCurrentNode)
