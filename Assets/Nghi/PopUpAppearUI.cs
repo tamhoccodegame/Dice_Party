@@ -1,45 +1,67 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PopUpAppearUI : MonoBehaviour
 {
+    public enum AnimationType
+    {
+        None,
+        FadeIn,
+        ScaleAndFade,
+        MoveAndFade,
+        Pop,
+        ZoomIn,
+        BounceIn,
+        SlideIn,
+        FlyIn,
+        Push,
+        Reveal,
+        Blink,
+        Swing,
+        DropBounce,
+        FromBackZoom,
+
+        FadeSlide,
+        EaseBackIn,
+        SmoothScaleFade,
+        CenterReveal,
+
+    }
+
+    public enum MoveDirection
+    {
+        None,
+        FromLeft,
+        FromRight,
+        FromTop,
+        FromBottom
+    }
+
     [System.Serializable]
-    public class AppearItem
+    public class UIElement
     {
         public GameObject target;
         public float delay = 0.2f;
-        public AnimationType animation = AnimationType.Scale;
-        public float duration = 0.3f;
-        public Vector3 fromPositionOffset = new Vector3(0, -50f, 0);
+        public float duration = 0.4f;
+        public AnimationType animation = AnimationType.MoveAndFade;
+        public MoveDirection moveDirection = MoveDirection.FromBottom;
+        public float moveDistance = 100f;
         public float fromAlpha = 0f;
     }
 
-    public enum AnimationType
-    {
-        Scale,
-        MoveFromOffset,
-        FadeIn,
-        ScaleAndFade,
-        MoveAndFade
-    }
-
-    [Header("Config")]
-    public List<AppearItem> appearSequence = new List<AppearItem>();
+    [Header("Cấu hình UI xuất hiện")]
+    public List<UIElement> appearSequence = new List<UIElement>();
     public bool playOnStart = true;
 
     void Start()
     {
         if (playOnStart)
         {
-            HideAllItems();
-            StartSequence();
+            HideAllItemsInstant();
+            StartCoroutine(PlaySequence());
         }
-    }
-
-    public void StartSequence()
-    {
-        StartCoroutine(PlaySequence());
     }
 
     IEnumerator PlaySequence()
@@ -49,90 +71,197 @@ public class PopUpAppearUI : MonoBehaviour
             if (item.target == null) continue;
 
             PrepareItem(item);
-
             yield return new WaitForSeconds(item.delay);
-
             PlayAnimation(item);
             yield return new WaitForSeconds(item.duration);
         }
     }
 
-    void PrepareItem(AppearItem item)
+    bool IsMoveAnimation(AnimationType anim)
+    {
+        return anim == AnimationType.MoveAndFade ||
+               anim == AnimationType.SlideIn ||
+               anim == AnimationType.FlyIn ||
+               anim == AnimationType.Push ||
+               anim == AnimationType.Reveal ||
+               anim == AnimationType.FadeSlide ||
+               anim == AnimationType.EaseBackIn ||
+               anim == AnimationType.FromBackZoom ||
+               anim == AnimationType.DropBounce;
+    }
+
+    void PrepareItem(UIElement item)
     {
         var t = item.target.transform;
 
-        // Setup ban đầu tuỳ theo Animation
-        switch (item.animation)
+        var cg = item.target.GetComponent<CanvasGroup>();
+        if (cg == null) cg = item.target.AddComponent<CanvasGroup>();
+        cg.alpha = item.fromAlpha;
+
+        Vector3 offset = GetOffset(item);
+
+        // Di chuyển nếu có hiệu ứng di chuyển
+        if (IsMoveAnimation(item.animation) && item.moveDirection != MoveDirection.None)
         {
-            case AnimationType.Scale:
-                t.localScale = Vector3.zero;
-                break;
-            case AnimationType.MoveFromOffset:
-                t.localPosition += item.fromPositionOffset;
-                break;
-            case AnimationType.FadeIn:
-                SetAlpha(item.target, item.fromAlpha);
-                break;
-            case AnimationType.ScaleAndFade:
-                t.localScale = Vector3.zero;
-                SetAlpha(item.target, item.fromAlpha);
-                break;
-            case AnimationType.MoveAndFade:
-                t.localPosition += item.fromPositionOffset;
-                SetAlpha(item.target, item.fromAlpha);
-                break;
+            t.localPosition += offset;
+        }
+
+        // Scale về 0 cho các animation cần scale
+        if (item.animation.ToString().Contains("Scale") ||
+            item.animation == AnimationType.Pop ||
+            item.animation == AnimationType.ZoomIn ||
+            item.animation == AnimationType.BounceIn ||
+            item.animation == AnimationType.CenterReveal ||
+            item.animation == AnimationType.SmoothScaleFade)
+        {
+            t.localScale = Vector3.zero;
         }
 
         item.target.SetActive(true);
     }
 
-    void PlayAnimation(AppearItem item)
+    void PlayAnimation(UIElement item)
     {
         var t = item.target.transform;
+        var cg = item.target.GetComponent<CanvasGroup>();
 
         switch (item.animation)
         {
-            case AnimationType.Scale:
-                LeanTween.scale(t.gameObject, Vector3.one, item.duration).setEaseOutBack();
-                break;
-            case AnimationType.MoveFromOffset:
-                LeanTween.moveLocal(t.gameObject, t.localPosition - item.fromPositionOffset, item.duration).setEaseOutCubic();
-                break;
             case AnimationType.FadeIn:
-                LeanTween.value(item.target, item.fromAlpha, 1f, item.duration)
-                    .setOnUpdate((float val) => SetAlpha(item.target, val));
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
                 break;
+
+            //case AnimationType.Scale:
+            //    LeanTween.scale(t.gameObject, Vector3.one, item.duration).setEaseOutBack();
+            //    break;
+
             case AnimationType.ScaleAndFade:
                 LeanTween.scale(t.gameObject, Vector3.one, item.duration).setEaseOutBack();
-                LeanTween.value(item.target, item.fromAlpha, 1f, item.duration)
-                    .setOnUpdate((float val) => SetAlpha(item.target, val));
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
                 break;
+
+            //case AnimationType.MoveFromDirection:
+            //    t.DOLocalMove(t.localPosition - GetOffset(item), item.duration).SetEase(Ease.OutCubic);
+            //    break;
+
             case AnimationType.MoveAndFade:
-                LeanTween.moveLocal(t.gameObject, t.localPosition - item.fromPositionOffset, item.duration).setEaseOutCubic();
-                LeanTween.value(item.target, item.fromAlpha, 1f, item.duration)
-                    .setOnUpdate((float val) => SetAlpha(item.target, val));
+                t.DOLocalMove(t.localPosition - GetOffset(item), item.duration).SetEase(Ease.OutCubic);
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
+                break;
+
+            case AnimationType.Pop:
+                t.localScale = Vector3.zero;
+                LeanTween.scale(t.gameObject, Vector3.one * 1.1f, item.duration * 0.6f).setEaseOutBack()
+                    .setOnComplete(() => {
+                        LeanTween.scale(t.gameObject, Vector3.one, item.duration * 0.4f).setEaseInOutCubic();
+                    });
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
+                break;
+
+            case AnimationType.ZoomIn:
+                t.localScale = Vector3.zero;
+                LeanTween.scale(t.gameObject, Vector3.one, item.duration).setEaseOutExpo();
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
+                break;
+
+            case AnimationType.BounceIn:
+                t.localScale = Vector3.zero;
+                LeanTween.scale(t.gameObject, Vector3.one, item.duration).setEaseOutBounce();
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
+                break;
+
+            case AnimationType.FlyIn:
+            case AnimationType.SlideIn:
+            case AnimationType.Push:
+            case AnimationType.Reveal:
+                // Dùng giống MoveAndFade
+                t.DOLocalMove(t.localPosition - GetOffset(item), item.duration).SetEase(Ease.OutBack);
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
+                break;
+
+            case AnimationType.Blink:
+                cg.DOFade(1f, item.duration * 0.2f)
+                    .SetEase(Ease.InOutSine)
+                    .SetLoops(4, LoopType.Yoyo)
+                    .OnComplete(() => cg.alpha = 1f);
+                break;
+
+            case AnimationType.Swing:
+                t.localRotation = Quaternion.Euler(0, 0, 30);
+                t.DOLocalRotate(Vector3.zero, item.duration, RotateMode.Fast).SetEase(Ease.OutElastic);
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
+                break;
+
+            case AnimationType.DropBounce:
+                t.localPosition += new Vector3(0, item.moveDistance, 0);
+                t.DOLocalMoveY(t.localPosition.y - item.moveDistance, item.duration)
+                    .SetEase(Ease.OutBounce);
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
+                break;
+
+            case AnimationType.FromBackZoom:
+                t.localPosition += GetOffset(item) * 2;
+                t.DOLocalMove(t.localPosition - GetOffset(item) * 2, item.duration)
+                    .SetEase(Ease.InOutBack);
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
+                break;
+
+
+            case AnimationType.FadeSlide:
+                t.DOLocalMove(t.localPosition - GetOffset(item), item.duration).SetEase(Ease.InOutSine);
+                cg.DOFade(1f, item.duration).SetEase(Ease.InOutSine);
+                break;
+
+            case AnimationType.EaseBackIn:
+                t.DOLocalMove(t.localPosition - GetOffset(item), item.duration).SetEase(Ease.InOutBack);
+                cg.DOFade(1f, item.duration).SetEase(Ease.InOutCubic);
+                break;
+
+            case AnimationType.SmoothScaleFade:
+                t.localScale = Vector3.zero;
+                LeanTween.scale(t.gameObject, Vector3.one, item.duration).setEaseOutQuad();
+                cg.DOFade(1f, item.duration).SetEase(Ease.InOutSine);
+                break;
+
+            case AnimationType.CenterReveal:
+                t.localScale = new Vector3(0f, 1f, 1f);
+                LeanTween.scaleX(t.gameObject, 1f, item.duration).setEaseOutCubic();
+                cg.DOFade(1f, item.duration * 0.8f).SetEase(Ease.OutSine);
+                break;
+
+            default:
+                cg.DOFade(1f, item.duration).SetEase(Ease.OutQuad);
                 break;
         }
     }
 
-    void SetAlpha(GameObject obj, float alpha)
-    {
-        var canvasGroup = obj.GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-        {
-            canvasGroup = obj.AddComponent<CanvasGroup>();
-        }
 
-        canvasGroup.alpha = alpha;
+    Vector3 GetOffset(UIElement item)
+    {
+        if (item.moveDirection == MoveDirection.None)
+            return Vector3.zero;
+
+        switch (item.moveDirection)
+        {
+            case MoveDirection.FromLeft: return new Vector3(-item.moveDistance, 0, 0);
+            case MoveDirection.FromRight: return new Vector3(item.moveDistance, 0, 0);
+            case MoveDirection.FromTop: return new Vector3(0, item.moveDistance, 0);
+            case MoveDirection.FromBottom: return new Vector3(0, -item.moveDistance, 0);
+            default: return Vector3.zero;
+        }
     }
 
-    void HideAllItems()
+
+    void HideAllItemsInstant()
     {
         foreach (var item in appearSequence)
         {
             if (item.target != null)
             {
-                item.target.SetActive(false);
+                var cg = item.target.GetComponent<CanvasGroup>();
+                if (cg == null) cg = item.target.AddComponent<CanvasGroup>();
+                cg.alpha = 0f;
+                item.target.SetActive(true); // Phải bật mới set alpha được
             }
         }
     }
