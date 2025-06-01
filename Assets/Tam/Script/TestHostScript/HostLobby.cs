@@ -15,7 +15,7 @@ public class HostLobby : NetworkBehaviour
     public Transform playerSlotContainer;
 
     private Dictionary<PlayerRef, NetworkObject> spawnedAvatars = new Dictionary<PlayerRef, NetworkObject>();
-    [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, NetworkBool> readyStatus { get; } = new NetworkDictionary<PlayerRef, NetworkBool>();
+    [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, NetworkBool> readyStatus => default;
 
     private void Awake()
     {
@@ -168,7 +168,7 @@ public class HostLobby : NetworkBehaviour
             var readyPanel = playerSlotUI.readyPanel;
             readyPanel.SetActive(isReady);
 
-            if(Runner.LocalPlayer != player)
+            if (Runner.LocalPlayer != player)
             {
                 playerSlotUI.unreadyButton.SetActive(false);
                 playerSlotUI.unreadyPanel.SetActive(!isReady);
