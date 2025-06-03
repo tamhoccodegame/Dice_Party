@@ -62,7 +62,7 @@ public class VongXoayManager : NetworkBehaviour
 
         if (Object.HasStateAuthority)
         {
-            StartCoroutine(HideTutorial());
+            RPC_HideTutorial();
             foreach (var player in NetworkManager.instance.GetAllPlayers())
             {
                 playerLives.Set(player, 3);
@@ -93,13 +93,6 @@ public class VongXoayManager : NetworkBehaviour
         blackScreen.color = newColor;
     }
 
-    IEnumerator HideTutorial()
-    {
-        yield return StartCoroutine(FadeBlackScreen(1, 0));
-        yield return new WaitForSecondsRealtime(5f);
-        RPC_HideTutorial();
-    }
-
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     void RPC_HideTutorial()
     {
@@ -108,10 +101,17 @@ public class VongXoayManager : NetworkBehaviour
 
     IEnumerator HideTutorialCouroutine()
     {
+        //Ẩn dần black screen rồi đợi 10s
+        yield return StartCoroutine(FadeBlackScreen(1, 0));
+        yield return new WaitForSecondsRealtime(10f);
+
+
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         tutorialPanel.SetActive(false);
+
         yield return new WaitForSecondsRealtime(2f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
+
         if (Object.HasStateAuthority)
         {
             isGameStarted = true;

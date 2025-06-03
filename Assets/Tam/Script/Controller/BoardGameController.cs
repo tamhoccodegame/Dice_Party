@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -36,6 +37,7 @@ public class BoardGameController : NetworkBehaviour
     // State Machine
     private enum MoveState { Idle, Rolling, WaitingForAnim, Moving }
     private MoveState moveState = MoveState.Idle;
+    private MoveState currentState;
 
     private float animTimer = 0f;
 
@@ -90,15 +92,6 @@ public class BoardGameController : NetworkBehaviour
                 }
             }
         }
-
-        if (HasStateAuthority && isMyTurn && moveState == MoveState.Idle)
-        {
-            // Nếu muốn host tự bấm space được thì mở dòng dưới
-            // if (Input.GetKeyDown(KeyCode.Space))
-            // {
-            //     StartMove();
-            // }
-        }
     }
 
     public override void FixedUpdateNetwork()
@@ -148,6 +141,29 @@ public class BoardGameController : NetworkBehaviour
                 animator.CrossFade("Run", 0.25f);
                 moveState = MoveState.Moving;
             }
+        }
+        
+        if(currentState != moveState)
+        {
+            currentState = moveState;
+            RPC_HandleAnim(moveState);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_HandleAnim(MoveState moveState)
+    {
+        switch(moveState)
+        {
+            case MoveState.Idle:
+                animator.CrossFade("Idle", 0.25f);
+                break;
+            case MoveState.Moving:
+                animator.CrossFade("Run", 0.1f);
+                break;
+            case MoveState.WaitingForAnim:
+                break;
+            default: break;
         }
     }
 
@@ -210,6 +226,11 @@ public class BoardGameController : NetworkBehaviour
         currentStep = steps;
         stepText.gameObject.SetActive(true);
         stepText.text = steps.ToString();
+
+        animator.CrossFade("RollDice", 0.25f);
+        animTimer = 0.25f + animator.GetCurrentAnimatorStateInfo(0).length;
+        stepText.gameObject.SetActive(false);
+        moveState = MoveState.WaitingForAnim;
 
         // Reset prediction khi nhận dữ liệu từ host
         predictedRoll = false;
