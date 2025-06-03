@@ -201,11 +201,20 @@ public class VongXoayManager : NetworkBehaviour
         }
 
         // Spawn phần thưởng avatar cho người chơi ở vị trí xếp hạng
-        Runner.Spawn(playerRewardPrefab, firstRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
+        var fGo = Runner.Spawn(playerRewardPrefab, firstRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
         firstRankName.text = firstRank.PlayerId.ToString();
 
-        Runner.Spawn(playerRewardPrefab, secondRankPosition.position, playerRewardPrefab.transform.rotation, secondRank);
+        var sGo = Runner.Spawn(playerRewardPrefab, secondRankPosition.position, playerRewardPrefab.transform.rotation, secondRank);
         secondRankName.text = secondRank.PlayerId.ToString();
+
+        RPC_ChangeAnimation(fGo, "Win");
+        RPC_ChangeAnimation(sGo, "Lose");
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_ChangeAnimation(NetworkObject player, string animName)
+    {
+        player.GetComponent<Animator>().Play(animName);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
