@@ -140,7 +140,6 @@ public class HostLobby : NetworkBehaviour
 
         if (Object.HasStateAuthority)
             RPC_UpdatePlayerList();
-
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

@@ -18,23 +18,30 @@ public class MNGVongXoayController : NetworkBehaviour
 
     public string currentAnim;
 
+    VongXoayManager manager;
+
     public override void Spawned()
     {
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
+        manager = VongXoayManager.instance;
     }
 
     void Update()
     {
         if (!Object.HasInputAuthority) return;
 
-        // Collect input on client
-        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        bool jump = Input.GetKeyDown(KeyCode.Space);
+        if (manager != null && manager.Object.IsValid && manager.isGameStarted)
+        {
+            // Collect input on client
+            Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            bool jump = Input.GetKeyDown(KeyCode.Space);
 
-        // Send input to host
-        RPC_SendInput(input, jump);
+            // Send input to host
+            RPC_SendInput(input, jump);
+        }
+
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
