@@ -1,8 +1,10 @@
 ﻿using Fusion;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HostLobby : NetworkBehaviour
 {
@@ -13,6 +15,9 @@ public class HostLobby : NetworkBehaviour
 
     public Transform playerSlotTemplate;
     public Transform playerSlotContainer;
+
+    public GameObject[] hostOwnObjects;
+    public Button hostStartButton;
 
     private Dictionary<PlayerRef, NetworkObject> spawnedAvatars = new Dictionary<PlayerRef, NetworkObject>();
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, NetworkBool> readyStatus => default;
@@ -28,10 +33,20 @@ public class HostLobby : NetworkBehaviour
         {
             EnsureReadyStatusInit();
             UpdatePlayerList();
+
+            foreach(var go in hostOwnObjects)
+            {
+                go.SetActive(true);
+            }
         }
         else
         {
             RPC_RequestUpdatePlayerList();
+
+            foreach (var go in hostOwnObjects)
+            {
+                go.SetActive(false);
+            }
         }
         networkManager.onPlayerListChange += NetworkManager_onPlayerListChange;
     }
@@ -69,18 +84,23 @@ public class HostLobby : NetworkBehaviour
     public void RPC_RequestSetReady(PlayerRef player, bool ready)
     {
         readyStatus.Set(player, ready);
+        hostStartButton.interactable = readyStatus.All(r => r.Value == true);
         foreach (var kvp in readyStatus)
         {
             Debug.Log($"Player: {kvp.Key} Ready: {kvp.Value}");
         }
 
         if (Object.HasStateAuthority)
+        {
             UpdatePlayerList();
+        }
     }
 
     void EnsureReadyStatusInit()
     {
         if (!Object.HasStateAuthority) return;
+
+        hostStartButton.interactable = false;
 
         List<PlayerRef> players = networkManager.GetAllPlayers();
         foreach (var player in players)
