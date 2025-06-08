@@ -136,4 +136,14 @@ public class SharkAI : MonoBehaviour
         float playerMiddleY = target.position.y - (playerHeight / 2);
         return playerMiddleY < waterLevel;
     }
+    void OnCollisionEnter(Collision collision)
+    {
+        // Nếu va chạm với đối tượng có tag là "Ground"
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            PickNewRoamPoint(); // Chọn hướng đi mới
+            lastTurnTime = Time.time; // Reset thời gian quay đầu
+        }
+    }
+
 }
