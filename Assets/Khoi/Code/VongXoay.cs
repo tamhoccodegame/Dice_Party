@@ -26,6 +26,8 @@ public class VongXoay : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        if (!HasStateAuthority) return; // Chỉ để Host điều khiển
+
         if (manager != null && manager.Object.IsValid && manager.isGameStarted)
         {
             // Tăng tốc dần theo thời gian
