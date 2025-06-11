@@ -34,6 +34,9 @@ public class BoardGameData : MonoBehaviour
 
     public string GetNode(PlayerRef player)
     {
+        if(playerCurrentNode.ContainsKey(player))
         return playerCurrentNode[player];
+
+        return null;
     }
 }

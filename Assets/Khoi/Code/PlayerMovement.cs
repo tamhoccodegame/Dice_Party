@@ -23,14 +23,14 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        if (cameraTransform == null)
-        {
-            cameraTransform = Camera.main.transform;
-            if (cameraTransform == null)
-            {
-                Debug.LogWarning("CameraTransform not assigned. Player movement might not be relative to camera direction.");
-            }
-        }
+        //if (cameraTransform == null)
+        //{
+        //    cameraTransform = Camera.main.transform;
+        //    if (cameraTransform == null)
+        //    {
+        //        Debug.LogWarning("CameraTransform not assigned. Player movement might not be relative to camera direction.");
+        //    }
+        //}
     }
 
     void Update()

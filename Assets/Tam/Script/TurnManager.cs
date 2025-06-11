@@ -116,12 +116,17 @@ public class TurnManager : NetworkBehaviour
             currentPlayerIndex = (currentPlayerIndex + 1) % playerController.Count;
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
             if (currentPlayerIndex == 0)
+            {
                 Runner.LoadScene("MNG3");
+            }
         }
 
-        playerController[currentPlayerIndex].StartTurn();
-        UpdateTurnUI();
-        StartFollowTarget();
+        if (currentPlayerIndex != 0)
+        {
+            playerController[currentPlayerIndex].StartTurn();
+            UpdateTurnUI();
+            StartFollowTarget();
+        }
     }
 
     void UpdateTurnUI()
