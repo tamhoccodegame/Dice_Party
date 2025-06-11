@@ -1,138 +1,120 @@
 ﻿using UnityEngine;
 
-// Script điều khiển nhân vật có animation đánh theo nút: chuột trái (Attack01), E, R, T
-// Và có di chuyển bằng Rigidbody
-
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerDayLui : MonoBehaviour
 {
+    [Header("Movement Settings")]
     public float moveSpeed = 5f;
+    public float rotationSpeed = 10f;
+    public float jumpForce = 7f;
 
     [Header("Combat Settings")]
-    public float attackRange = 2f;
+    public float attackRange = 1.5f;
     public float pushForce = 10f;
-    public float attackCooldown = 0.5f;
+    public float attackCooldown = 0.8f;
 
     [Header("Animator")]
     public Animator animator;
 
     private Rigidbody rb;
+    private Vector3 moveDirection;
     private float lastAttackTime = -999f;
+    private bool isAttacking = false;
+    private bool isGrounded = true;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-
-        if (animator == null)
-        {
-            animator = GetComponent<Animator>();
-        }
-
-        if (animator == null)
-        {
-            Debug.LogError("Animator chưa được gán vào PlayerDayLui!");
-        }
+        if (animator == null) animator = GetComponent<Animator>();
+        if (animator == null) Debug.LogError("Animator chưa được gán cho PlayerDayLui!");
     }
 
     void Update()
     {
         HandleMovement();
-        HandleAttackInputs();
+        HandleAttack();
+        HandleJump();
     }
 
     void HandleMovement()
     {
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveZ = Input.GetAxisRaw("Vertical");
+        float h = Input.GetAxisRaw("Horizontal"); // A, D
+        float v = Input.GetAxisRaw("Vertical");   // W, S
+        Debug.Log($"Input H: {h}, V: {v}, MoveDir: {moveDirection}");
 
-        Vector3 moveDir = new Vector3(moveX, 0f, moveZ).normalized;
+        moveDirection = new Vector3(h, 0f, v).normalized;
 
-        if (moveDir.magnitude > 0.1f)
+        if (!isAttacking) // Nếu không đang đánh thì mới cho di chuyển
         {
-            rb.velocity = new Vector3(moveDir.x * moveSpeed, rb.velocity.y, moveDir.z * moveSpeed);
-
-            // Gọi animation chạy (chỉ cần gõ đúng tên state trong Animator Controller)
-            if (animator != null)
+            if (moveDirection.magnitude >= 0.1f)
             {
-                animator.Play("Run01FWD");
+                // Di chuyển
+                Vector3 moveVelocity = moveDirection * moveSpeed;
+                rb.velocity = new Vector3(moveVelocity.x, rb.velocity.y, moveVelocity.z);
+
+                // Xoay theo hướng di chuyển
+                Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+                transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+
+                animator.CrossFade("Run", 0.1f);
             }
-        }
-        else
-        {
-            // Đứng yên
-            rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
-
-            if (animator != null)
+            else
             {
-                animator.Play("Idle01");
-            }
-        }
-    }
-
-    void HandleAttackInputs()
-    {
-        if (Time.time < lastAttackTime + attackCooldown) return;
-
-        // Chuột trái → Attack01
-        if (Input.GetMouseButtonDown(0))
-        {
-            PlayAttack("Attack01");
-        }
-
-        // Phím E → Attack02
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            PlayAttack("Attack02");
-        }
-
-        // Phím R → Attack03
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            PlayAttack("Attack03");
-        }
-
-        // Phím T → Push
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            PlayAttack("Push");
-        }
-    }
-
-    void PlayAttack(string animName)
-    {
-        lastAttackTime = Time.time;
-
-        if (animator != null)
-        {
-            animator.Play(animName);
-        }
-
-        // Gây lực đẩy nếu đánh trúng player khác
-        Collider[] hits = Physics.OverlapSphere(transform.position, attackRange);
-        foreach (var hit in hits)
-        {
-            if (hit.gameObject != gameObject && hit.CompareTag("Player"))
-            {
-                PlayerDayLui other = hit.GetComponent<PlayerDayLui>();
-                if (other != null)
-                {
-                    other.TakeHit(transform.position);
-                }
+                // Đứng yên
+                rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
+                animator.CrossFade("Idle", 0.1f);
             }
         }
     }
 
-    public void TakeHit(Vector3 attackerPos)
+    void HandleJump()
     {
-        Vector3 pushDir = (transform.position - attackerPos).normalized;
-        rb.AddForce(pushDir * pushForce, ForceMode.Impulse);
-
-        Debug.Log($"{gameObject.name} bị đẩy lùi!");
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            isGrounded = false; // Chờ rơi xuống mới nhảy tiếp
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            animator.CrossFade("Jump", 0.1f);
+        }
     }
 
-    void OnDrawGizmosSelected()
+    void HandleAttack()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        if (Input.GetMouseButtonDown(1) && Time.time >= lastAttackTime + attackCooldown)
+        {
+            lastAttackTime = Time.time;
+            isAttacking = true;
+
+            // Ngắt di chuyển, animation chuyển sang đánh
+            animator.CrossFade("hit", 0.1f);
+
+            Invoke(nameof(ResetAttack), 0.5f); // Tùy thời gian animation đánh
+        }
+    }
+
+    void ResetAttack()
+    {
+        isAttacking = false;
+    }
+
+    // Xử lý va chạm khi nhảy tiếp đất
+    void OnCollisionEnter(Collision collision)
+    {
+        // Check tiếp đất
+        if (collision.contacts[0].normal.y > 0.5f)
+        {
+            isGrounded = true;
+        }
+
+        // Kiểm tra va chạm với Player khác khi đang đánh
+        if (isAttacking && collision.gameObject.CompareTag("Player") && collision.gameObject != gameObject)
+        {
+            Rigidbody otherRb = collision.gameObject.GetComponent<Rigidbody>();
+            if (otherRb != null)
+            {
+                Vector3 pushDir = (collision.transform.position - transform.position).normalized;
+                otherRb.AddForce(pushDir * pushForce, ForceMode.Impulse);
+            }
+        }
+
     }
 }

@@ -200,7 +200,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 249690705}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.23675555, y: -0.000000023572728, z: 0.0000000057442886, w: 0.9715693}
+  m_LocalRotation: {x: 0.23675555, y: -0.000000023572726, z: 0.000000005744288, w: 0.97156924}
   m_LocalPosition: {x: 21.676, y: 3.147, z: 10.627999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1122,6 +1122,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  rotationSpeed: 10
+  jumpForce: 7
   attackRange: 2
   pushForce: 10
   attackCooldown: 1
@@ -1135,7 +1137,7 @@ Rigidbody:
   m_GameObject: {fileID: 1605003045}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
+  m_Drag: 0.1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -1182,8 +1184,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4115868, y: 1.7819942, z: 1}
-  m_Center: {x: -0.029296875, y: 0.88107544, z: 0}
+  m_Size: {x: 1.4115868, y: 1.9164052, z: 1.0906811}
+  m_Center: {x: -0.029296875, y: 0.9315957, z: 0.045340538}
 --- !u!1 &1648485366
 GameObject:
   m_ObjectHideFlags: 0
