@@ -47,6 +47,8 @@ public class VongXoayManager : NetworkBehaviour
     public TextMeshProUGUI firstRankName;
     public TextMeshProUGUI secondRankName;
 
+    public Transform spawnPosition;
+
 
     public Image blackScreen;
 
@@ -105,12 +107,14 @@ public class VongXoayManager : NetworkBehaviour
         yield return StartCoroutine(FadeBlackScreen(1, 0));
         yield return new WaitForSecondsRealtime(10f);
 
-
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         tutorialPanel.SetActive(false);
 
-        yield return new WaitForSecondsRealtime(2f);
+        yield return new WaitForSecondsRealtime(5f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
+
+        yield return new WaitForSecondsRealtime(4f);
+
 
         if (Object.HasStateAuthority)
         {
