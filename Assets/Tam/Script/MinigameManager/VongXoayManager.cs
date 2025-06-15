@@ -179,7 +179,10 @@ public class VongXoayManager : NetworkBehaviour
 
     IEnumerator ReturnToBoard()
     {
-        yield return new WaitForSeconds(6f);
+        yield return new WaitForSecondsRealtime(6f);
+        yield return StartCoroutine(FadeBlackScreen(0, 1));
+        yield return new WaitForSecondsRealtime(3f);
+
         Runner.LoadScene("TuanSceneMap");
     }
 

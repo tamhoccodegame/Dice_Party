@@ -39,5 +39,17 @@ public class BoardNode : NetworkBehaviour
                 Debug.Log("Add Blood");
                 break;
         }
+
+        BoardGameController[] players = FindObjectsByType<BoardGameController>(FindObjectsSortMode.None);
+
+        foreach(var p in players)
+        {
+            if (p.Object.InputAuthority == player)
+            {
+                p.EndTurn();
+            }
+            else continue;
+        }
+
     }
 }

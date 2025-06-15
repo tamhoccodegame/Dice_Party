@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TurnManager : NetworkBehaviour
 {
@@ -30,6 +31,13 @@ public class TurnManager : NetworkBehaviour
 
     public GameState currentState;
 
+    public Image blackScreen;
+
+    public float fadeDuration = 1f;
+
+    public void FadeIn() => StartCoroutine(FadeBlackScreen(0, 1));
+    public void FadeOut() => StartCoroutine(FadeBlackScreen(1, 0));
+
     private void Awake()
     {
         instance = this;
@@ -37,6 +45,7 @@ public class TurnManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        StartCoroutine(FadeBlackScreen(1, 0));
         cam = Camera.main;
 
         playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
@@ -117,7 +126,7 @@ public class TurnManager : NetworkBehaviour
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
             if (currentPlayerIndex == 0)
             {
-                Runner.LoadScene("MNG3");
+                RPC_LoadScene();
             }
         }
 
@@ -141,6 +150,44 @@ public class TurnManager : NetworkBehaviour
         }
 
         turnNotifyText.gameObject.SetActive(true);
+    }
+
+    private IEnumerator FadeBlackScreen(float from, float to)
+    {
+        float elapsed = 0f;
+        Color color = blackScreen.color;
+        color.a = from;
+
+        blackScreen.color = color;
+
+        Color newColor = blackScreen.color;
+
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime; // Dùng unscaled để không bị ảnh hưởng bởi Time.timeScale
+            newColor.a = Mathf.Lerp(from, to, elapsed / fadeDuration);
+            blackScreen.color = newColor;
+            yield return null;
+        }
+
+        blackScreen.color = newColor;
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_LoadScene()
+    {
+        StartCoroutine(LoadMNG());
+    }
+
+    IEnumerator LoadMNG()
+    {
+        yield return StartCoroutine(FadeBlackScreen(0, 1));
+        yield return new WaitForSecondsRealtime(2f);
+
+        if (HasStateAuthority)
+        {
+            Runner.LoadScene("MNG3");
+        }
     }
 
     void StartFollowTarget()

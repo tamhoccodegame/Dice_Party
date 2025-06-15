@@ -32,11 +32,9 @@ public class BoardGameController : NetworkBehaviour
     public TextMeshPro stepText;
 
     private enum MoveState { Idle, Rolling, WaitingForAnim, Moving }
-    private MoveState moveState = MoveState.Idle;
-    private MoveState currentState;
+    [Networked] private MoveState moveState { get; set; }
 
     private float animTimer = 0f;
-    private bool predictedRoll = false;
 
     public override void Spawned()
     {
@@ -62,6 +60,7 @@ public class BoardGameController : NetworkBehaviour
         }
 
         toMoveNode = currentNode.nextNodes[0];
+        stepText.gameObject.SetActive(false);
     }
 
     void Update()
@@ -70,13 +69,8 @@ public class BoardGameController : NetworkBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                if (!predictedRoll && moveState == MoveState.Idle)
+                if (moveState == MoveState.Idle)
                 {
-                    predictedRoll = true;
-                    int predictedSteps = Random.Range(1, 5);
-                    currentStep = predictedSteps;
-                    stepText.gameObject.SetActive(true);
-                    stepText.text = predictedSteps.ToString();
                     RPC_RequestDiceRoll();
                 }
             }
@@ -113,8 +107,7 @@ public class BoardGameController : NetworkBehaviour
                     {
                         waitingForChoice = true;
                         ShowDirectionChoices();
-                        moveState = MoveState.Idle;
-                        animator.CrossFade("Idle", 0.25f);
+                        SetMoveState(MoveState.Idle);
                         return;
                     }
                     else
@@ -124,10 +117,8 @@ public class BoardGameController : NetworkBehaviour
                 }
                 else
                 {
-                    moveState = MoveState.Idle;
-                    animator.CrossFade("Idle", 0.25f);
+                    SetMoveState(MoveState.Idle);
                     TriggerNodeEvent();
-                    EndTurn();
                 }
             }
         }
@@ -137,20 +128,18 @@ public class BoardGameController : NetworkBehaviour
             animTimer -= Runner.DeltaTime;
             if (animTimer <= 0f)
             {
-                animator.CrossFade("Run", 0.25f);
-                moveState = MoveState.Moving;
+                SetMoveState(MoveState.Moving);
             }
-        }
-
-        if (currentState != moveState)
-        {
-            currentState = moveState;
-            RPC_HandleAnim(moveState);
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_HandleAnim(MoveState moveState)
+    private void SetMoveState(MoveState newState)
+    {
+        moveState = newState;
+        UpdateAnimation();
+    }
+
+    private void UpdateAnimation()
     {
         switch (moveState)
         {
@@ -158,16 +147,17 @@ public class BoardGameController : NetworkBehaviour
                 animator.CrossFade("Idle", 0.25f);
                 break;
             case MoveState.Moving:
-                animator.CrossFade("Run", 0.1f);
+                animator.CrossFade("Run", 0.25f);
                 break;
             case MoveState.WaitingForAnim:
+                animator.CrossFade("RollDice", 0.25f);
                 break;
         }
     }
 
     public void StartTurn()
     {
-        if (Object.HasInputAuthority)
+        if (HasInputAuthority)
         {
             RPC_RequestShowDice();
         }
@@ -192,17 +182,30 @@ public class BoardGameController : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestDiceRoll()
     {
-        if (HasStateAuthority && moveState == MoveState.Idle)
-        {
-            StartMove();
-        }
+        if (moveState != MoveState.Idle) return;
+
+        currentStep = Random.Range(1, 5);
+        SetMoveState(MoveState.WaitingForAnim);
+
+        RPC_UpdateStepText(currentStep);
+
+        animTimer = 1f; // Thời gian animation roll
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_ShowDice()
+    private void RPC_UpdateStepText(int steps)
     {
-        if (activeDice != null || !Object.HasStateAuthority) return;
-        activeDice = Runner.Spawn(dicePrefab, transform.position + new Vector3(0, 5f, 0), Quaternion.identity).GetComponent<Dice>();
+        currentStep = steps;
+        stepText.text = steps.ToString();
+        stepText.gameObject.SetActive(true);
+        Runner.Despawn(activeDice.Object);
+        StartCoroutine(HideStepText());
+    }
+
+    private IEnumerator HideStepText()
+    {
+        yield return new WaitForSeconds(1f);
+        stepText.gameObject.SetActive(false);
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -212,50 +215,17 @@ public class BoardGameController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_Move(int steps)
+    private void RPC_ShowDice()
     {
-        currentStep = steps;
-        stepText.gameObject.SetActive(true);
-        stepText.text = steps.ToString();
+        if (activeDice != null) return;
 
-        animator.CrossFade("RollDice", 0.25f);
-        animTimer = 0.25f + animator.GetCurrentAnimatorStateInfo(0).length;
-        stepText.gameObject.SetActive(false);
-        moveState = MoveState.WaitingForAnim;
-
-        predictedRoll = false;
-
-        if (!HasStateAuthority && moveState == MoveState.Idle)
-        {
-            animator.CrossFade("Run", 0.25f);
-            moveState = MoveState.Moving;
-        }
-    }
-
-    private void StartMove()
-    {
-        currentStep = Random.Range(1, 5);
-        stepText.gameObject.SetActive(true);
-        stepText.text = currentStep.ToString();
-
-        if (activeDice != null)
-        {
-            activeDice.RequestDestroyDice();
-            activeDice = null;
-        }
-
-        animator.CrossFade("RollDice", 0.25f);
-        animTimer = 0.25f + animator.GetCurrentAnimatorStateInfo(0).length;
-        stepText.gameObject.SetActive(false);
-        moveState = MoveState.WaitingForAnim;
-
-        RPC_Move(currentStep);
+        Vector3 spawnPos = transform.position + new Vector3(0, 5f, 0);
+        activeDice = Runner.Spawn(dicePrefab, spawnPos, Quaternion.identity).GetComponent<Dice>();
     }
 
     void ShowDirectionChoices()
     {
         ClearArrow();
-        animator.CrossFade("Idle", 0.25f);
         for (int i = 0; i < currentNode.nextNodes.Count; i++)
         {
             BoardNode next = currentNode.nextNodes[i];
@@ -281,10 +251,9 @@ public class BoardGameController : NetworkBehaviour
     public void ChooseDirection(int index)
     {
         ClearArrow();
-        animator.CrossFade("Run", 0.25f);
         toMoveNode = currentNode.nextNodes[index];
         waitingForChoice = false;
-        moveState = MoveState.Moving;
+        SetMoveState(MoveState.Moving);
     }
 
     void TriggerNodeEvent()
