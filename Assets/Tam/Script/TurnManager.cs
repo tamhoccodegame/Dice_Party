@@ -45,6 +45,7 @@ public class TurnManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        GetComponent<PlayerSpawner>().SpawnPlayer();
         MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
         StartCoroutine(FadeBlackScreen(1, 0));
         cam = Camera.main;

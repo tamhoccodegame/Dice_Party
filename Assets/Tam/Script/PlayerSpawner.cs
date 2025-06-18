@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class PlayerSpawner : NetworkBehaviour
 {
     private NetworkManager networkManager;
+
     public GameObject playerPrefab;
     public Transform spawnPosition;
 
@@ -15,6 +16,11 @@ public class PlayerSpawner : NetworkBehaviour
     }
 
     public override void Spawned()
+    {
+        
+    }
+
+    public void SpawnPlayer()
     {
         if (!Object.HasStateAuthority) return;
 

@@ -1,12 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-[System.Serializable]
-public class MNGMusic
-{
-    public string minigameName;
-    public AudioClip minigameMusic;
-}
 
 public class MusicManager : MonoBehaviour
 {
@@ -14,7 +8,7 @@ public class MusicManager : MonoBehaviour
 
     public AudioClip menuMusic;
     public AudioClip boardMusic;
-    public MNGMusic[] mngMusic;
+    public AudioClip[] mngMusics;
 
     private AudioSource audioSource;
 
@@ -65,8 +59,8 @@ public class MusicManager : MonoBehaviour
                 audioSource.clip = boardMusic;
                 break;
             case MusicType.MNG:
-                if (mngIndex >= 0 && mngIndex < mngMusic.Length)
-                    audioSource.clip = mngMusic[mngIndex].minigameMusic;
+                if (mngIndex >= 0 && mngIndex < mngMusics.Length)
+                    audioSource.clip = mngMusics[mngIndex];
                 break;
         }
 

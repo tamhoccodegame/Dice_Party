@@ -59,6 +59,7 @@ public class VongXoayManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
         instance = this;
         tutorialPanel.SetActive(true);
 
@@ -112,6 +113,8 @@ public class VongXoayManager : NetworkBehaviour
 
         yield return new WaitForSecondsRealtime(5f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
+
+        GetComponent<PlayerSpawner>().SpawnPlayer();
 
         yield return new WaitForSecondsRealtime(4f);
 
