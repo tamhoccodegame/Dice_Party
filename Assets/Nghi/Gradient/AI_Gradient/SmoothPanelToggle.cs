@@ -59,12 +59,12 @@ public class SmoothPanelToggle : MonoBehaviour
         LeanTween.scale(gameObject, originalScale, fadeDuration).setEase(tweenType);
 
         // Cho tương tác sau tween
-        //LeanTween.delayedCall(fadeDuration * 0.7f, () =>
-        //{
-        //    canvasGroup.interactable = true;
-        //    canvasGroup.blocksRaycasts = true;
-        //    isVisible = true;
-        //});
+        LeanTween.delayedCall(fadeDuration * 0.7f, () =>
+        {
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
+            isVisible = true;
+        });
     }
 
     public void Hide()
