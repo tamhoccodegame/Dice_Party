@@ -55,18 +55,18 @@ public class BoardGameController : NetworkBehaviour
         animator = GetComponent<Animator>();
 
         // Lấy dữ liệu node từ BoardGameData (nếu có)
-        string currentNodeName = null;
+        string currentNodeName1 = null;
         BoardGameData gameData = BoardGameData.instance;
 
         if (gameData != null && gameData.playerCurrentNode.Count > 0)
         {
-            currentNodeName = gameData.GetNode(Runner.LocalPlayer);
+            currentNodeName1 = gameData.GetNode(Runner.LocalPlayer);
         }
 
         // Nếu không có dữ liệu từ BoardGameData thì lấy node mặc định
-        if (currentNodeName != null)
+        if (currentNodeName1 != null)
         {
-            currentNode = GameObject.Find(currentNodeName).GetComponent<BoardNode>();
+            currentNode = GameObject.Find(currentNodeName1).GetComponent<BoardNode>();
         }
         else
         {
@@ -74,7 +74,7 @@ public class BoardGameController : NetworkBehaviour
         }
 
         // Set node tiếp theo mặc định là node đầu tiên
-        currentNodeName = currentNode.name;
+        RPC_SetCurrentNode(currentNode.name);
         toMoveNode = currentNode.nextNodes[0];
         stepText.gameObject.SetActive(false);
 
@@ -137,7 +137,7 @@ public class BoardGameController : NetworkBehaviour
             if (Vector3.Distance(transform.position, toMoveNode.transform.position) <= 0.5f)
             {
                 currentNode = toMoveNode;
-                currentNodeName = currentNode.name;
+                RPC_SetCurrentNode(currentNode.name);
                 currentStep--;
 
                 if (currentStep > 0)
@@ -300,11 +300,14 @@ public class BoardGameController : NetworkBehaviour
         dice.SetActive(false);
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestUpdateCurrentNode()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_SetCurrentNode(string newName)
     {
-
+        currentNodeName = newName;
     }
+
+
+
     #endregion
 
 }
