@@ -74,6 +74,7 @@ public class BoardGameController : NetworkBehaviour
         }
 
         // Set node tiếp theo mặc định là node đầu tiên
+        if(HasStateAuthority)
         RPC_SetCurrentNode(currentNode.name);
         toMoveNode = currentNode.nextNodes[0];
         stepText.gameObject.SetActive(false);
@@ -137,6 +138,7 @@ public class BoardGameController : NetworkBehaviour
             if (Vector3.Distance(transform.position, toMoveNode.transform.position) <= 0.5f)
             {
                 currentNode = toMoveNode;
+                if(HasStateAuthority)
                 RPC_SetCurrentNode(currentNode.name);
                 currentStep--;
 

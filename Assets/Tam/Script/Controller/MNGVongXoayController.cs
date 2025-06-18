@@ -26,6 +26,7 @@ public class MNGVongXoayController : NetworkBehaviour
 
     public override void Spawned()
     {
+        bloodEffect.Stop();
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
