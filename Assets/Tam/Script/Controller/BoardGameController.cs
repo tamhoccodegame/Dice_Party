@@ -16,6 +16,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Các node hiện tại và node sắp di chuyển ---
     [Header("Move")]
     public BoardNode currentNode;         // node hiện tại đang đứng
+    [Networked, UnitySerializeField] public string currentNodeName { get; set; }
     public BoardNode toMoveNode;          // node sẽ di chuyển tới tiếp
 
     [Networked] public int currentStep { get; set; }      // số bước xúc xắc random, sync qua network
@@ -28,13 +29,15 @@ public class BoardGameController : NetworkBehaviour
     public GameObject arrowDirectionPrefab;   // prefab của mũi tên chỉ hướng
     public List<GameObject> spawnedArrows = new List<GameObject>(); // danh sách các mũi tên đã spawn ra
 
+    [Header("Effect")]
+    public ParticleSystem rollDiceEffect;
+
     // --- Kiểm tra có phải lượt của mình hay không ---
     bool isMyTurn => TurnManager.instance.currentPlayerRef == Runner.LocalPlayer;
 
     // --- Quản lý xúc xắc và UI hiển thị bước ---
     [Header("Dice and Step")]
-    public GameObject dicePrefab;    // prefab xúc xắc
-    private Dice activeDice;         // xúc xắc đang spawn trên scene
+    public GameObject dice;         // xúc xắc đang spawn trên scene
     public TextMeshPro stepText;     // text hiện số bước trên UI
 
     // --- State Machine cho việc di chuyển ---
@@ -71,6 +74,7 @@ public class BoardGameController : NetworkBehaviour
         }
 
         // Set node tiếp theo mặc định là node đầu tiên
+        currentNodeName = currentNode.name;
         toMoveNode = currentNode.nextNodes[0];
         stepText.gameObject.SetActive(false);
 
@@ -87,6 +91,8 @@ public class BoardGameController : NetworkBehaviour
             // Nếu là lượt mình và đang idle thì bấm space để roll dice
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                RPC_HideDice();
+
                 if (moveState == MoveState.Idle)
                 {
                     RPC_RequestDiceRoll();
@@ -131,6 +137,7 @@ public class BoardGameController : NetworkBehaviour
             if (Vector3.Distance(transform.position, toMoveNode.transform.position) <= 0.5f)
             {
                 currentNode = toMoveNode;
+                currentNodeName = currentNode.name;
                 currentStep--;
 
                 if (currentStep > 0)
@@ -195,7 +202,7 @@ public class BoardGameController : NetworkBehaviour
     {
         if (HasInputAuthority)
         {
-            RPC_RequestShowDice();
+            RPC_ShowDice();
         }
     }
 
@@ -209,34 +216,13 @@ public class BoardGameController : NetworkBehaviour
         foreach (var player in players)
         {
             PlayerRef playerRef = player.GetComponent<NetworkObject>().InputAuthority;
-            string currentNodeName = player.currentNode.name;
+            string currentNodeName = player.currentNodeName;
             boardGameData.UpdateNode(playerRef, currentNodeName);
         }
 
         TurnManager.instance.RequestNextTurn();
     }
 
-    // --- RPC: Client gửi yêu cầu lắc xúc xắc ---
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestDiceRoll()
-    {
-        if (moveState != MoveState.Idle) return;
-
-        currentStep = Random.Range(1, 5);   // random số bước
-        SetMoveState(MoveState.WaitingForAnim);
-        animTimer = 1f;                     // đợi 1 giây chơi animation roll
-    }
-
-    // --- RPC: Client yêu cầu host spawn dice ---
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestShowDice()
-    {
-        if (activeDice != null)
-            return;
-
-        Vector3 spawnPos = transform.position + new Vector3(0, 5f, 0);
-        activeDice = Runner.Spawn(dicePrefab, spawnPos, Quaternion.identity).GetComponent<Dice>();
-    }
 
     // --- Spawn các mũi tên chọn hướng khi tới ngã ba ---
     void ShowDirectionChoices()
@@ -281,4 +267,44 @@ public class BoardGameController : NetworkBehaviour
         if (HasStateAuthority)
             currentNode.RPC_ProcessNode(Runner.LocalPlayer);
     }
+
+    #region RPC
+    // --- RPC: Client gửi yêu cầu lắc xúc xắc ---
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestDiceRoll()
+    {
+        if (moveState != MoveState.Idle) return;
+
+        currentStep = Random.Range(1, 5);   // random số bước
+        SetMoveState(MoveState.WaitingForAnim);
+        animTimer = 1f;                     // đợi 1 giây chơi animation roll
+        rollDiceEffect.Play();
+    }
+
+    // --- RPC: Client yêu cầu host spawn dice ---
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    private void RPC_ShowDice()
+    {
+        dice.SetActive(true);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    private void RPC_HideDice()
+    {
+        StartCoroutine(HideDiceCoroutine());
+    }
+
+    IEnumerator HideDiceCoroutine()
+    {
+        yield return new WaitForSecondsRealtime(0.2f);
+        dice.SetActive(false);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestUpdateCurrentNode()
+    {
+
+    }
+    #endregion
+
 }

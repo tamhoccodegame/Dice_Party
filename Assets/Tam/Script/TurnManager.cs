@@ -68,7 +68,7 @@ public class TurnManager : NetworkBehaviour
     // Chỉ Host mới cập nhật vị trí mới và gửi cho Client
     public override void FixedUpdateNetwork()
     {
-        if (!isCameraMoving && playerController.Count > 0)
+        if (!isCameraMoving && playerController.Count > 0 && playerController[currentPlayerIndex] != null)
         {
             Vector3 newCamPosition = playerController[currentPlayerIndex].transform.position + camOffset;
 

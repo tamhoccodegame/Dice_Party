@@ -6,6 +6,9 @@ public class BoardNode : NetworkBehaviour
 {
     public bool isStartNode = false;
     public List<BoardNode> nextNodes;
+
+    public ParticleSystem nodeEffect;
+
     public enum EventType
     {
         None,
@@ -30,6 +33,9 @@ public class BoardNode : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_ProcessNode(PlayerRef player)
     {
+        if(eventType != EventType.None)
+        nodeEffect.Play();
+
         switch (eventType)
         {
             case EventType.Key:

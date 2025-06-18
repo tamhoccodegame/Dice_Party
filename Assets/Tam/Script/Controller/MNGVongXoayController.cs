@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using UnityEngine;
+using UnityEngine.VFX;
 
 [RequireComponent(typeof(CharacterController))]
 public class MNGVongXoayController : NetworkBehaviour
@@ -16,6 +17,8 @@ public class MNGVongXoayController : NetworkBehaviour
     [Networked] private Vector2 moveInput { get; set; }
     [Networked] private bool jumpRequest { get; set; }
     [Networked] private string NetworkAnim { get; set; } // Animation sync
+
+    public VisualEffect bloodEffect;
 
     public string currentAnim;
 
@@ -115,9 +118,17 @@ public class MNGVongXoayController : NetworkBehaviour
         animator.CrossFade(animName, blendTime);
     }
 
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_BloodEffect()
+    {
+        bloodEffect.Play();
+    }
+
     public void Die()
     {
         if (VongXoayManager.instance.isGameOver) return;
+
+        RPC_BloodEffect();
 
         if (Object.HasInputAuthority)
         {
