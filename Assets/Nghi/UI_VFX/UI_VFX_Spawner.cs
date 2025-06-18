@@ -13,14 +13,38 @@ public class UI_VFX_Spawner : MonoBehaviour
     }
 
     [System.Serializable]
+    public class VFXPrefabConfig
+    {
+        public GameObject prefab;
+        public bool useCustomSettings;
+
+        // RandomInArea
+        public RectTransform customSpawnArea;
+
+        // SequentialAtPoints
+        public List<Transform> customSpawnPoints;
+        public bool playInOrder;
+        public bool playOnAwakeOnly;
+        public bool simultaneousSpawnAtAllPoints;
+
+        // MoveAlongPath
+        public List<Transform> customPathPoints;
+        public float moveSpeed = 100f;
+        public float waitBetweenMoves = 1f;
+        public bool loopPath;
+
+        // Common per-VFX settings
+        public float appearDuration = 0.5f;
+        public Ease appearEase = Ease.OutBack;
+    }
+
+    [System.Serializable]
     public class ModeConfig
     {
         public SpawnMode mode;
         public bool enabled = true;
+        public List<GameObject> vfxPrefabs = new List<GameObject>();
     }
-
-    [Header("⚡ List of VFX Prefabs")]
-    public List<GameObject> vfxPrefabs;
 
     [Header("🎯 Spawn Settings")]
     public RectTransform spawnArea;
@@ -32,9 +56,6 @@ public class UI_VFX_Spawner : MonoBehaviour
 
     [Header("🎮 Mode Config List")]
     public List<ModeConfig> modeConfigs = new List<ModeConfig>();
-
-    [Header("🔀 Mode Execution")]
-    public bool executeModesSequentially = false; // False = chạy song song; True = chạy lần lượt từ trên xuống.
 
     [Header("🎞 UI Animation")]
     public float appearDuration = 0.5f;
@@ -51,7 +72,6 @@ public class UI_VFX_Spawner : MonoBehaviour
     public float moveSpeed = 100f;
     public float waitBetweenMoves = 1f;
     public bool loopPath = false;
-    public bool playVFXAtEachPoint = true;
 
     private bool isSpawning = false;
     private int currentIndex = 0;
@@ -69,11 +89,7 @@ public class UI_VFX_Spawner : MonoBehaviour
         if (!isSpawning)
         {
             isSpawning = true;
-
-            if (executeModesSequentially)
-                StartCoroutine(SequentialModeRoutine());
-            else
-                StartCoroutine(ParallelModeRoutine());
+            StartCoroutine(ParallelModeRoutine());
         }
     }
 
@@ -81,16 +97,6 @@ public class UI_VFX_Spawner : MonoBehaviour
     {
         isSpawning = false;
         StopAllCoroutines();
-    }
-
-    private IEnumerator SequentialModeRoutine()
-    {
-        foreach (var config in modeConfigs)
-        {
-            if (!config.enabled) continue;
-
-            yield return StartCoroutine(SpawnRoutine(config.mode));
-        }
     }
 
     private IEnumerator ParallelModeRoutine()
@@ -101,43 +107,43 @@ public class UI_VFX_Spawner : MonoBehaviour
         {
             if (!config.enabled) continue;
 
-            Coroutine coroutine = StartCoroutine(SpawnRoutine(config.mode));
+            Coroutine coroutine = StartCoroutine(SpawnRoutine(config));
             activeCoroutines.Add(coroutine);
         }
 
-        // Wait all coroutines finish (never ending loops excluded unless stopped externally)
         yield break;
     }
 
-    private IEnumerator SpawnRoutine(SpawnMode mode)
+    private IEnumerator SpawnRoutine(ModeConfig config)
     {
         while (isSpawning)
         {
-            switch (mode)
+            switch (config.mode)
             {
                 case SpawnMode.RandomInArea:
-                    SpawnRandomVFX();
+                    SpawnRandomVFX(config);
                     break;
                 case SpawnMode.SequentialAtPoints:
                     if (simultaneousSpawnAtAllPoints)
-                        SpawnSimultaneouslyAtAllPoints();
+                        SpawnSimultaneouslyAtAllPoints(config);
                     else
-                        SpawnAtNextPoint();
+                        SpawnAtNextPoint(config);
                     break;
                 case SpawnMode.MoveAlongPath:
-                    yield return MoveVFXAlongPath();
+                    yield return MoveVFXAlongPath(config);
                     break;
             }
             yield return new WaitForSeconds(spawnInterval);
         }
     }
 
-    private void SpawnRandomVFX()
+    private void SpawnRandomVFX(ModeConfig config)
     {
-        if (vfxPrefabs.Count == 0 || spawnArea == null) return;
+        if (config.vfxPrefabs.Count == 0 || spawnArea == null) return;
 
-        GameObject vfxPrefab = vfxPrefabs[Random.Range(0, vfxPrefabs.Count)];
+        GameObject vfxPrefab = config.vfxPrefabs[Random.Range(0, config.vfxPrefabs.Count)];
         GameObject vfxInstance = Instantiate(vfxPrefab, spawnArea);
+        DisablePlayOnAwake(vfxInstance);
 
         Vector2 size = spawnArea.rect.size;
         Vector2 randomPos = new Vector2(
@@ -153,14 +159,18 @@ public class UI_VFX_Spawner : MonoBehaviour
         Destroy(vfxInstance, destroyDelay);
     }
 
-    private void SpawnAtNextPoint()
+    private void SpawnAtNextPoint(ModeConfig config)
     {
-        if (vfxPrefabs.Count == 0 || spawnPoints.Count == 0) return;
+        if (config.vfxPrefabs.Count == 0 || spawnPoints.Count == 0) return;
 
-        GameObject vfxPrefab = vfxPrefabs[playOnAwakeOnly ? currentIndex % vfxPrefabs.Count : Random.Range(0, vfxPrefabs.Count)];
+        GameObject vfxPrefab = config.vfxPrefabs[
+            playOnAwakeOnly ? currentIndex % config.vfxPrefabs.Count : Random.Range(0, config.vfxPrefabs.Count)
+        ];
+
         Transform targetPoint = spawnPoints[currentIndex % spawnPoints.Count];
 
         GameObject vfxInstance = Instantiate(vfxPrefab, targetPoint.position, Quaternion.identity, spawnArea);
+        DisablePlayOnAwake(vfxInstance);
         RectTransform rt = vfxInstance.GetComponent<RectTransform>();
         rt.localScale = Vector3.zero;
         rt.DOScale(Vector3.one, appearDuration).SetEase(appearEase);
@@ -173,14 +183,15 @@ public class UI_VFX_Spawner : MonoBehaviour
             currentIndex = Random.Range(0, spawnPoints.Count);
     }
 
-    private void SpawnSimultaneouslyAtAllPoints()
+    private void SpawnSimultaneouslyAtAllPoints(ModeConfig config)
     {
-        if (vfxPrefabs.Count == 0 || spawnPoints.Count == 0) return;
+        if (config.vfxPrefabs.Count == 0 || spawnPoints.Count == 0) return;
 
         foreach (Transform point in spawnPoints)
         {
-            GameObject vfxPrefab = vfxPrefabs[Random.Range(0, vfxPrefabs.Count)];
+            GameObject vfxPrefab = config.vfxPrefabs[Random.Range(0, config.vfxPrefabs.Count)];
             GameObject vfxInstance = Instantiate(vfxPrefab, point.position, Quaternion.identity, spawnArea);
+            DisablePlayOnAwake(vfxInstance);
             RectTransform rt = vfxInstance.GetComponent<RectTransform>();
             rt.localScale = Vector3.zero;
             rt.DOScale(Vector3.one, appearDuration).SetEase(appearEase);
@@ -188,12 +199,13 @@ public class UI_VFX_Spawner : MonoBehaviour
         }
     }
 
-    private IEnumerator MoveVFXAlongPath()
+    private IEnumerator MoveVFXAlongPath(ModeConfig config)
     {
-        if (vfxPrefabs.Count == 0 || pathPoints.Count < 2) yield break;
+        if (config.vfxPrefabs.Count == 0 || pathPoints.Count < 2) yield break;
 
-        GameObject vfxPrefab = vfxPrefabs[Random.Range(0, vfxPrefabs.Count)];
+        GameObject vfxPrefab = config.vfxPrefabs[Random.Range(0, config.vfxPrefabs.Count)];
         GameObject vfxInstance = Instantiate(vfxPrefab, pathPoints[0].position, Quaternion.identity, spawnArea);
+        DisablePlayOnAwake(vfxInstance);
 
         if (loopPath)
         {
@@ -224,9 +236,6 @@ public class UI_VFX_Spawner : MonoBehaviour
 
             yield return rt.DOAnchorPos(targetPos, duration).SetEase(Ease.Linear).WaitForCompletion();
 
-            if (playVFXAtEachPoint)
-                PlayVFX(rt);
-
             if (waitBetweenMoves > 0f)
                 yield return new WaitForSeconds(waitBetweenMoves);
 
@@ -242,11 +251,13 @@ public class UI_VFX_Spawner : MonoBehaviour
         }
     }
 
-    private void PlayVFX(RectTransform rt)
+    private void DisablePlayOnAwake(GameObject vfxInstance)
     {
-        ParticleSystem ps = rt.GetComponentInChildren<ParticleSystem>();
-        if (ps != null)
-            ps.Play();
+        ParticleSystem[] particleSystems = vfxInstance.GetComponentsInChildren<ParticleSystem>(true);
+        foreach (ParticleSystem ps in particleSystems)
+        {
+            var main = ps.main;
+            main.playOnAwake = false;
+        }
     }
-
 }
