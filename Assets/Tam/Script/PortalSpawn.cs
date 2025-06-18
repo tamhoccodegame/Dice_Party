@@ -19,7 +19,7 @@ public class PortalSpawn : NetworkBehaviour
     IEnumerator SpawnCoroutine()
     {
         yield return new WaitForSecondsRealtime(16f);
-        var go = Runner.Spawn(portalPrefab, spawnPosition.position + new Vector3(0, 0, 2), Quaternion.identity);
+        var go = Runner.Spawn(portalPrefab, spawnPosition.position + new Vector3(0, 2, 0), Quaternion.identity);
         yield return new WaitForSecondsRealtime(3f);
         Runner.Despawn(go);
     }
