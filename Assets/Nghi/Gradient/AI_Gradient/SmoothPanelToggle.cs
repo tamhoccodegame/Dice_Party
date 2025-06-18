@@ -49,6 +49,8 @@ public class SmoothPanelToggle : MonoBehaviour
 
         gameObject.SetActive(true); // Bắt buộc để visible trước tween
 
+        if (canvasGroup == null) return; 
+
         canvasGroup.alpha = 0;
         transform.localScale = originalScale * scaleFrom;
         canvasGroup.interactable = false;
@@ -59,17 +61,19 @@ public class SmoothPanelToggle : MonoBehaviour
         LeanTween.scale(gameObject, originalScale, fadeDuration).setEase(tweenType);
 
         // Cho tương tác sau tween
-        //LeanTween.delayedCall(fadeDuration * 0.7f, () =>
-        //{
-        //    canvasGroup.interactable = true;
-        //    canvasGroup.blocksRaycasts = true;
-        //    isVisible = true;
-        //});
+        LeanTween.delayedCall(fadeDuration * 0.7f, () =>
+        {
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
+            isVisible = true;
+        });
     }
 
     public void Hide()
     {
         if (!isVisible) return;
+
+        if (canvasGroup == null) return;
 
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
