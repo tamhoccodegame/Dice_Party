@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class PlayerMovement : MonoBehaviour
     private CharacterController characterController;
     private Vector3 velocity;
     private bool isGrounded;
+
+    public float groundCheckDistance;
+    public LayerMask glassLayer;
 
     void Start()
     {
@@ -33,6 +37,7 @@ public class PlayerMovement : MonoBehaviour
         //}
     }
 
+    
     void Update()
     {
         // Kiểm tra xem Player có đang chạm đất không
@@ -41,6 +46,8 @@ public class PlayerMovement : MonoBehaviour
         {
             velocity.y = -2f; // Đặt lại vận tốc rơi khi chạm đất
         }
+
+        //if (Physics.Raycast(new Ray(transform.position, Vector3.down), 20f, glassLayer, out))
 
         // Lấy input cho di chuyển
         float forwardInput = Input.GetKey(KeyCode.W) ? 1f : (Input.GetKey(KeyCode.S) ? -1f : 0f);
