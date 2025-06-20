@@ -39,6 +39,7 @@ public class UI_NonStatic_Effect : MonoBehaviour
         public float pingPongDistance = 30f;
 
         [HideInInspector] public Tween currentTween; // Store the running tween
+        [HideInInspector] public bool isHovering = false;
     }
 
     public List<UIEffectItem> effectItems = new List<UIEffectItem>();
@@ -101,6 +102,58 @@ public class UI_NonStatic_Effect : MonoBehaviour
         }
     }
 
+    //private void AddEventTriggers(UIEffectItem item)
+    //{
+    //    EventTrigger trigger = item.target.GetComponent<EventTrigger>();
+    //    if (trigger == null)
+    //    {
+    //        trigger = item.target.gameObject.AddComponent<EventTrigger>();
+    //    }
+
+    //    if (item.playMode == PlayMode.OnHover)
+    //    {
+    //        EventTrigger.Entry entry = new EventTrigger.Entry
+    //        {
+    //            eventID = EventTriggerType.PointerEnter
+    //        };
+    //        entry.callback.AddListener((data) =>
+    //        {
+    //            if (item.loop)
+    //            {
+    //                // Play loop only once and keep looping
+    //                if (item.currentTween == null || !item.currentTween.IsActive())
+    //                    PlayEffect(item);
+    //            }
+    //            else
+    //            {
+    //                PlayEffect(item);
+    //            }
+    //        });
+    //        trigger.triggers.Add(entry);
+    //    }
+
+    //    if (item.playMode == PlayMode.OnClick)
+    //    {
+    //        EventTrigger.Entry entry = new EventTrigger.Entry
+    //        {
+    //            eventID = EventTriggerType.PointerClick
+    //        };
+    //        entry.callback.AddListener((data) =>
+    //        {
+    //            if (item.loop)
+    //            {
+    //                if (item.currentTween == null || !item.currentTween.IsActive())
+    //                    PlayEffect(item);
+    //            }
+    //            else
+    //            {
+    //                PlayEffect(item);
+    //            }
+    //        });
+    //        trigger.triggers.Add(entry);
+    //    }
+    //}
+
     private void AddEventTriggers(UIEffectItem item)
     {
         EventTrigger trigger = item.target.GetComponent<EventTrigger>();
@@ -119,13 +172,18 @@ public class UI_NonStatic_Effect : MonoBehaviour
             {
                 if (item.loop)
                 {
-                    // Play loop only once and keep looping
                     if (item.currentTween == null || !item.currentTween.IsActive())
                         PlayEffect(item);
                 }
                 else
                 {
-                    PlayEffect(item);
+                    if (!item.isHovering)
+                    {
+                        item.isHovering = true;
+                        PlayEffect(item);
+                        float totalTime = item.duration + item.delay;
+                        StartCoroutine(ResetHoverFlag(item, totalTime));
+                    }
                 }
             });
             trigger.triggers.Add(entry);
@@ -151,5 +209,12 @@ public class UI_NonStatic_Effect : MonoBehaviour
             });
             trigger.triggers.Add(entry);
         }
+    }
+
+
+    private IEnumerator ResetHoverFlag(UIEffectItem item, float time)
+    {
+        yield return new WaitForSeconds(time);
+        item.isHovering = false;
     }
 }
