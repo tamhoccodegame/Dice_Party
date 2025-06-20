@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using UnityEngine;
+using UnityEngine.VFX;
 
 [RequireComponent(typeof(CharacterController))]
 public class MNGVongXoayController : NetworkBehaviour
@@ -15,6 +16,9 @@ public class MNGVongXoayController : NetworkBehaviour
 
     [Networked] private Vector2 moveInput { get; set; }
     [Networked] private bool jumpRequest { get; set; }
+    [Networked] private string NetworkAnim { get; set; } // Animation sync
+
+    public VisualEffect bloodEffect;
 
     public string currentAnim;
 
@@ -22,6 +26,7 @@ public class MNGVongXoayController : NetworkBehaviour
 
     public override void Spawned()
     {
+        bloodEffect.Stop();
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
@@ -41,7 +46,6 @@ public class MNGVongXoayController : NetworkBehaviour
             // Send input to host
             RPC_SendInput(input, jump);
         }
-
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -53,7 +57,16 @@ public class MNGVongXoayController : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (!Object.HasStateAuthority) return;
+        if (!Object.HasStateAuthority)
+        {
+            // Client đọc networked animation state
+            if (NetworkAnim != currentAnim)
+            {
+                animator.CrossFade(NetworkAnim, 0.25f);
+                currentAnim = NetworkAnim;
+            }
+            return;
+        }
 
         // Gravity
         if (controller.isGrounded && verticalVelocity < 0)
@@ -88,8 +101,10 @@ public class MNGVongXoayController : NetworkBehaviour
         // Animation
         if (controller.isGrounded)
         {
-            if (moveDirection.magnitude > 0) ChangeAnim("Run");
-            else ChangeAnim("Idle");
+            if (moveDirection.magnitude > 0)
+                ChangeAnim("Run");
+            else
+                ChangeAnim("Idle");
         }
     }
 
@@ -97,14 +112,39 @@ public class MNGVongXoayController : NetworkBehaviour
     {
         if (animName == currentAnim) return;
         currentAnim = animName;
+
+        if (Object.HasStateAuthority)
+            NetworkAnim = animName;
+
         animator.CrossFade(animName, blendTime);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_BloodEffect()
+    {
+        bloodEffect.Play();
     }
 
     public void Die()
     {
         if (VongXoayManager.instance.isGameOver) return;
 
+        RPC_BloodEffect();
+
         if (Object.HasInputAuthority)
+        {
             VongXoayManager.instance.RequestUpdateLive(Runner.LocalPlayer);
+
+            if (VongXoayManager.instance.playerLives.Get(Runner.LocalPlayer) <= 0)
+            {
+                RPC_EnableRagdoll();
+            }
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    void RPC_EnableRagdoll()
+    {
+        GetComponent<Ragdoll>().EnableRagdoll();
     }
 }

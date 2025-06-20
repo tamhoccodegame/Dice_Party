@@ -49,6 +49,8 @@ public class SmoothPanelToggle : MonoBehaviour
 
         gameObject.SetActive(true); // Bắt buộc để visible trước tween
 
+        if (canvasGroup == null) return; 
+
         canvasGroup.alpha = 0;
         transform.localScale = originalScale * scaleFrom;
         canvasGroup.interactable = false;
@@ -70,6 +72,8 @@ public class SmoothPanelToggle : MonoBehaviour
     public void Hide()
     {
         if (!isVisible) return;
+
+        if (canvasGroup == null) return;
 
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;

@@ -47,6 +47,8 @@ public class VongXoayManager : NetworkBehaviour
     public TextMeshProUGUI firstRankName;
     public TextMeshProUGUI secondRankName;
 
+    public Transform spawnPosition;
+
 
     public Image blackScreen;
 
@@ -57,6 +59,7 @@ public class VongXoayManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
         instance = this;
         tutorialPanel.SetActive(true);
 
@@ -105,12 +108,16 @@ public class VongXoayManager : NetworkBehaviour
         yield return StartCoroutine(FadeBlackScreen(1, 0));
         yield return new WaitForSecondsRealtime(10f);
 
-
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         tutorialPanel.SetActive(false);
 
-        yield return new WaitForSecondsRealtime(2f);
+        yield return new WaitForSecondsRealtime(5f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
+
+        GetComponent<PlayerSpawner>().SpawnPlayer();
+
+        yield return new WaitForSecondsRealtime(4f);
+
 
         if (Object.HasStateAuthority)
         {
@@ -175,7 +182,10 @@ public class VongXoayManager : NetworkBehaviour
 
     IEnumerator ReturnToBoard()
     {
-        yield return new WaitForSeconds(6f);
+        yield return new WaitForSecondsRealtime(6f);
+        yield return StartCoroutine(FadeBlackScreen(0, 1));
+        yield return new WaitForSecondsRealtime(3f);
+
         Runner.LoadScene("TuanSceneMap");
     }
 

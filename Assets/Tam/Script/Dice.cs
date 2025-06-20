@@ -20,26 +20,4 @@ public class Dice : NetworkBehaviour
     {
         transform.Rotate(new Vector3(90, 90, 90) * 10f * Runner.DeltaTime);
     }
-
-    public void RequestDestroyDice()
-    {
-        if (Object.HasStateAuthority)
-            RPC_DestroySelf();
-        else
-        {
-            RPC_RequestDestroyDice();
-        }
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    void RPC_RequestDestroyDice()
-    {
-        RPC_DestroySelf();
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_DestroySelf()
-    {
-        Destroy(gameObject);
-    }
 }

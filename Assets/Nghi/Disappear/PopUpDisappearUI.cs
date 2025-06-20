@@ -43,6 +43,9 @@ public class PopUpDisappearUI : MonoBehaviour
         public MoveDirection moveDirection = MoveDirection.FromBottom;
         public float moveDistance = 100f;
         public float fromAlpha = 0f; // có thể xóa nếu không dùng
+
+        [Header("Delay đến khi hiện UI tiếp theo")]
+        public float delayBeforeNextShow = 0.2f; // Thêm delay này
     }
 
     [Header("Cấu hình UI biến mất")]
@@ -84,6 +87,9 @@ public class PopUpDisappearUI : MonoBehaviour
             });
 
             yield return seq.WaitForCompletion();
+            //!!!!!!!!!!!!!!!
+            // Thêm delay tùy chỉnh cho mỗi UI element
+            yield return new WaitForSeconds(item.delayBeforeNextShow);
         }
     }
 
@@ -199,193 +205,4 @@ public class PopUpDisappearUI : MonoBehaviour
             default: return Vector3.zero;
         }
     }
-
-    //public enum AnimationType
-    //{
-    //    None,
-    //    FadeIn,
-    //    ScaleAndFade,
-    //    MoveAndFade,
-    //    Pop,
-    //    ZoomIn,
-    //    BounceIn,
-    //    Blink,
-    //    Swing,
-    //    DropBounce,
-    //    FromBackZoom,
-    //    FadeSlide,
-    //    EaseBackIn,
-    //    SmoothScaleFade,
-    //    CenterReveal,
-    //}
-
-    //public enum MoveDirection
-    //{
-    //    None,
-    //    FromLeft,
-    //    FromRight,
-    //    FromTop,
-    //    FromBottom
-    //}
-
-    //[System.Serializable]
-    //public class UIElement
-    //{
-    //    public GameObject target;
-    //    public float delay = 0.2f;
-    //    public float duration = 0.4f;
-    //    public AnimationType animation = AnimationType.MoveAndFade;
-    //    public MoveDirection moveDirection = MoveDirection.FromBottom;
-    //    public float moveDistance = 100f;
-    //    public float fromAlpha = 0f;
-    //}
-
-    //[Header("Cấu hình UI biến mất")]
-    //public List<UIElement> disappearSequence = new List<UIElement>();
-    //public bool playOnStart = true;
-
-    //// Lưu vị trí gốc để không bị cộng dồn vị trí
-    //private Dictionary<GameObject, Vector3> originalPositions = new Dictionary<GameObject, Vector3>();
-    //private Dictionary<GameObject, Vector3> originalScales = new Dictionary<GameObject, Vector3>();
-
-    //void Start()
-    //{
-    //    if (playOnStart)
-    //    {
-    //        StartCoroutine(DelayedPlay());
-    //    }
-    //}
-
-    //IEnumerator DelayedPlay()
-    //{
-    //    yield return null; // Delay 1 frame để layout ổn định
-    //    StartCoroutine(PlaySequence());
-    //}
-
-    //public IEnumerator PlaySequence()
-    //{
-    //    foreach (var item in disappearSequence)
-    //    {
-    //        if (item.target == null) continue;
-
-    //        CacheOriginals(item); // Đảm bảo đã lưu vị trí và scale ban đầu
-
-    //        yield return new WaitForSeconds(item.delay);
-    //        PlayHideAnimation(item);
-    //        yield return new WaitForSeconds(item.duration);
-
-    //        item.target.SetActive(false);
-    //        ResetToOriginal(item); // Reset lại transform để dùng lần sau không bị lệch
-    //    }
-    //}
-
-    //void CacheOriginals(UIElement item)
-    //{
-    //    var go = item.target;
-    //    var t = go.transform;
-
-    //    if (!originalPositions.ContainsKey(go))
-    //        originalPositions[go] = t.localPosition;
-
-    //    if (!originalScales.ContainsKey(go))
-    //        originalScales[go] = t.localScale;
-    //}
-
-    //void ResetToOriginal(UIElement item)
-    //{
-    //    var go = item.target;
-    //    var t = go.transform;
-
-    //    if (originalPositions.ContainsKey(go))
-    //        t.localPosition = originalPositions[go];
-
-    //    if (originalScales.ContainsKey(go))
-    //        t.localScale = originalScales[go];
-    //}
-
-    //void PlayHideAnimation(UIElement item)
-    //{
-    //    var t = item.target.transform;
-    //    var cg = item.target.GetComponent<CanvasGroup>();
-    //    if (cg == null) cg = item.target.AddComponent<CanvasGroup>();
-
-    //    Vector3 offset = GetOffset(item);
-    //    Vector3 startPos = originalPositions[item.target];
-
-    //    switch (item.animation)
-    //    {
-    //        case AnimationType.MoveAndFade:
-    //            t.DOLocalMove(startPos + offset, item.duration).SetEase(Ease.InCubic);
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.InQuad);
-    //            break;
-
-    //        case AnimationType.FadeIn:
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.InQuad);
-    //            break;
-
-    //        case AnimationType.ScaleAndFade:
-    //        case AnimationType.Pop:
-    //        case AnimationType.ZoomIn:
-    //        case AnimationType.BounceIn:
-    //            LeanTween.scale(t.gameObject, Vector3.zero, item.duration).setEaseInBack();
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.InQuad);
-    //            break;
-
-    //        case AnimationType.Blink:
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.OutSine);
-    //            break;
-
-    //        case AnimationType.Swing:
-    //            t.DOLocalRotate(new Vector3(0, 0, 30), item.duration * 0.5f, RotateMode.Fast).SetEase(Ease.InBack);
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.InQuad);
-    //            break;
-
-    //        case AnimationType.DropBounce:
-    //            t.DOLocalMoveY(startPos.y - item.moveDistance, item.duration).SetEase(Ease.InBack);
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.InQuad);
-    //            break;
-
-    //        case AnimationType.FromBackZoom:
-    //            t.DOLocalMove(startPos + offset * 2, item.duration).SetEase(Ease.InBack);
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.InQuad);
-    //            break;
-
-    //        case AnimationType.FadeSlide:
-    //            t.DOLocalMove(startPos + offset, item.duration).SetEase(Ease.InOutSine);
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.InOutSine);
-    //            break;
-
-    //        case AnimationType.EaseBackIn:
-    //            t.DOLocalMove(startPos + offset, item.duration).SetEase(Ease.InBack);
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.InOutCubic);
-    //            break;
-
-    //        case AnimationType.SmoothScaleFade:
-    //            LeanTween.scale(t.gameObject, Vector3.zero, item.duration).setEaseInBack();
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.InOutSine);
-    //            break;
-
-    //        case AnimationType.CenterReveal:
-    //            LeanTween.scaleX(t.gameObject, 0f, item.duration).setEaseInBack();
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.OutSine);
-    //            break;
-
-    //        default:
-    //            cg.DOFade(0f, item.duration).SetEase(Ease.OutQuad);
-    //            break;
-    //    }
-    //}
-
-    //Vector3 GetOffset(UIElement item)
-    //{
-    //    switch (item.moveDirection)
-    //    {
-    //        case MoveDirection.FromLeft: return new Vector3(-item.moveDistance, 0, 0);
-    //        case MoveDirection.FromRight: return new Vector3(item.moveDistance, 0, 0);
-    //        case MoveDirection.FromTop: return new Vector3(0, item.moveDistance, 0);
-    //        case MoveDirection.FromBottom: return new Vector3(0, -item.moveDistance, 0);
-    //        default: return Vector3.zero;
-    //    }
-    //}
-
 }
