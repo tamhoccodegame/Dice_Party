@@ -41,10 +41,10 @@ public class BoardGameController : NetworkBehaviour
     public TextMeshPro stepText;     // text hiện số bước trên UI
 
     // --- State Machine cho việc di chuyển ---
-    private enum MoveState { Idle, Rolling, WaitingForAnim, Moving }
-    [Networked] private MoveState moveState { get; set; }  // state hiện tại, sync toàn bộ clients
+    private enum State { Idle, Rolling, WaitingForAnim, Moving, UsingItem }
+    [Networked] private State currentState { get; set; }  // state hiện tại, sync toàn bộ clients
 
-    private MoveState cachedMoveState;   // lưu state cũ để kiểm tra thay đổi (chỉ dùng cho animation)
+    private State cachedMoveState;   // lưu state cũ để kiểm tra thay đổi (chỉ dùng cho animation)
     private float animTimer = 0f;        // thời gian chờ khi chơi animation roll dice
 
     // --- Hàm Spawned() chạy khi object này spawn ---
@@ -53,6 +53,9 @@ public class BoardGameController : NetworkBehaviour
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
+
+        //inventory = UIInventory.inventory;
+        //inventory.onItemUsed += OnItemUsed;
 
         // Lấy dữ liệu node từ BoardGameData (nếu có)
         string currentNodeName1 = null;
@@ -74,13 +77,13 @@ public class BoardGameController : NetworkBehaviour
         }
 
         // Set node tiếp theo mặc định là node đầu tiên
-        if(HasStateAuthority)
-        RPC_SetCurrentNode(currentNode.name);
+        if (HasStateAuthority)
+            RPC_SetCurrentNode(currentNode.name);
         toMoveNode = currentNode.nextNodes[0];
         stepText.gameObject.SetActive(false);
 
         // Khởi tạo cached state để sync animation
-        cachedMoveState = moveState;
+        cachedMoveState = currentState;
         UpdateAnimation();  // cập nhật animation đúng state
     }
 
@@ -89,15 +92,17 @@ public class BoardGameController : NetworkBehaviour
     {
         if (HasInputAuthority && isMyTurn)
         {
+            if (currentState != State.Idle) return;
+
             // Nếu là lượt mình và đang idle thì bấm space để roll dice
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 RPC_HideDice();
-
-                if (moveState == MoveState.Idle)
-                {
-                    RPC_RequestDiceRoll();
-                }
+                RPC_RequestDiceRoll();
+            }
+            else if (Input.GetKeyDown(KeyCode.Q))
+            {
+                RPC_HideDice();
             }
         }
 
@@ -110,9 +115,9 @@ public class BoardGameController : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         // Kiểm tra nếu moveState thay đổi thì update animation
-        if (cachedMoveState != moveState)
+        if (cachedMoveState != currentState)
         {
-            cachedMoveState = moveState;
+            cachedMoveState = currentState;
             UpdateAnimation();
         }
 
@@ -120,7 +125,7 @@ public class BoardGameController : NetworkBehaviour
             return; // chỉ host xử lý logic game
 
         // --- Logic di chuyển nhân vật ---
-        if (moveState == MoveState.Moving && !waitingForChoice)
+        if (currentState == State.Moving && !waitingForChoice)
         {
             Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
             direction.y = 0;
@@ -138,8 +143,8 @@ public class BoardGameController : NetworkBehaviour
             if (Vector3.Distance(transform.position, toMoveNode.transform.position) <= 0.5f)
             {
                 currentNode = toMoveNode;
-                if(HasStateAuthority)
-                RPC_SetCurrentNode(currentNode.name);
+                if (HasStateAuthority)
+                    RPC_SetCurrentNode(currentNode.name);
                 currentStep--;
 
                 if (currentStep > 0)
@@ -149,7 +154,7 @@ public class BoardGameController : NetworkBehaviour
                     {
                         waitingForChoice = true;
                         ShowDirectionChoices();
-                        SetMoveState(MoveState.Idle);
+                        SetMoveState(State.Idle);
                         return;
                     }
                     else
@@ -159,41 +164,41 @@ public class BoardGameController : NetworkBehaviour
                 }
                 else
                 {
-                    SetMoveState(MoveState.Idle);
+                    SetMoveState(State.Idle);
                     TriggerNodeEvent();
                 }
             }
         }
 
         // --- Logic chờ anim roll dice kết thúc ---
-        if (moveState == MoveState.WaitingForAnim)
+        if (currentState == State.WaitingForAnim)
         {
             animTimer -= Runner.DeltaTime;
             if (animTimer <= 0f)
             {
-                SetMoveState(MoveState.Moving);
+                SetMoveState(State.Moving);
             }
         }
     }
 
     // --- Đổi state ---
-    private void SetMoveState(MoveState newState)
+    private void SetMoveState(State newState)
     {
-        moveState = newState;
+        currentState = newState;
     }
 
     // --- Cập nhật animation theo state ---
     private void UpdateAnimation()
     {
-        switch (moveState)
+        switch (currentState)
         {
-            case MoveState.Idle:
+            case State.Idle:
                 animator.CrossFade("Idle", 0.25f);
                 break;
-            case MoveState.Moving:
+            case State.Moving:
                 animator.CrossFade("Run", 0.25f);
                 break;
-            case MoveState.WaitingForAnim:
+            case State.WaitingForAnim:
                 animator.CrossFade("RollDice", 0.25f);
                 break;
         }
@@ -259,7 +264,7 @@ public class BoardGameController : NetworkBehaviour
         ClearArrow();
         toMoveNode = currentNode.nextNodes[index];
         waitingForChoice = false;
-        SetMoveState(MoveState.Moving);
+        SetMoveState(State.Moving);
     }
 
     // --- Gọi sự kiện khi đứng trên node ---
@@ -270,15 +275,20 @@ public class BoardGameController : NetworkBehaviour
             currentNode.RPC_ProcessNode(Runner.LocalPlayer);
     }
 
+    void OnItemUsed(NetworkId itemPrefab)
+    {
+
+    }
+
     #region RPC
     // --- RPC: Client gửi yêu cầu lắc xúc xắc ---
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestDiceRoll()
     {
-        if (moveState != MoveState.Idle) return;
+        if (currentState != State.Idle) return;
 
         currentStep = Random.Range(1, 5);   // random số bước
-        SetMoveState(MoveState.WaitingForAnim);
+        SetMoveState(State.WaitingForAnim);
         animTimer = 1f;                     // đợi 1 giây chơi animation roll
         rollDiceEffect.Play();
     }
@@ -308,7 +318,16 @@ public class BoardGameController : NetworkBehaviour
         currentNodeName = newName;
     }
 
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestUseItem()
+    {
+        if (currentState != State.Idle) return;
 
+        currentStep = Random.Range(1, 5);   // random số bước
+        SetMoveState(State.WaitingForAnim);
+        animTimer = 1f;                     // đợi 1 giây chơi animation roll
+        rollDiceEffect.Play();
+    }
 
     #endregion
 

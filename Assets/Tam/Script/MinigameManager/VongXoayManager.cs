@@ -21,11 +21,6 @@ public class VongXoayManager : NetworkBehaviour
     public NetworkLinkedList<PlayerRef> playerRanks => default;
 
     [Networked]
-    [Capacity(4)]
-    [UnitySerializeField]
-    public NetworkDictionary<PlayerRef, NetworkBool> readyStatus => default;
-
-    [Networked]
     public bool isGameOver { get; set; } = false;
 
     [Networked]
@@ -34,6 +29,7 @@ public class VongXoayManager : NetworkBehaviour
     [Header("Avatar Standing Position")]
     public Transform firstRankPosition;
     public Transform secondRankPosition;
+    public Transform thirdRankPosition;
 
     public GameObject playerRewardPrefab;
 
@@ -171,11 +167,12 @@ public class VongXoayManager : NetworkBehaviour
             isGameOver = true;
             RPC_ShowGameOverPanel();
 
-            if (Object.HasStateAuthority && playerRanks.Count >= 2)
+            if (Object.HasStateAuthority && playerRanks.Count >= 3)
             {
                 PlayerRef firstRankRef = playerRanks[^1]; // Người cuối cùng chết (Top 1)
                 PlayerRef secondRankRef = playerRanks[^2]; // Người chết trước nó (Top 2)
-                SpawnRewardAvatar(firstRankRef, secondRankRef);
+                PlayerRef thirdRankRef = playerRanks[^3];
+                SpawnRewardAvatar(firstRankRef, secondRankRef, thirdRankRef);
             }
         }
     }
@@ -200,7 +197,7 @@ public class VongXoayManager : NetworkBehaviour
         gameOverPanel.SetActive(true);
     }
 
-    public void SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank)
+    public void SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank, PlayerRef thirdRank)
     {
         MNGVongXoayController[] players = FindObjectsByType<MNGVongXoayController>(FindObjectsSortMode.None);
         
@@ -217,8 +214,14 @@ public class VongXoayManager : NetworkBehaviour
         var sGo = Runner.Spawn(playerRewardPrefab, secondRankPosition.position, playerRewardPrefab.transform.rotation, secondRank);
         secondRankName.text = secondRank.PlayerId.ToString();
 
+        var tGo = Runner.Spawn(playerRewardPrefab, thirdRankPosition.position, playerRewardPrefab.transform.rotation, thirdRank);
+        secondRankName.text = thirdRank.PlayerId.ToString();
+        
+
         RPC_ChangeAnimation(fGo, "Win");
         RPC_ChangeAnimation(sGo, "Lose");
+        RPC_ChangeAnimation(tGo, "Lose");
+
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
