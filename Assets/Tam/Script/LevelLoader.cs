@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class LevelLoader : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public static LevelLoader instance;
+
+    public Animator animator;
+
+    private void Awake()
     {
-        
+        instance = this;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void StartLoad()
     {
-        
+        animator.Play("StartLoad");
     }
+
 }
