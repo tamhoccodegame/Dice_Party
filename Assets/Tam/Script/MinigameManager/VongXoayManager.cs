@@ -172,7 +172,7 @@ public class VongXoayManager : NetworkBehaviour
                 PlayerRef firstRankRef = playerRanks[^1]; // Người cuối cùng chết (Top 1)
                 PlayerRef secondRankRef = playerRanks[^2]; // Người chết trước nó (Top 2)
                 PlayerRef thirdRankRef = playerRanks[^3];
-                SpawnRewardAvatar(firstRankRef, secondRankRef, thirdRankRef);
+                SpawnRewardAvatar(firstRankRef, secondRankRef/*, thirdRankRef*/);
             }
         }
     }
@@ -197,7 +197,7 @@ public class VongXoayManager : NetworkBehaviour
         gameOverPanel.SetActive(true);
     }
 
-    public void SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank, PlayerRef thirdRank)
+    public void SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank/*, PlayerRef thirdRank*/)
     {
         MNGVongXoayController[] players = FindObjectsByType<MNGVongXoayController>(FindObjectsSortMode.None);
         
@@ -214,13 +214,13 @@ public class VongXoayManager : NetworkBehaviour
         var sGo = Runner.Spawn(playerRewardPrefab, secondRankPosition.position, playerRewardPrefab.transform.rotation, secondRank);
         secondRankName.text = secondRank.PlayerId.ToString();
 
-        var tGo = Runner.Spawn(playerRewardPrefab, thirdRankPosition.position, playerRewardPrefab.transform.rotation, thirdRank);
-        secondRankName.text = thirdRank.PlayerId.ToString();
+        //var tGo = Runner.Spawn(playerRewardPrefab, thirdRankPosition.position, playerRewardPrefab.transform.rotation, thirdRank);
+        //secondRankName.text = thirdRank.PlayerId.ToString();
         
 
         RPC_ChangeAnimation(fGo, "Win");
         RPC_ChangeAnimation(sGo, "Lose");
-        RPC_ChangeAnimation(tGo, "Lose");
+        //RPC_ChangeAnimation(tGo, "Lose");
 
     }
 

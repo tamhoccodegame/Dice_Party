@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.VFX;
 
 [RequireComponent(typeof(CharacterController))]
-public class MNGVongXoayController : NetworkBehaviour
+public class MNGCauKinh : NetworkBehaviour
 {
     private CharacterController controller;
     private Animator animator;
@@ -18,15 +18,14 @@ public class MNGVongXoayController : NetworkBehaviour
     [Networked] private bool jumpRequest { get; set; }
     [Networked] private string NetworkAnim { get; set; } // Animation sync
 
-    public VisualEffect bloodEffect;
-
     public string currentAnim;
+
+    public LayerMask glassLayer;
 
     VongXoayManager manager;
 
     public override void Spawned()
     {
-        bloodEffect.Stop();
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
@@ -84,6 +83,7 @@ public class MNGVongXoayController : NetworkBehaviour
             ChangeAnim("Jump");
             verticalVelocity = jumpForce;
         }
+
         jumpRequest = false; // reset jump request
 
         // Movement
@@ -117,35 +117,5 @@ public class MNGVongXoayController : NetworkBehaviour
             NetworkAnim = animName;
 
         animator.CrossFade(animName, blendTime);
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    public void RPC_BloodEffect()
-    {
-        bloodEffect.Play();
-    }
-
-    public void Die()
-    {
-        if (VongXoayManager.instance.isGameOver) return;
-
-
-        if (Object.HasInputAuthority)
-        {
-            RPC_BloodEffect();
-
-            VongXoayManager.instance.RequestUpdateLive(Runner.LocalPlayer);
-
-            if (VongXoayManager.instance.playerLives.Get(Runner.LocalPlayer) <= 0)
-            {
-                RPC_EnableRagdoll();
-            }
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    void RPC_EnableRagdoll()
-    {
-        GetComponent<Ragdoll>().EnableRagdoll();
     }
 }
