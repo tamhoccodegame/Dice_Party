@@ -50,9 +50,6 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm Spawned() chạy khi object này spawn ---
     public override void Spawned()
     {
-        if(HasInputAuthority)
-        Debug.Log("Tôi được cấp quyền " + Object.InputAuthority);
-
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
@@ -66,7 +63,7 @@ public class BoardGameController : NetworkBehaviour
 
         if (gameData != null && gameData.playerCurrentNode.Count > 0)
         {
-            currentNodeName1 = gameData.GetNode(Runner.LocalPlayer);
+            currentNodeName1 = gameData.GetNode(Object.InputAuthority);
         }
 
         // Nếu không có dữ liệu từ BoardGameData thì lấy node mặc định
@@ -79,9 +76,12 @@ public class BoardGameController : NetworkBehaviour
             currentNode = GameObject.Find("Dice (7)").GetComponent<BoardNode>();
         }
 
+        Debug.Log(currentNode.name);
+
         // Set node tiếp theo mặc định là node đầu tiên
         if (HasStateAuthority)
-            RPC_SetCurrentNode(currentNode.name);
+            RPC_SetCurrentNode((NetworkString<_16>)currentNode.name);
+
         toMoveNode = currentNode.nextNodes[0];
         stepText.gameObject.SetActive(false);
 
@@ -150,7 +150,7 @@ public class BoardGameController : NetworkBehaviour
             {
                 currentNode = toMoveNode;
                 if (HasStateAuthority)
-                    RPC_SetCurrentNode(currentNode.name);
+                    RPC_SetCurrentNode((NetworkString<_16>)currentNode.name);
                 currentStep--;
 
                 if (currentStep > 0)
@@ -159,7 +159,7 @@ public class BoardGameController : NetworkBehaviour
                     if (currentNode.nextNodes.Count > 1)
                     {
                         waitingForChoice = true;
-                        ShowDirectionChoices();
+                        RPC_ShowDirectionChoices();
                         SetMoveState(State.Idle);
                         return;
                     }
@@ -182,8 +182,19 @@ public class BoardGameController : NetworkBehaviour
             animTimer -= Runner.DeltaTime;
             if (animTimer <= 0f)
             {
-                SetMoveState(State.Moving);
+                if (currentNode.nextNodes.Count > 1)
+                {
+                    waitingForChoice = true;
+                    RPC_ShowDirectionChoices();
+                    SetMoveState(State.Idle);
+                    return;
+                }
+                else
+                {
+                    SetMoveState(State.Moving);
+                }
             }
+
         }
     }
 
@@ -235,8 +246,11 @@ public class BoardGameController : NetworkBehaviour
 
 
     // --- Spawn các mũi tên chọn hướng khi tới ngã ba ---
-    void ShowDirectionChoices()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_ShowDirectionChoices()
     {
+        if (!isMyTurn) return;
+
         ClearArrow();
         for (int i = 0; i < currentNode.nextNodes.Count; i++)
         {
@@ -318,9 +332,9 @@ public class BoardGameController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_SetCurrentNode(string newName)
+    private void RPC_SetCurrentNode(NetworkString<_16> newName)
     {
-        currentNodeName = newName;
+        currentNodeName = (string)newName;
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]

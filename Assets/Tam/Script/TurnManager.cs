@@ -189,7 +189,7 @@ public class TurnManager : NetworkBehaviour
 
         if (HasStateAuthority)
         {
-            Runner.LoadScene("MNG1");
+            Runner.LoadScene("MNG3");
         }
     }
 
