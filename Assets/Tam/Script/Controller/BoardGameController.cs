@@ -1,11 +1,12 @@
 ﻿using Fusion;
+using Fusion.Addons.Physics;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 // Bắt buộc object này phải có CharacterController
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(NetworkRigidbody3D))]
 public class BoardGameController : NetworkBehaviour
 {
     // --- Các thông số cấu hình di chuyển ---
@@ -21,6 +22,7 @@ public class BoardGameController : NetworkBehaviour
 
     [Networked] public int currentStep { get; set; }      // số bước xúc xắc random, sync qua network
     private CharacterController controller;               // component điều khiển di chuyển vật lý
+    private Rigidbody rb;
     private Animator animator;                            // component điều khiển animation
     [Networked] public bool waitingForChoice { get; set; } // đang chờ người chơi chọn hướng đi (sync)
 
@@ -53,9 +55,8 @@ public class BoardGameController : NetworkBehaviour
         if(HasInputAuthority)
         Debug.Log("Tôi được cấp quyền " + Object.InputAuthority);
 
-        controller = GetComponent<CharacterController>();
-        controller.enabled = true;
-        animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();    
 
         //inventory = UIInventory.inventory;
         //inventory.onItemUsed += OnItemUsed;
@@ -143,7 +144,7 @@ public class BoardGameController : NetworkBehaviour
             }
 
             Vector3 moveDir = direction * moveSpeed * Runner.DeltaTime;
-            controller.Move(moveDir);
+            rb.MovePosition(rb.position + moveDir);
 
             // Đã tới node kế tiếp
             if (Vector3.Distance(transform.position, toMoveNode.transform.position) <= 0.5f)
@@ -159,7 +160,7 @@ public class BoardGameController : NetworkBehaviour
                     if (currentNode.nextNodes.Count > 1)
                     {
                         waitingForChoice = true;
-                        ShowDirectionChoices();
+                        RPC_ShowDirectionChoices();
                         SetMoveState(State.Idle);
                         return;
                     }
@@ -235,9 +236,11 @@ public class BoardGameController : NetworkBehaviour
 
 
     // --- Spawn các mũi tên chọn hướng khi tới ngã ba ---
-    void ShowDirectionChoices()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_ShowDirectionChoices()
     {
-        ClearArrow();
+        if (!Object.HasInputAuthority) return;
+
         for (int i = 0; i < currentNode.nextNodes.Count; i++)
         {
             BoardNode next = currentNode.nextNodes[i];
@@ -265,6 +268,12 @@ public class BoardGameController : NetworkBehaviour
     public void ChooseDirection(int index)
     {
         ClearArrow();
+        RPC_SendChoseDirection(index);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_SendChoseDirection(int index)
+    {
         toMoveNode = currentNode.nextNodes[index];
         waitingForChoice = false;
         SetMoveState(State.Moving);

@@ -129,10 +129,11 @@ public class MNGVongXoayController : NetworkBehaviour
     {
         if (VongXoayManager.instance.isGameOver) return;
 
-        RPC_BloodEffect();
 
         if (Object.HasInputAuthority)
         {
+            RPC_BloodEffect();
+
             VongXoayManager.instance.RequestUpdateLive(Runner.LocalPlayer);
 
             if (VongXoayManager.instance.playerLives.Get(Runner.LocalPlayer) <= 0)
