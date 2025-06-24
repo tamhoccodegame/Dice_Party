@@ -13,12 +13,11 @@ public class BreakGlass : MonoBehaviour
         this.isBreakable = isBreakable;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    public void TryBreak()
     {
-        if(collision.gameObject.layer == LayerMask.NameToLayer("Player"))
-        {
-            Instantiate(breakEffect, transform.position, transform.rotation);
-            Destroy(gameObject);
-        }
+        if (!isBreakable) return;
+
+        Instantiate(breakEffect, transform.position, transform.rotation);
+        Destroy(gameObject);
     }
 }

@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,15 +10,15 @@ public class GlassCouple
     public BreakGlass glass2;
 }
 
-public class GlassBreakManager : MonoBehaviour
+public class GlassBreakManager : NetworkBehaviour
 {
     public GlassCouple[] glassCouples;
 
-    private void Start()
+    public override void Spawned()
     {
-        foreach(var glassCouple in glassCouples)
+        foreach (var glassCouple in glassCouples)
         {
-            if(Random.value < 0.5f)
+            if (Random.value < 0.5f)
             {
                 glassCouple.glass1.SetBreakable(true);
                 glassCouple.glass2.SetBreakable(false);
@@ -28,5 +29,8 @@ public class GlassBreakManager : MonoBehaviour
                 glassCouple.glass2.SetBreakable(true);
             }
         }
+
+        GetComponent<PlayerSpawner>().SpawnPlayer();
     }
+
 }
