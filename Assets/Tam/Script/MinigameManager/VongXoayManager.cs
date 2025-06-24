@@ -43,6 +43,9 @@ public class VongXoayManager : NetworkBehaviour
     public TextMeshProUGUI firstRankName;
     public TextMeshProUGUI secondRankName;
 
+    public Transform spawnPosition;
+
+
     public Image blackScreen;
 
     public float fadeDuration = 1f;

@@ -2842,11 +2842,11 @@ GameObject:
   m_Component:
   - component: {fileID: 2935424376565863942}
   - component: {fileID: 9105315542713420924}
+  - component: {fileID: -1359556976780472910}
   - component: {fileID: -5833059894958035310}
+  - component: {fileID: 5673406980010025986}
   - component: {fileID: 2450850399698432518}
   - component: {fileID: 4076572559471206847}
-  - component: {fileID: 5600361226249576379}
-  - component: {fileID: 7882559494528221734}
   m_Layer: 3
   m_Name: BoardGameCharacter
   m_TagString: Untagged
@@ -2901,6 +2901,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-1359556976780472910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
 --- !u!114 &-5833059894958035310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2919,10 +2936,36 @@ MonoBehaviour:
   NestedObjects:
   - {fileID: 8738965838245190259}
   NetworkedBehaviours:
+  - {fileID: -1359556976780472910}
   - {fileID: 2450850399698432518}
   - {fileID: 4076572559471206847}
-  - {fileID: 7882559494528221734}
   ForceRemoteRenderTimeframe: 0
+--- !u!143 &5673406980010025986
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &2450850399698432518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2950,7 +2993,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0e1f0a1304070f42b048a3e9f9ea9a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 12
+  moveSpeed: 8
   rotationSpeed: 20
   currentNode: {fileID: 0}
   _currentNodeName: 
@@ -2962,56 +3005,6 @@ MonoBehaviour:
   rollDiceEffect: {fileID: 7433801954753670725}
   dice: {fileID: 7859789439665928958}
   stepText: {fileID: 6770067897922902656}
---- !u!54 &5600361226249576379
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2591654762118859964}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &7882559494528221734
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2591654762118859964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a591d221a634417e9827eb58e17de84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stateAuthorityChangeErrorCorrectionDelta: 0
-  SyncScale: 0
-  SyncParent: 0
-  _interpolationTarget: {fileID: 0}
-  UsePreciseRotation: 0
-  UseRenderSleepThresholds: 1
-  RenderThresholds:
-    UseEnergy: 1
-    Position: 0.001
-    Rotation: 0.01
-    Scale: 0.01
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0
