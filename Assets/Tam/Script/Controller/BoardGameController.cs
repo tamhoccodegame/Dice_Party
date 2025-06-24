@@ -278,7 +278,14 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm khi client chọn hướng ---
     public void ChooseDirection(int index)
     {
+        if(!isMyTurn) return;
         ClearArrow();
+        RPC_ChooseDirection(index);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    void RPC_ChooseDirection(int index)
+    {
         toMoveNode = currentNode.nextNodes[index];
         waitingForChoice = false;
         SetMoveState(State.Moving);
