@@ -50,6 +50,9 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm Spawned() chạy khi object này spawn ---
     public override void Spawned()
     {
+        if(HasInputAuthority)
+        Debug.Log("Tôi được cấp quyền " + Object.InputAuthority);
+
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
@@ -90,6 +93,13 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm Update() chỉ chạy trên client local ---
     void Update()
     {
+        // Đảm bảo cả host và client đều update animation nếu state thay đổi
+        if (cachedMoveState != currentState)
+        {
+            cachedMoveState = currentState;
+            UpdateAnimation();
+        }
+
         if (HasInputAuthority && isMyTurn)
         {
             if (currentState != State.Idle) return;
@@ -97,18 +107,14 @@ public class BoardGameController : NetworkBehaviour
             // Nếu là lượt mình và đang idle thì bấm space để roll dice
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                RPC_HideDice();
                 RPC_RequestDiceRoll();
+                RPC_HideDice();
             }
             else if (Input.GetKeyDown(KeyCode.Q))
             {
                 RPC_HideDice();
             }
         }
-
-        // Cập nhật số bước hiển thị trên UI
-        stepText.text = currentStep.ToString();
-        stepText.gameObject.SetActive(currentStep > 0);
     }
 
     // --- FixedUpdateNetwork() chạy trên State Authority (host) ---
@@ -207,10 +213,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm gọi khi bắt đầu lượt ---
     public void StartTurn()
     {
-        if (HasInputAuthority)
-        {
-            RPC_ShowDice();
-        }
+        ShowDice();
     }
 
     // --- Hàm kết thúc lượt ---
@@ -280,6 +283,11 @@ public class BoardGameController : NetworkBehaviour
 
     }
 
+    private void ShowDice()
+    {
+        dice.SetActive(true);
+    }
+
     #region RPC
     // --- RPC: Client gửi yêu cầu lắc xúc xắc ---
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -290,14 +298,6 @@ public class BoardGameController : NetworkBehaviour
         currentStep = Random.Range(1, 5);   // random số bước
         SetMoveState(State.WaitingForAnim);
         animTimer = 1f;                     // đợi 1 giây chơi animation roll
-        rollDiceEffect.Play();
-    }
-
-    // --- RPC: Client yêu cầu host spawn dice ---
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    private void RPC_ShowDice()
-    {
-        dice.SetActive(true);
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
@@ -309,7 +309,12 @@ public class BoardGameController : NetworkBehaviour
     IEnumerator HideDiceCoroutine()
     {
         yield return new WaitForSecondsRealtime(0.2f);
+        stepText.gameObject.SetActive(true);
+        rollDiceEffect.Play();
         dice.SetActive(false);
+        stepText.text = currentStep.ToString();
+        yield return new WaitForSeconds(0.5f);
+        stepText.gameObject.SetActive(false);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

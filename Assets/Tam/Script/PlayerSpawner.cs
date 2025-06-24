@@ -42,14 +42,4 @@ public class PlayerSpawner : NetworkBehaviour
                 Runner.Spawn(playerPrefab, spawnPosition.position, Quaternion.identity, player);
             }
     }
-
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-    private void OnDestroy()
-    {
-    }
 }

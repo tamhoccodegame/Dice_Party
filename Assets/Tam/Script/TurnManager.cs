@@ -95,8 +95,9 @@ public class TurnManager : NetworkBehaviour
         {
             currentPlayerIndex = 0;
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
-            playerController[currentPlayerIndex].StartTurn();
         }
+
+        playerController[currentPlayerIndex].StartTurn();
         UpdateTurnUI();
         StartFollowTarget();
     }
