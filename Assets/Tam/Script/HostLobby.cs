@@ -64,6 +64,8 @@ public class HostLobby : NetworkBehaviour
     #region UpdatePlayerListUI
     private void NetworkManager_onPlayerListChange()
     {
+        RequestApplyCustom();
+
         if (Object.HasStateAuthority)
         {
             EnsureReadyStatusInit();

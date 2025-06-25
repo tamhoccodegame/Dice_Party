@@ -100,8 +100,6 @@ public class VongXoayManager : NetworkBehaviour
 
     IEnumerator HideTutorialCouroutine()
     {
-        //Ẩn dần black screen rồi đợi 10s
-        yield return StartCoroutine(FadeBlackScreen(1, 0));
         yield return new WaitForSecondsRealtime(10f);
 
         yield return StartCoroutine(FadeBlackScreen(0, 1));

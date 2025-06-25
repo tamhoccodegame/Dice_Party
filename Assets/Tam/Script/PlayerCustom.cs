@@ -9,9 +9,9 @@ public class PlayerCustom : NetworkBehaviour
     public Transform color;
     public Transform bodypart;
 
-    public int currentHairIndex = 0;
-    public int currentColorIndex = 0;
-    public int currentBodypartIndex = 0;
+    [Networked] public int currentHairIndex { get; set; } = 0;
+    [Networked] public int currentColorIndex { get; set; } = 0;
+    [Networked] public int currentBodypartIndex { get; set; } = 0;
 
     public override void Spawned()
     {

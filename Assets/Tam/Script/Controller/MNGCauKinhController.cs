@@ -24,14 +24,14 @@ public class MNGCauKinhController : NetworkBehaviour
     public LayerMask glassLayer;
     public Transform feet;
 
-    VongXoayManager manager;
+    GlassBreakManager manager;
 
     public override void Spawned()
     {
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
-        manager = VongXoayManager.instance;
+        manager = GlassBreakManager.instance;
     }
 
     void Update()
@@ -42,6 +42,7 @@ public class MNGCauKinhController : NetworkBehaviour
         cam.Follow = transform;
         cam.LookAt = transform;
 
+        if (manager != null && manager.Object.IsValid && manager.isGameStarted)
         {
             // Collect input on client
             Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
@@ -127,5 +128,19 @@ public class MNGCauKinhController : NetworkBehaviour
             NetworkAnim = animName;
 
         animator.CrossFade(animName, blendTime);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "Goal")
+        {
+            manager.RequestAddRank(Runner.LocalPlayer);
+        }
+        else if(other.name == "Deadzone")
+        {
+            GetComponent<CharacterController>().enabled = false;
+            transform.position = manager.spawnPosition.position;
+            GetComponent<CharacterController>().enabled = true;
+        }
     }
 }

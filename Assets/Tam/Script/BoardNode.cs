@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
@@ -39,20 +40,29 @@ public class BoardNode : NetworkBehaviour
     {
         if(eventType != EventType.None)
         nodeEffect.Play();
-
-        switch (eventType)
+        else
         {
-            case EventType.Key:
-                Debug.Log("Add Key");
-                break;
-            case EventType.Heal:
-                Debug.Log("Heal");
-                break;
+            EndTurn(player);
         }
 
+            switch (eventType)
+            {
+                case EventType.Key:
+                    StartCoroutine(AddKeyCoroutine(player));
+                    Debug.Log("Add Key");
+                    break;
+                case EventType.Heal:
+                    TurnManager.instance.RequestUpdateHealth(player, 20);
+                    Debug.Log("Heal");
+                    break;
+            }
+    }
+
+    void EndTurn(PlayerRef player)
+    {
         BoardGameController[] players = FindObjectsByType<BoardGameController>(FindObjectsSortMode.None);
 
-        foreach(var p in players)
+        foreach (var p in players)
         {
             if (p.Object.InputAuthority == player)
             {
@@ -61,4 +71,19 @@ public class BoardNode : NetworkBehaviour
             else continue;
         }
     }
+
+    IEnumerator AddKeyCoroutine(PlayerRef player)
+    {
+        for(int i = 0; i < 10; i++)
+        {
+            if (keyPrefab == null) break;
+            var rb = Instantiate(keyPrefab, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
+            rb.AddForce(Vector3.up * 10f);
+        }
+
+        yield return new WaitForSecondsRealtime(3f);
+        TurnManager.instance.RequestUpdateKey(player, 5);
+        EndTurn(player);
+    }
+
 }

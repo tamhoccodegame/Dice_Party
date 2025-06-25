@@ -16,7 +16,6 @@ public class BreakGlass : MonoBehaviour
     public void TryBreak()
     {
         if (!isBreakable) return;
-
         Instantiate(breakEffect, transform.position, transform.rotation);
         Destroy(gameObject);
     }
