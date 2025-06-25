@@ -224,7 +224,7 @@ public class GlassBreakManager : NetworkBehaviour
 
     public void SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank/*, PlayerRef thirdRank*/)
     {
-        MNGVongXoayController[] players = FindObjectsByType<MNGVongXoayController>(FindObjectsSortMode.None);
+        MNGCauKinhController[] players = FindObjectsByType<MNGCauKinhController>(FindObjectsSortMode.None);
 
         foreach (var player in players)
         {
