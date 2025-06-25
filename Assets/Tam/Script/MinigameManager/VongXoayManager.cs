@@ -165,7 +165,7 @@ public class VongXoayManager : NetworkBehaviour
             isGameOver = true;
             RPC_ShowGameOverPanel();
 
-            if (Object.HasStateAuthority && playerRanks.Count >= 3)
+            if (Object.HasStateAuthority && playerRanks.Count >= 2)
             {
                 PlayerRef firstRankRef = playerRanks[^1]; // Người cuối cùng chết (Top 1)
                 PlayerRef secondRankRef = playerRanks[^2]; // Người chết trước nó (Top 2)
