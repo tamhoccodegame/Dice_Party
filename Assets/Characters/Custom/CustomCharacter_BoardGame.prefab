@@ -2818,8 +2818,11 @@ GameObject:
   - component: {fileID: -1359556976780472910}
   - component: {fileID: -5833059894958035310}
   - component: {fileID: 1723543133382975127}
+  - component: {fileID: 3812267046210856960}
+  - component: {fileID: 4850745682665233094}
+  - component: {fileID: 4746361735063017072}
   m_Layer: 0
-  m_Name: CustomCharacter
+  m_Name: CustomCharacter_BoardGame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2859,7 +2862,7 @@ Animator:
   m_GameObject: {fileID: 2591654762118859964}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 503415fc3fea44f7bb0eebf41e58e8be, type: 3}
-  m_Controller: {fileID: 9100000, guid: 8b07dffaccb64524b8e95c6a7f8cc5b1, type: 2}
+  m_Controller: {fileID: 9100000, guid: 7466400ba5d940d882bbb7dee5ef9201, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2899,13 +2902,15 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 2076971387
+  SortKey: 83928790
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -1359556976780472910}
   - {fileID: 1723543133382975127}
+  - {fileID: 3812267046210856960}
+  - {fileID: 4746361735063017072}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &1723543133382975127
 MonoBehaviour:
@@ -2914,7 +2919,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2591654762118859964}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7050caa888943444bc5334fdd96e0c6, type: 3}
   m_Name: 
@@ -2925,6 +2930,71 @@ MonoBehaviour:
   currentHairIndex: 0
   currentColorIndex: 0
   currentBodypartIndex: 0
+--- !u!114 &3812267046210856960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b8d48cade35023408dfbd668f812fb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hair: {fileID: 5616962125916618925}
+  color: {fileID: 8536833452002015234}
+  bodypart: {fileID: 2766755286650585113}
+--- !u!143 &4850745682665233094
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &4746361735063017072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0e1f0a1304070f42b048a3e9f9ea9a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 8
+  rotationSpeed: 20
+  currentNode: {fileID: 0}
+  _currentNodeName: 
+  toMoveNode: {fileID: 0}
+  _currentStep: 0
+  _waitingForChoice: 0
+  arrowDirectionPrefab: {fileID: 9035063740964656231, guid: e788408d93fc4df4c869f756e543deab, type: 3}
+  spawnedArrows: []
+  rollDiceEffect: {fileID: 7433801954753670725, guid: 2d27d9c97bc4fca42bf8f5897b31e2ef, type: 3}
+  dice: {fileID: 7859789439665928958, guid: 2d27d9c97bc4fca42bf8f5897b31e2ef, type: 3}
+  stepText: {fileID: 6770067897922902656, guid: 2d27d9c97bc4fca42bf8f5897b31e2ef, type: 3}
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0
