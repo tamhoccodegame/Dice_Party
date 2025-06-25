@@ -130,11 +130,11 @@ public class GlassBreakManager : NetworkBehaviour
             isGameOver = true;
             RPC_ShowGameOverPanel();
 
-            if (Object.HasStateAuthority && playerRanks.Count >= 3)
+            if (Object.HasStateAuthority && playerRanks.Count >= 2)
             {
                 PlayerRef firstRankRef = playerRanks[^1]; 
                 PlayerRef secondRankRef = playerRanks[^2]; 
-                PlayerRef thirdRankRef = playerRanks[^3];
+                //PlayerRef thirdRankRef = playerRanks[^3];
                 SpawnRewardAvatar(firstRankRef, secondRankRef/*, thirdRankRef*/);
             }
         }
