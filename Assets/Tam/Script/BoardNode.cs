@@ -13,10 +13,14 @@ public class BoardNode : NetworkBehaviour
     {
         None,
         Key,
-        Blood,
+        Heal,
+        RareChest,
+        GoldChest,
     }
 
     public EventType eventType;
+
+    public GameObject keyPrefab;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -41,8 +45,8 @@ public class BoardNode : NetworkBehaviour
             case EventType.Key:
                 Debug.Log("Add Key");
                 break;
-            case EventType.Blood:
-                Debug.Log("Add Blood");
+            case EventType.Heal:
+                Debug.Log("Heal");
                 break;
         }
 
@@ -56,6 +60,5 @@ public class BoardNode : NetworkBehaviour
             }
             else continue;
         }
-
     }
 }

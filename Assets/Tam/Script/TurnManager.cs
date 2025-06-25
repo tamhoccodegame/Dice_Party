@@ -6,12 +6,25 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class PlayerBoardData : INetworkStruct
+{
+    public int health;
+    public int key;
+    public int cup;
+}
+
 public class TurnManager : NetworkBehaviour
 {
     public static TurnManager instance;
     public List<BoardGameController> playerController;
     [Networked] public int currentPlayerIndex { get; set; }
     [Networked] public PlayerRef currentPlayerRef { get; set; }
+
+    [Header("BXH")]
+    public Transform slotTemplate;
+    public Transform slotContainer;
+    [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, PlayerBoardData> playersData => default;
+    
 
     [Header("Camera")]
     public Camera cam;
@@ -82,10 +95,9 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateCameraPosition(Vector3 newPosition)
+    public void RequestUpdatePlayerData()
     {
-        targetCamPosition = newPosition;
+
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -185,17 +197,19 @@ public class TurnManager : NetworkBehaviour
     IEnumerator LoadMNG()
     {
         yield return StartCoroutine(FadeBlackScreen(0, 1));
-        yield return new WaitForSecondsRealtime(2f);
-
-        if (HasStateAuthority)
-        {
-            Runner.LoadScene("MNG3");
-        }
+        LevelLoader.instance.LoadScene("MNG3");
     }
 
+    #region Camera
     void StartFollowTarget()
     {
         RPC_RequestFollowTarget();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_UpdateCameraPosition(Vector3 newPosition)
+    {
+        targetCamPosition = newPosition;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)] // Chạy trên tất cả client
@@ -230,4 +244,5 @@ public class TurnManager : NetworkBehaviour
         cam.transform.position = newTarget;
         isCameraMoving = false;
     }
+    #endregion
 }

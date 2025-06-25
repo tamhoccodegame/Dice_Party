@@ -11,7 +11,7 @@ public class MNGVongXoayController : NetworkBehaviour
     public float moveSpeed = 5f;
     public float rotationSpeed = 10f;
     public float jumpForce = 5f;
-    public float gravity = -9.81f;
+    public float gravity = -3f;
     public float verticalVelocity;
 
     [Networked] private Vector2 moveInput { get; set; }
@@ -31,6 +31,12 @@ public class MNGVongXoayController : NetworkBehaviour
         controller.enabled = true;
         animator = GetComponent<Animator>();
         manager = VongXoayManager.instance;
+        Invoke(nameof(ResetGravity), 2f);
+    }
+
+    void ResetGravity()
+    {
+        gravity = -20f;
     }
 
     void Update()
