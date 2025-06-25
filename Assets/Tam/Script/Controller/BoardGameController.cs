@@ -143,6 +143,7 @@ public class BoardGameController : NetworkBehaviour
             }
 
             Vector3 moveDir = direction * moveSpeed * Runner.DeltaTime;
+
             controller.Move(moveDir);
 
             // Đã tới node kế tiếp
