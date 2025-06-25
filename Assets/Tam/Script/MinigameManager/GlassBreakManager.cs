@@ -1,8 +1,7 @@
 ﻿using Fusion;
 using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 using TMPro;
-using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -62,18 +61,22 @@ public class GlassBreakManager : NetworkBehaviour
 
     public override void Spawned()
     {
-        foreach (var glassCouple in glassCouples)
+        if (HasStateAuthority)
         {
-            if (Random.value < 0.5f)
+            foreach (var glassCouple in glassCouples)
             {
-                glassCouple.glass1.SetBreakable(true);
-                glassCouple.glass2.SetBreakable(false);
+                if (Random.value < 0.5f)
+                {
+                    glassCouple.glass1.SetBreakable(true);
+                    glassCouple.glass2.SetBreakable(false);
+                }
+                else
+                {
+                    glassCouple.glass1.SetBreakable(false);
+                    glassCouple.glass2.SetBreakable(true);
+                }
             }
-            else
-            {
-                glassCouple.glass1.SetBreakable(false);
-                glassCouple.glass2.SetBreakable(true);
-            }
+
         }
 
         MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
@@ -210,7 +213,7 @@ public class GlassBreakManager : NetworkBehaviour
 
     bool CheckGameOver()
     {
-        return true;
+        return playerRanks.Count >= Runner.ActivePlayers.Count();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

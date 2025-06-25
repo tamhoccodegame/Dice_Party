@@ -51,6 +51,11 @@ public class MNGCauKinhController : NetworkBehaviour
             // Send input to host
             RPC_SendInput(input, jump);
         }
+
+        if (Physics.Raycast(feet.position, Vector3.down, out RaycastHit hit, 0.1f, glassLayer))
+        {
+            hit.collider.gameObject.GetComponent<BreakGlass>().TryBreak();
+        }
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -73,10 +78,7 @@ public class MNGCauKinhController : NetworkBehaviour
             return;
         }
 
-        if(Physics.Raycast(feet.position, Vector3.down, out RaycastHit hit, 0.1f, glassLayer))
-        {
-            hit.collider.gameObject.GetComponent<BreakGlass>().TryBreak();
-        }
+       
 
         // Gravity
         if (controller.isGrounded && verticalVelocity < 0)
