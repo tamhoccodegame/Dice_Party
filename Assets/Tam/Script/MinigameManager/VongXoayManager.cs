@@ -169,7 +169,7 @@ public class VongXoayManager : NetworkBehaviour
             {
                 PlayerRef firstRankRef = playerRanks[^1]; // Người cuối cùng chết (Top 1)
                 PlayerRef secondRankRef = playerRanks[^2]; // Người chết trước nó (Top 2)
-                PlayerRef thirdRankRef = playerRanks[^3];
+                //PlayerRef thirdRankRef = playerRanks[^3];
                 SpawnRewardAvatar(firstRankRef, secondRankRef/*, thirdRankRef*/);
             }
         }

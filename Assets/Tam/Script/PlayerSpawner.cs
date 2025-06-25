@@ -30,6 +30,7 @@ public class PlayerSpawner : NetworkBehaviour
 
         if (boardGameData != null && boardGameData.playerCurrentNode.Count > 0 && isBoardScene)
         {
+            TurnManager.instance.isFirstTry = false;
             foreach (var player in networkManager.GetAllPlayers())
             {
                 Transform spawnPosition1 = GameObject.Find(boardGameData.GetNode(player)).transform;

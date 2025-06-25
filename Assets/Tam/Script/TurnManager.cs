@@ -20,6 +20,8 @@ public class TurnManager : NetworkBehaviour
     [Networked] public int currentPlayerIndex { get; set; }
     [Networked] public PlayerRef currentPlayerRef { get; set; }
 
+    [Networked] public bool isFirstTry { get; set; } = true;
+
     [Header("BXH")]
     public Transform slotTemplate;
     public Transform slotContainer;
@@ -272,7 +274,15 @@ public class TurnManager : NetworkBehaviour
     IEnumerator LoadMNG()
     {
         yield return StartCoroutine(FadeBlackScreen(0, 1));
-        LevelLoader.instance.LoadScene("MNG1");
+        if (isFirstTry)
+        {
+            LevelLoader.instance.LoadScene("MNG3");
+
+        }
+        else
+        {
+            LevelLoader.instance.LoadScene("MNG1");
+        }
     }
 
     #region Camera

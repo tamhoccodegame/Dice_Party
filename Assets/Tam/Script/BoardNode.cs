@@ -38,9 +38,9 @@ public class BoardNode : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_ProcessNode(PlayerRef player)
     {
-        if(eventType != EventType.None)
-        nodeEffect.Play();
-        else
+        if(eventType == EventType.None)
+        //nodeEffect.Play();
+        //else
         {
             EndTurn(player);
         }
