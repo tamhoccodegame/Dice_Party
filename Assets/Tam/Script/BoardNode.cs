@@ -48,11 +48,11 @@ public class BoardNode : NetworkBehaviour
             switch (eventType)
             {
                 case EventType.Key:
-                    StartCoroutine(AddKeyCoroutine(player));
+                    //StartCoroutine(AddKeyCoroutine(player));
                     Debug.Log("Add Key");
                     break;
                 case EventType.Heal:
-                    TurnManager.instance.RequestUpdateHealth(player, 20);
+                    //TurnManager.instance.RequestUpdateHealth(player, 20);
                     Debug.Log("Heal");
                     break;
             }
