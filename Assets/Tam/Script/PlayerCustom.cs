@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class PlayerCustom : NetworkBehaviour
 {
-    public Transform hair;
-    public Transform color;
-    public Transform bodypart;
+    public GameObject[] hairs;
+    public GameObject[] colors;
+    public GameObject[]bodyparts;
 
     [Networked] public int currentHairIndex { get; set; } = 0;
     [Networked] public int currentColorIndex { get; set; } = 0;
@@ -17,30 +17,7 @@ public class PlayerCustom : NetworkBehaviour
     {
         if (!Object.HasInputAuthority) return;
 
-        for(int i = 0; i < hair.childCount; i++)
-        {
-            if (hair.GetChild(i).gameObject.activeSelf)
-            {
-                currentHairIndex = i;
-                break;
-            }
-        }
-        for(int i = 0; i <  color.childCount; i++)
-        {
-            if (color.GetChild(i).gameObject.activeSelf)
-            {
-                currentColorIndex = i;
-                break;
-            }
-        }
-        for(int i = 0; i < bodypart.childCount; i++)
-        {
-            if (bodypart.GetChild(i).gameObject.activeSelf)
-            {
-                currentBodypartIndex = i;
-                break;
-            }
-        }
+        RequestApplyCustom(currentHairIndex, currentColorIndex, currentBodypartIndex);
     }
 
     public void RequestApplyCustom(int hairIndex, int colorIndex, int bodypartIndex)
@@ -69,15 +46,13 @@ public class PlayerCustom : NetworkBehaviour
         ApplyHair(hairIndex);
         ApplyColor(colorIndex);
         ApplyBodypart(bodypartIndex);
-
-        
     }
 
     public void NextHair()
     {
         if (!Object.HasInputAuthority) return;
 
-        currentHairIndex = (currentHairIndex + 1) % hair.childCount;
+        currentHairIndex = (currentHairIndex + 1) % hairs.Length;
         ApplyHair(currentHairIndex);
     }
 
@@ -86,17 +61,15 @@ public class PlayerCustom : NetworkBehaviour
         if (!Object.HasInputAuthority) return;
 
         currentHairIndex--;
-        if (currentHairIndex < 0) currentHairIndex = hair.childCount - 1;
+        if (currentHairIndex < 0) currentHairIndex = hairs.Length - 1;
         ApplyHair(currentHairIndex);
     }
 
     public void ApplyHair(int index)
     {
-        currentHairIndex = Mathf.Clamp(index, 0, hair.childCount - 1);
-
-        for (int i = 0; i < hair.childCount; i++)
+        for (int i = 0; i < hairs.Length; i++)
         {
-            hair.GetChild(i).gameObject.SetActive(i == currentHairIndex);
+            hairs[i].SetActive(i == index);
         }
     }
 
@@ -104,7 +77,7 @@ public class PlayerCustom : NetworkBehaviour
     {
         if (!Object.HasInputAuthority) return;
 
-        currentColorIndex = (currentColorIndex + 1) % color.childCount;
+        currentColorIndex = (currentColorIndex + 1) % colors.Length;
         ApplyColor(currentColorIndex);
     }
 
@@ -113,17 +86,15 @@ public class PlayerCustom : NetworkBehaviour
         if (!Object.HasInputAuthority) return;
 
         currentColorIndex--;
-        if (currentColorIndex < 0) currentColorIndex = color.childCount - 1;
+        if (currentColorIndex < 0) currentColorIndex = colors.Length - 1;
         ApplyColor(currentColorIndex);
     }
 
     public void ApplyColor(int index)
     {
-        currentColorIndex = Mathf.Clamp(index, 0, color.childCount - 1);
-
-        for (int i = 0; i < color.childCount; i++)
+        for (int i = 0; i < colors.Length; i++)
         {
-            color.GetChild(i).gameObject.SetActive(i == currentColorIndex);
+            colors[i].SetActive(i == index);
         }
     }
 
@@ -131,7 +102,7 @@ public class PlayerCustom : NetworkBehaviour
     {
         if (!Object.HasInputAuthority) return;
 
-        currentBodypartIndex = (currentBodypartIndex + 1) % bodypart.childCount;
+        currentBodypartIndex = (currentBodypartIndex + 1) % bodyparts.Length;
         ApplyBodypart(currentBodypartIndex);
     }
 
@@ -140,17 +111,15 @@ public class PlayerCustom : NetworkBehaviour
         if (!Object.HasInputAuthority) return;
 
         currentBodypartIndex--;
-        if (currentBodypartIndex < 0) currentBodypartIndex = bodypart.childCount - 1;
+        if (currentBodypartIndex < 0) currentBodypartIndex = bodyparts.Length - 1;
         ApplyBodypart(currentBodypartIndex);
     }
 
     public void ApplyBodypart(int index)
     {
-        currentBodypartIndex = Mathf.Clamp(index, 0, bodypart.childCount - 1);
-
-        for (int i = 0; i < bodypart.childCount; i++)
+        for (int i = 0; i < bodyparts.Length; i++)
         {
-            bodypart.GetChild(i).gameObject.SetActive(i == currentBodypartIndex);
+            bodyparts[i].SetActive(i == index);
         }
     }
 }

@@ -20,7 +20,7 @@ public class BoardGameController : NetworkBehaviour
     public BoardNode toMoveNode;          // node sẽ di chuyển tới tiếp
 
     [Networked] public int currentStep { get; set; }      // số bước xúc xắc random, sync qua network
-    private CharacterController controller;               // component điều khiển di chuyển vật lý
+    private NetworkCharacterController controller;               // component điều khiển di chuyển vật lý
     private Animator animator;                            // component điều khiển animation
     [Networked] public bool waitingForChoice { get; set; } // đang chờ người chơi chọn hướng đi (sync)
 
@@ -50,7 +50,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm Spawned() chạy khi object này spawn ---
     public override void Spawned()
     {
-        controller = GetComponent<CharacterController>();
+        controller = GetComponent<NetworkCharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
 
@@ -330,7 +330,7 @@ public class BoardGameController : NetworkBehaviour
 
     IEnumerator HideDiceCoroutine()
     {
-        yield return new WaitForSecondsRealtime(0.2f);
+        yield return new WaitForSecondsRealtime(0.4f);
         stepText.gameObject.SetActive(true);
         rollDiceEffect.Play();
         dice.SetActive(false);

@@ -1,11 +1,19 @@
 ﻿using Fusion;
+using Fusion.Sockets;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 
 [RequireComponent(typeof(CharacterController))]
 public class MNGCauKinhController : NetworkBehaviour
 {
+    private CinemachineCamera cam;
+    [Networked] private Vector3 clientCamForward { get; set; }
+
     private CharacterController controller;
     private Animator animator;
 
@@ -18,6 +26,10 @@ public class MNGCauKinhController : NetworkBehaviour
     [Networked] private Vector2 moveInput { get; set; }
     [Networked] private bool jumpRequest { get; set; }
     [Networked] private string NetworkAnim { get; set; } // Animation sync
+
+    private float lastInputSendTime = 0f;
+    private float inputSendInterval = 1f / 30f; // Gửi tối đa 30 lần/giây (tick rate tương đương 30Hz)
+
 
     public string currentAnim;
 
@@ -32,24 +44,24 @@ public class MNGCauKinhController : NetworkBehaviour
         controller.enabled = true;
         animator = GetComponent<Animator>();
         manager = GlassBreakManager.instance;
+
+        cam = FindFirstObjectByType<CinemachineCamera>();
+        cam.Follow = transform;
+        cam.LookAt = transform;
     }
 
     void Update()
     {
         if (!Object.HasInputAuthority) return;
-
-        CinemachineCamera cam = FindFirstObjectByType<CinemachineCamera>();
-        cam.Follow = transform;
-        cam.LookAt = transform;
-
+        
         if (manager != null && manager.Object.IsValid && manager.isGameStarted)
         {
             // Collect input on client
-            Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            //Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             bool jump = Input.GetKeyDown(KeyCode.Space);
 
             // Send input to host
-            RPC_SendInput(input, jump);
+            RPC_SendInput(jump, cam.transform.forward);
         }
 
         if (Physics.Raycast(feet.position, Vector3.down, out RaycastHit hit, 0.1f, glassLayer))
@@ -59,9 +71,10 @@ public class MNGCauKinhController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_SendInput(Vector2 input, bool jump)
+    private void RPC_SendInput(/*Vector2 input, */bool jump, Vector3 camForward)
     {
-        moveInput = input;
+        //moveInput = input;
+        clientCamForward = camForward; 
         if (jump) jumpRequest = true;
     }
 
@@ -77,8 +90,6 @@ public class MNGCauKinhController : NetworkBehaviour
             }
             return;
         }
-
-       
 
         // Gravity
         if (controller.isGrounded && verticalVelocity < 0)
@@ -99,12 +110,35 @@ public class MNGCauKinhController : NetworkBehaviour
 
         jumpRequest = false; // reset jump request
 
-        // Movement
-        Vector3 movement = new Vector3(moveInput.x, verticalVelocity, moveInput.y);
-        controller.Move(movement * moveSpeed * Runner.DeltaTime);
+        Vector3 moveDir = Vector3.zero;
 
-        // Rotation
-        Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
+        if (GetInput(out NetworkInputData data))
+        {
+            Debug.Log(data.direction);
+
+            data.direction.Normalize();
+            // Movement
+            Vector3 camForward = Vector3.ProjectOnPlane(clientCamForward, Vector3.up).normalized;
+            Vector3 camRight = Vector3.Cross(Vector3.up, camForward).normalized;
+
+            camForward.y = 0;
+            camRight.y = 0;
+
+            moveDir = camRight * data.direction.x + camForward * data.direction.z;
+            Vector3 movement = moveDir * moveSpeed;
+            movement.y = verticalVelocity;
+
+            controller.Move(movement * Runner.DeltaTime);
+        }
+        else
+        {
+            Debug.Log("No input data");
+        }
+
+
+            // Rotation
+            Vector3 moveDirection = moveDir;
+        moveDirection.y = 0;
         if (moveDirection.magnitude > 0)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
@@ -140,9 +174,11 @@ public class MNGCauKinhController : NetworkBehaviour
         }
         else if(other.name == "Deadzone")
         {
-            GetComponent<CharacterController>().enabled = false;
-            transform.position = manager.spawnPosition.position;
-            GetComponent<CharacterController>().enabled = true;
+            controller.enabled = false;
+            verticalVelocity = 0;
+            transform.position = manager.spawnPosition.position + new Vector3(0, 3, 0);
+            controller.enabled = true;
         }
     }
+
 }
