@@ -47,6 +47,9 @@ public class BoardGameController : NetworkBehaviour
     private State cachedMoveState;   // lưu state cũ để kiểm tra thay đổi (chỉ dùng cho animation)
     private float animTimer = 0f;        // thời gian chờ khi chơi animation roll dice
 
+    Vector3 _smoothedPos;
+    [Networked] private Vector3 NetworkedPosition { get; set; }
+
     // --- Hàm Spawned() chạy khi object này spawn ---
     public override void Spawned()
     {
@@ -93,6 +96,12 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm Update() chỉ chạy trên client local ---
     void Update()
     {
+        if (!Object.HasStateAuthority)
+        {
+            _smoothedPos = Vector3.Lerp(_smoothedPos, NetworkedPosition, Time.deltaTime * 10f);
+            transform.position = _smoothedPos;
+        }
+
         // Đảm bảo cả host và client đều update animation nếu state thay đổi
         if (cachedMoveState != currentState)
         {
@@ -125,6 +134,12 @@ public class BoardGameController : NetworkBehaviour
         {
             cachedMoveState = currentState;
             UpdateAnimation();
+        }
+
+        if (Object.HasStateAuthority)
+        {
+            NetworkedPosition = transform.position;
+            // Logic di chuyển host ở đây...
         }
 
         if (!HasStateAuthority)
