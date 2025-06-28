@@ -3821,8 +3821,11 @@ GameObject:
   - component: {fileID: -1359556976780472910}
   - component: {fileID: -5833059894958035310}
   - component: {fileID: 1723543133382975127}
+  - component: {fileID: -7580246330910568954}
+  - component: {fileID: 241218543249684500}
+  - component: {fileID: 4983479660986284423}
   m_Layer: 0
-  m_Name: CustomCharacter
+  m_Name: CustomCharacter_Update_VongXoay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3902,13 +3905,15 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 2076971387
+  SortKey: 2814459881
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -1359556976780472910}
   - {fileID: 1723543133382975127}
+  - {fileID: -7580246330910568954}
+  - {fileID: 4983479660986284423}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &1723543133382975127
 MonoBehaviour:
@@ -3917,7 +3922,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2591654762118859964}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7050caa888943444bc5334fdd96e0c6, type: 3}
   m_Name: 
@@ -3966,6 +3971,66 @@ MonoBehaviour:
   _currentHairIndex: 0
   _currentColorIndex: 0
   _currentBodypartIndex: 0
+--- !u!114 &-7580246330910568954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b8d48cade35023408dfbd668f812fb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hair: {fileID: 5616962125916618925}
+  color: {fileID: 8536833452002015234}
+  bodypart: {fileID: 2766755286650585113}
+--- !u!143 &241218543249684500
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &4983479660986284423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50132d0a3bdcb3646948f6415f3e4a5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 8
+  rotationSpeed: 20
+  jumpForce: 3.5
+  gravity: -15
+  verticalVelocity: 0
+  bloodEffect: {fileID: 1442472169281278127, guid: 40631a6530818ff4bb6e85c2ab4e5d82, type: 3}
+  currentAnim: 
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0
