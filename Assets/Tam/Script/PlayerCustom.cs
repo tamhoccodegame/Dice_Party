@@ -9,9 +9,9 @@ public class PlayerCustom : NetworkBehaviour
     public GameObject[] colors;
     public GameObject[]bodyparts;
 
-    [Networked] public int currentHairIndex { get; set; } = 0;
-    [Networked] public int currentColorIndex { get; set; } = 0;
-    [Networked] public int currentBodypartIndex { get; set; } = 0;
+    public int currentHairIndex = 0;
+    public int currentColorIndex = 0;
+    public int currentBodypartIndex = 0;
 
     public override void Spawned()
     {

@@ -17,7 +17,8 @@ public class PlayerSpawner : NetworkBehaviour
 
     public override void Spawned()
     {
-        
+        //Test Scene Only
+        //Runner.Spawn(playerPrefab, spawnPosition.position, Quaternion.identity, Runner.LocalPlayer);
     }
 
     public void SpawnPlayer()

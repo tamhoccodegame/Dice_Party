@@ -96,12 +96,6 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm Update() chỉ chạy trên client local ---
     void Update()
     {
-        if (!Object.HasStateAuthority)
-        {
-            _smoothedPos = Vector3.Lerp(_smoothedPos, NetworkedPosition, Time.deltaTime * 10f);
-            transform.position = _smoothedPos;
-        }
-
         // Đảm bảo cả host và client đều update animation nếu state thay đổi
         if (cachedMoveState != currentState)
         {
@@ -149,17 +143,8 @@ public class BoardGameController : NetworkBehaviour
         if (currentState == State.Moving && !waitingForChoice)
         {
             Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
-            direction.y = 0;
-
-            if (direction != Vector3.zero)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
-            }
-
-            Vector3 moveDir = direction * moveSpeed * Runner.DeltaTime;
-
-            controller.Move(moveDir);
+            
+            controller.Move(direction);
 
             // Đã tới node kế tiếp
             if (Vector3.Distance(transform.position, toMoveNode.transform.position) <= 0.5f)
@@ -345,7 +330,7 @@ public class BoardGameController : NetworkBehaviour
 
     IEnumerator HideDiceCoroutine()
     {
-        yield return new WaitForSecondsRealtime(0.4f);
+        yield return new WaitForSecondsRealtime(0.2f);
         stepText.gameObject.SetActive(true);
         rollDiceEffect.Play();
         dice.SetActive(false);

@@ -1,21 +1,14 @@
 ﻿using Fusion;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 
+[RequireComponent(typeof(NetworkCharacterController))]
 [RequireComponent(typeof(CharacterController))]
 public class MNGVongXoayController : NetworkBehaviour
 {
-    private CharacterController controller;
+    private NetworkCharacterController controller;
     private Animator animator;
-
-    public float moveSpeed = 5f;
-    public float rotationSpeed = 10f;
-    public float jumpForce = 5f;
-    public float gravity = -3f;
-    public float verticalVelocity;
-
-    [Networked] private Vector2 moveInput { get; set; }
-    [Networked] private bool jumpRequest { get; set; }
     [Networked] private string NetworkAnim { get; set; } // Animation sync
 
     public VisualEffect bloodEffect;
@@ -27,7 +20,7 @@ public class MNGVongXoayController : NetworkBehaviour
     public override void Spawned()
     {
         bloodEffect.Stop();
-        controller = GetComponent<CharacterController>();
+        controller = GetComponent<NetworkCharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
         manager = VongXoayManager.instance;
@@ -36,78 +29,30 @@ public class MNGVongXoayController : NetworkBehaviour
 
     void ResetGravity()
     {
-        gravity = -20f;
+
     }
 
     void Update()
     {
         if (!Object.HasInputAuthority) return;
 
-        if (manager != null && manager.Object.IsValid && manager.isGameStarted)
+        if (GetInput(out NetworkInputData data))
         {
-            bool jump = Input.GetKeyDown(KeyCode.Space);
+            Vector3 direction = data.direction;
 
-            // Send input to host
-            RPC_SendInput(jump);
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_SendInput(bool jump)
-    {
-        if (jump) jumpRequest = true;
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-        if (!Object.HasStateAuthority)
-        {
-            // Client đọc networked animation state
-            if (NetworkAnim != currentAnim)
+            if (data.buttons.IsSet(NetworkInputData.JUMPBUTTON) && controller.Grounded)
             {
-                animator.CrossFade(NetworkAnim, 0.25f);
-                currentAnim = NetworkAnim;
-            }
-            return;
-        }
-
-        // Gravity
-        if (controller.isGrounded && verticalVelocity < 0)
-        {
-            verticalVelocity = -2f;
-        }
-        else
-        {
-            verticalVelocity += gravity * Runner.DeltaTime;
-        }
-
-        // Jump
-        if (jumpRequest && controller.isGrounded)
-        {
-            ChangeAnim("Jump");
-            verticalVelocity = jumpForce;
-        }
-        jumpRequest = false; // reset jump request
-
-
-        if(GetInput(out NetworkInputData data))
-        {
-            // Movement
-            Vector3 movement = new Vector3(data.direction.x, verticalVelocity, data.direction.z);
-            controller.Move(movement * moveSpeed * Runner.DeltaTime);
-
-            // Rotation
-            Vector3 moveDirection = new Vector3(data.direction.x, 0, data.direction.z);
-            if (moveDirection.magnitude > 0)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
+                controller.Jump();
+                ChangeAnim("Jump");
             }
 
-            // Animation
-            if (controller.isGrounded)
+            // Luôn chạy Move
+            controller.Move(direction);
+
+            // Anim xử lý tách biệt
+            if (controller.Grounded)
             {
-                if (moveDirection.magnitude > 0)
+                if (direction.sqrMagnitude > 0.001f)
                     ChangeAnim("Run");
                 else
                     ChangeAnim("Idle");
@@ -115,12 +60,48 @@ public class MNGVongXoayController : NetworkBehaviour
         }
     }
 
+    public override void FixedUpdateNetwork()
+    {
+        // Client đọc networked animation state
+        if (NetworkAnim != currentAnim)
+        {
+            animator.CrossFade(NetworkAnim, 0.25f);
+            currentAnim = NetworkAnim;
+        }
+
+        if (!Object.HasStateAuthority) return;
+
+        if (GetInput(out NetworkInputData data))
+        {
+            Vector3 direction = data.direction;
+
+            if (data.buttons.IsSet(NetworkInputData.JUMPBUTTON) && controller.Grounded)
+            {
+                controller.Jump();
+                ChangeAnim("Jump");
+            }
+
+            // Luôn chạy Move
+            controller.Move(direction);
+
+            // Anim xử lý tách biệt
+            if (controller.Grounded)
+            {
+                if (direction.sqrMagnitude > 0.001f)
+                    ChangeAnim("Run");
+                else
+                    ChangeAnim("Idle");
+            }
+        }
+
+    }
+
     public void ChangeAnim(string animName, float blendTime = 0.25f)
     {
         if (animName == currentAnim) return;
         currentAnim = animName;
 
-        if (Object.HasStateAuthority)
+        if (HasStateAuthority)
             NetworkAnim = animName;
 
         animator.CrossFade(animName, blendTime);
