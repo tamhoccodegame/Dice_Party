@@ -282,9 +282,9 @@ public class TurnManager : NetworkBehaviour
 
         //}
         //else
-        {
-            LevelLoader.instance.LoadScene("MNG1");
-        }
+        //{
+        //    LevelLoader.instance.LoadScene("MNG1");
+        //}
     }
 
     #region Camera

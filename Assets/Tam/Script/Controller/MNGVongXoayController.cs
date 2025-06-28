@@ -45,19 +45,16 @@ public class MNGVongXoayController : NetworkBehaviour
 
         if (manager != null && manager.Object.IsValid && manager.isGameStarted)
         {
-            // Collect input on client
-            Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             bool jump = Input.GetKeyDown(KeyCode.Space);
 
             // Send input to host
-            RPC_SendInput(input, jump);
+            RPC_SendInput(jump);
         }
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_SendInput(Vector2 input, bool jump)
+    private void RPC_SendInput(bool jump)
     {
-        moveInput = input;
         if (jump) jumpRequest = true;
     }
 
@@ -92,25 +89,29 @@ public class MNGVongXoayController : NetworkBehaviour
         }
         jumpRequest = false; // reset jump request
 
-        // Movement
-        Vector3 movement = new Vector3(moveInput.x, verticalVelocity, moveInput.y);
-        controller.Move(movement * moveSpeed * Runner.DeltaTime);
 
-        // Rotation
-        Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
-        if (moveDirection.magnitude > 0)
+        if(GetInput(out NetworkInputData data))
         {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
-        }
+            // Movement
+            Vector3 movement = new Vector3(data.direction.x, verticalVelocity, data.direction.z);
+            controller.Move(movement * moveSpeed * Runner.DeltaTime);
 
-        // Animation
-        if (controller.isGrounded)
-        {
+            // Rotation
+            Vector3 moveDirection = new Vector3(data.direction.x, 0, data.direction.z);
             if (moveDirection.magnitude > 0)
-                ChangeAnim("Run");
-            else
-                ChangeAnim("Idle");
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
+            }
+
+            // Animation
+            if (controller.isGrounded)
+            {
+                if (moveDirection.magnitude > 0)
+                    ChangeAnim("Run");
+                else
+                    ChangeAnim("Idle");
+            }
         }
     }
 
