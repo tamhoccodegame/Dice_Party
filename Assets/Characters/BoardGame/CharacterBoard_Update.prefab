@@ -3963,7 +3963,7 @@ GameObject:
   - component: {fileID: -4970366187477402676}
   - component: {fileID: 6313809305522371884}
   - component: {fileID: -6553507065160089101}
-  - component: {fileID: 4152578046348581220}
+  - component: {fileID: -9195892410077921398}
   m_Layer: 3
   m_Name: CharacterBoard_Update
   m_TagString: Untagged
@@ -4039,7 +4039,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6313809305522371884}
   - {fileID: -6553507065160089101}
-  - {fileID: 4152578046348581220}
+  - {fileID: -9195892410077921398}
   ForceRemoteRenderTimeframe: 0
 --- !u!143 &-4970366187477402676
 CharacterController:
@@ -4135,6 +4135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentNode: {fileID: 0}
+  currentNodeId: 0
   _currentNodeName: 
   toMoveNode: {fileID: 0}
   _currentStep: 0
@@ -4145,7 +4146,7 @@ MonoBehaviour:
   dice: {fileID: 4177470746245077836}
   stepText: {fileID: 6770067897922902656}
   feet: {fileID: 5339602891216914746}
---- !u!114 &4152578046348581220
+--- !u!114 &-9195892410077921398
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4158,10 +4159,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stateAuthorityChangeErrorCorrectionDelta: 0
-  gravity: -10000
+  gravity: 0
   jumpImpulse: 0
-  acceleration: 30
-  braking: 10
+  acceleration: 50
+  braking: 50
   maxSpeed: 8
   rotationSpeed: 15
 --- !u!1 &2713937601389622726

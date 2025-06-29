@@ -11,6 +11,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Các node hiện tại và node sắp di chuyển ---
     [Header("Move")]
     public BoardNode currentNode;         // node hiện tại đang đứng
+    public int currentNodeId;             //Chỉ dùng được local scene
     [Networked, UnitySerializeField] public string currentNodeName { get; set; }
     public BoardNode toMoveNode;          // node sẽ di chuyển tới tiếp
 
@@ -42,9 +43,6 @@ public class BoardGameController : NetworkBehaviour
     private State cachedMoveState;   // lưu state cũ để kiểm tra thay đổi (chỉ dùng cho animation)
     private float animTimer = 0f;        // thời gian chờ khi chơi animation roll dice
 
-    Vector3 _smoothedPos;
-    [Networked] private Vector3 NetworkedPosition { get; set; }
-
     public Transform feet;
 
     // --- Hàm Spawned() chạy khi object này spawn ---
@@ -73,14 +71,14 @@ public class BoardGameController : NetworkBehaviour
         }
         else
         {
-            currentNode = GameObject.Find("Dice (7)").GetComponent<BoardNode>();
+            currentNode = GameObject.Find("AddDice").GetComponent<BoardNode>();
         }
 
         Debug.Log(currentNode.name);
 
         // Set node tiếp theo mặc định là node đầu tiên
         if (HasStateAuthority)
-            RPC_SetCurrentNode((NetworkString<_16>)currentNode.name);
+            RPC_SetCurrentNode(currentNode.Object.Id);
 
         toMoveNode = currentNode.nextNodes[0];
         stepText.gameObject.SetActive(false);
@@ -127,12 +125,6 @@ public class BoardGameController : NetworkBehaviour
             UpdateAnimation();
         }
 
-        if (Object.HasStateAuthority)
-        {
-            NetworkedPosition = transform.position;
-            // Logic di chuyển host ở đây...
-        }
-
         if (!HasStateAuthority)
             return; // chỉ host xử lý logic game
 
@@ -140,7 +132,8 @@ public class BoardGameController : NetworkBehaviour
         if (currentState == State.Moving && !waitingForChoice)
         {
             Vector3 direction = (toMoveNode.transform.position - feet.position).normalized;
-            
+            direction.y = 0;
+
             controller.Move(direction);
 
             // Đã tới node kế tiếp
@@ -148,7 +141,7 @@ public class BoardGameController : NetworkBehaviour
             {
                 currentNode = toMoveNode;
                 if (HasStateAuthority)
-                    RPC_SetCurrentNode((NetworkString<_16>)currentNode.name);
+                    RPC_SetCurrentNode(currentNode.Object.Id);
                 currentStep--;
 
                 if (currentStep > 0)
@@ -338,10 +331,10 @@ public class BoardGameController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_SetCurrentNode(NetworkString<_16> newName)
+    private void RPC_SetCurrentNode(NetworkId nodeId)
     {
-        currentNodeName = (string)newName;
-        currentNode = GameObject.Find(currentNodeName).GetComponent<BoardNode>();
+        currentNode = Runner.FindObject(nodeId).GetComponent<BoardNode>();
+        currentNodeName = currentNode.name;
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
