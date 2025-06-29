@@ -7,7 +7,7 @@ public class PlayerCustom : NetworkBehaviour
 {
     public GameObject[] hairs;
     public GameObject[] colors;
-    public GameObject[]bodyparts;
+    public GameObject[] bodyparts;
 
     public int currentHairIndex = 0;
     public int currentColorIndex = 0;
