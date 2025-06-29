@@ -17,7 +17,8 @@ public class PlayerSpawner : NetworkBehaviour
 
     public override void Spawned()
     {
-        
+        //Test Scene Only
+        //Runner.Spawn(playerPrefab, spawnPosition.position, Quaternion.identity, Runner.LocalPlayer);
     }
 
     public void SpawnPlayer()
@@ -30,6 +31,7 @@ public class PlayerSpawner : NetworkBehaviour
 
         if (boardGameData != null && boardGameData.playerCurrentNode.Count > 0 && isBoardScene)
         {
+            TurnManager.instance.isFirstTry = false;
             foreach (var player in networkManager.GetAllPlayers())
             {
                 Transform spawnPosition1 = GameObject.Find(boardGameData.GetNode(player)).transform;
@@ -41,15 +43,5 @@ public class PlayerSpawner : NetworkBehaviour
             {
                 Runner.Spawn(playerPrefab, spawnPosition.position, Quaternion.identity, player);
             }
-    }
-
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-    private void OnDestroy()
-    {
     }
 }
