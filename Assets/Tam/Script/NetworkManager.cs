@@ -35,6 +35,14 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         sessionNameInput.onValueChanged.AddListener(UpdateSessionName);
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            runnerInstance.Shutdown();
+        }
+    }
+
     public List<PlayerRef> GetAllPlayers()
     {
         return players;

@@ -8,11 +8,6 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class BoardGameController : NetworkBehaviour
 {
-    // --- Các thông số cấu hình di chuyển ---
-    [Header("Stat")]
-    public float moveSpeed;               // tốc độ di chuyển
-    public float rotationSpeed;           // tốc độ quay mặt nhân vật
-
     // --- Các node hiện tại và node sắp di chuyển ---
     [Header("Move")]
     public BoardNode currentNode;         // node hiện tại đang đứng
@@ -49,6 +44,8 @@ public class BoardGameController : NetworkBehaviour
 
     Vector3 _smoothedPos;
     [Networked] private Vector3 NetworkedPosition { get; set; }
+
+    public Transform feet;
 
     // --- Hàm Spawned() chạy khi object này spawn ---
     public override void Spawned()
@@ -142,12 +139,12 @@ public class BoardGameController : NetworkBehaviour
         // --- Logic di chuyển nhân vật ---
         if (currentState == State.Moving && !waitingForChoice)
         {
-            Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
+            Vector3 direction = (toMoveNode.transform.position - feet.position).normalized;
             
             controller.Move(direction);
 
             // Đã tới node kế tiếp
-            if (Vector3.Distance(transform.position, toMoveNode.transform.position) <= 0.5f)
+            if (Vector3.Distance(feet.position, toMoveNode.transform.position) <= 0.5f)
             {
                 currentNode = toMoveNode;
                 if (HasStateAuthority)
@@ -198,6 +195,7 @@ public class BoardGameController : NetworkBehaviour
 
         }
     }
+
 
     // --- Đổi state ---
     private void SetMoveState(State newState)
@@ -343,6 +341,7 @@ public class BoardGameController : NetworkBehaviour
     private void RPC_SetCurrentNode(NetworkString<_16> newName)
     {
         currentNodeName = (string)newName;
+        currentNode = GameObject.Find(currentNodeName).GetComponent<BoardNode>();
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
