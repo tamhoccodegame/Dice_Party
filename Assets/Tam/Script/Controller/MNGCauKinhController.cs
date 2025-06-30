@@ -20,9 +20,9 @@ public class MNGCauKinhController : NetworkBehaviour
     public string currentAnim;
 
     public LayerMask glassLayer;
-    public Transform feet;
 
     GlassBreakManager manager;
+    public Transform feet;
 
     public override void Spawned()
     {
@@ -53,12 +53,12 @@ public class MNGCauKinhController : NetworkBehaviour
         {
             hit.collider.gameObject.GetComponent<BreakGlass>().TryBreak();
         }
+
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_SendInput(Vector3 camForward)
     {
-        //moveInput = input;
         clientCamForward = camForward; 
     }
 

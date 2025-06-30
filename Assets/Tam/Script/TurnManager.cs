@@ -70,7 +70,7 @@ public class TurnManager : NetworkBehaviour
         playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
 
         if(isFirstTry)
-        Invoke(nameof(PlayCutscene), 1f);
+        PlayCutscene();
         else
         {
             if (Object.HasStateAuthority)
@@ -98,6 +98,7 @@ public class TurnManager : NetworkBehaviour
 
     private void StartGame(PlayableDirector obj)
     {
+        introCutscene.stopped -= StartGame; 
         Destroy(obj.gameObject);
         Destroy(introVolume.gameObject);
         cam.gameObject.SetActive(true);

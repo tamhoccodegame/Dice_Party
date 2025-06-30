@@ -109,13 +109,21 @@ public class GlassBreakManager : NetworkBehaviour
         if (HasStateAuthority)
         {
             time -= 1;
-        }
 
+            CheckTimeOut();
+        }
         countDownText.text = time.ToString();
     }
 
     void CheckTimeOut()
     {
+        if(time <= 0)
+        {
+            foreach (var p in PlayerSpawner.instance.GetSpawnedCharacters())
+            {
+                UpdateRank(p);
+            }
+        }
 
     }
 

@@ -1,19 +1,25 @@
 ﻿using Fusion;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerSpawner : NetworkBehaviour
 {
+    public static PlayerSpawner instance;
     private NetworkManager networkManager;
 
     public GameObject playerPrefab;
     public Transform[] spawnPosition;
 
+    [Networked, Capacity(4), UnitySerializeField]
+    public NetworkLinkedList<NetworkId> spawnedCharacters => default;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         networkManager = FindFirstObjectByType<NetworkManager>();
+        instance = this;
     }
 
     public override void Spawned()
@@ -36,24 +42,31 @@ public class PlayerSpawner : NetworkBehaviour
             foreach (var player in networkManager.GetAllPlayers())
             {
                 Transform spawnPosition1 = GameObject.Find(boardGameData.GetNode(player)).transform;
-                Runner.Spawn(playerPrefab, spawnPosition1.position, Quaternion.identity, player);
+                var go = Runner.Spawn(playerPrefab, spawnPosition1.position, Quaternion.identity, player);
+                spawnedCharacters.Add(go);
             }
         }
         else if (isBoardScene)
         {
             foreach (var player in networkManager.GetAllPlayers())
             {
-                Runner.Spawn(playerPrefab, spawnPosition[0].position, Quaternion.identity, player);
+                var go = Runner.Spawn(playerPrefab, spawnPosition[0].position, Quaternion.identity, player);
+                spawnedCharacters.Add(go);
             }
         }
         else
         {
             List<PlayerRef> playerList = networkManager.GetAllPlayers();
-            for(int i = 0; i < playerList.Count; i++)
+            for (int i = 0; i < playerList.Count; i++)
             {
-                Runner.Spawn(playerPrefab, spawnPosition[i].position, Quaternion.identity, playerList[i]);
+                var go = Runner.Spawn(playerPrefab, spawnPosition[i].position, Quaternion.identity, playerList[i]);
+                spawnedCharacters.Add(go);
             }
         }
-            
+    }
+
+    public List<NetworkId> GetSpawnedCharacters()
+    {
+        return spawnedCharacters.ToList();
     }
 }
