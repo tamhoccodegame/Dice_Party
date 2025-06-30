@@ -23,7 +23,6 @@ public class MNGVongXoayController : NetworkBehaviour
         animator = GetComponent<Animator>();
         VongXoayManager.instance.RequestUpdateLive(Object.Id);
 
-        //manager.
         Invoke(nameof(ResetGravity), 2f);
     }
 
