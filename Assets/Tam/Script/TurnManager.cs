@@ -274,7 +274,7 @@ public class TurnManager : NetworkBehaviour
     IEnumerator LoadMNG()
     {
         yield return null;
-        LevelLoader.instance.LoadScene("MNG1");
+        LevelLoader.instance.LoadScene("MNG3");
         //yield return StartCoroutine(FadeBlackScreen(0, 1));
         //if (isFirstTry)
         //{

@@ -15,15 +15,15 @@ public class MNGVongXoayController : NetworkBehaviour
 
     public string currentAnim;
 
-    VongXoayManager manager;
-
     public override void Spawned()
     {
         bloodEffect.Stop();
         controller = GetComponent<NetworkCharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
-        manager = VongXoayManager.instance;
+        VongXoayManager.instance.RequestUpdateLive(Object.Id);
+
+        //manager.
         Invoke(nameof(ResetGravity), 2f);
     }
 
@@ -113,6 +113,7 @@ public class MNGVongXoayController : NetworkBehaviour
         bloodEffect.Play();
     }
 
+    [ContextMenu("Die Simu")]
     public void Die()
     {
         if (VongXoayManager.instance.isGameOver) return;
@@ -122,9 +123,9 @@ public class MNGVongXoayController : NetworkBehaviour
         {
             RPC_BloodEffect();
 
-            VongXoayManager.instance.RequestUpdateLive(Runner.LocalPlayer);
+            VongXoayManager.instance.RequestUpdateLive(Object.Id);
 
-            if (VongXoayManager.instance.playerLives.Get(Runner.LocalPlayer) <= 0)
+            if (VongXoayManager.instance.playerLives.Get(Object.Id) <= 0)
             {
                 RPC_EnableRagdoll();
             }

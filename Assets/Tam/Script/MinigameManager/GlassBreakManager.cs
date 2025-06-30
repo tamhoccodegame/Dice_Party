@@ -261,7 +261,6 @@ public class GlassBreakManager : NetworkBehaviour
 
             if (HasStateAuthority)
             {
-                Debug.Log($"Try Telport {iRankObject.name}");
                 iCc.Teleport(rankPositions[i].position, Quaternion.Euler(0, -90, 0));
             }
 
@@ -279,20 +278,5 @@ public class GlassBreakManager : NetworkBehaviour
                 iAnimator.Play("Lose");
             }
         }
-
-        //firstRankName.text = firstRank.PlayerId.ToString();
-        //secondRankName.text = secondRank.PlayerId.ToString();
-
-        //RPC_ChangeAnimation(fGo, "Win");
-        //RPC_ChangeAnimation(sGo, "Lose");
-        //RPC_ChangeAnimation(tGo, "Lose");
-
     }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_ChangeAnimation(NetworkObject player, string animName)
-    {
-        player.GetComponent<Animator>().Play(animName);
-    }
-
 }

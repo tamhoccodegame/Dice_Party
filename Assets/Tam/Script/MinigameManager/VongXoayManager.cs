@@ -13,12 +13,12 @@ public class VongXoayManager : NetworkBehaviour
     [Networked]
     [Capacity(4)]
     [UnitySerializeField]
-    public NetworkDictionary<PlayerRef, int> playerLives => default;
+    public NetworkDictionary<NetworkId, int> playerLives => default;
 
     [Networked]
     [Capacity(4)]
     [UnitySerializeField]
-    public NetworkLinkedList<PlayerRef> playerRanks => default;
+    public NetworkLinkedList<NetworkId> playerRanks => default;
 
     [Networked]
     public bool isGameOver { get; set; } = false;
@@ -27,9 +27,7 @@ public class VongXoayManager : NetworkBehaviour
     public bool isGameStarted { get; set; } = false;
 
     [Header("Avatar Standing Position")]
-    public Transform firstRankPosition;
-    public Transform secondRankPosition;
-    public Transform thirdRankPosition;
+    public Transform[] rankPositions;
 
     public GameObject playerRewardPrefab;
 
@@ -62,13 +60,7 @@ public class VongXoayManager : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             RPC_HideTutorial();
-            foreach (var player in NetworkManager.instance.GetAllPlayers())
-            {
-                playerLives.Set(player, 3);
-            }
         }
-
-        RequestUpdateLive(Runner.LocalPlayer);
     }
 
     private IEnumerator FadeBlackScreen(float from, float to)
@@ -119,7 +111,7 @@ public class VongXoayManager : NetworkBehaviour
         }
     }
 
-    public void RequestUpdateLive(PlayerRef player)
+    public void RequestUpdateLive(NetworkId player)
     {
         if (isGameOver) return;
 
@@ -134,18 +126,23 @@ public class VongXoayManager : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_RequestUpdateLive(PlayerRef player)
+    public void RPC_RequestUpdateLive(NetworkId player)
     {
         UpdateLive(player);
     }
 
-    private void UpdateLive(PlayerRef player)
+    private void UpdateLive(NetworkId player)
     {
         if (isGameOver) return;
 
         if (playerLives.TryGet(player, out int value))
         {
             playerLives.Set(player, value - 1);
+        }
+        else
+        {
+            playerLives.Add(player, 3);
+            return;
         }
 
         if (playerLives[player] <= 0 && !playerRanks.Contains(player))
@@ -160,23 +157,22 @@ public class VongXoayManager : NetworkBehaviour
 
         if (CheckGameOver())
         {
-            StartCoroutine(ReturnToBoard());
-
             isGameOver = true;
             RPC_ShowGameOverPanel();
 
-            if (Object.HasStateAuthority && playerRanks.Count >= 2)
-            {
-                PlayerRef firstRankRef = playerRanks[^1]; // Người cuối cùng chết (Top 1)
-                PlayerRef secondRankRef = playerRanks[^2]; // Người chết trước nó (Top 2)
-                //PlayerRef thirdRankRef = playerRanks[^3];
-                SpawnRewardAvatar(firstRankRef, secondRankRef/*, thirdRankRef*/);
-            }
+            //if (playerRanks.Count >= 2)
+            playerRanks.Reverse();
+
+            RPC_SpawnRewardAvatar();
         }
     }
 
     IEnumerator ReturnToBoard()
     {
+        //Volume active
+        yield return new WaitForSecondsRealtime(1.5f);
+        gameOverPanel.SetActive(true);
+        //Volume deactive
         yield return new WaitForSecondsRealtime(6f);
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         yield return new WaitForSecondsRealtime(3f);
@@ -192,40 +188,29 @@ public class VongXoayManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     void RPC_ShowGameOverPanel()
     {
-        gameOverPanel.SetActive(true);
+        StartCoroutine(ReturnToBoard());
     }
 
-    public void SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank/*, PlayerRef thirdRank*/)
+    [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
+    public void RPC_SpawnRewardAvatar()
     {
-        MNGVongXoayController[] players = FindObjectsByType<MNGVongXoayController>(FindObjectsSortMode.None);
-        
-        foreach(var player in players)
+        for (int i = 0; i < playerRanks.Count; i++)
         {
-            NetworkObject networkObject = player.GetComponent<NetworkObject>();
-            Runner.Despawn(networkObject);
+            NetworkObject iRankObject = Runner.FindObject(playerRanks[i]);
+            NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
+            iCc.gravity = 0;
+            iCc.jumpImpulse = 0;
+
+            if (HasStateAuthority)
+            {
+                iCc.Teleport(rankPositions[i].position, Quaternion.Euler(0, -90, 0));
+            }
+
+            Animator iAnimator = iRankObject.GetComponent<Animator>();
+
+            if (i == 0) iAnimator.Play("Win");
+            else iAnimator.Play("Lose");
         }
-
-        // Spawn phần thưởng avatar cho người chơi ở vị trí xếp hạng
-        var fGo = Runner.Spawn(playerRewardPrefab, firstRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
-        firstRankName.text = firstRank.PlayerId.ToString();
-
-        var sGo = Runner.Spawn(playerRewardPrefab, secondRankPosition.position, playerRewardPrefab.transform.rotation, secondRank);
-        secondRankName.text = secondRank.PlayerId.ToString();
-
-        //var tGo = Runner.Spawn(playerRewardPrefab, thirdRankPosition.position, playerRewardPrefab.transform.rotation, thirdRank);
-        //secondRankName.text = thirdRank.PlayerId.ToString();
-        
-
-        RPC_ChangeAnimation(fGo, "Win");
-        RPC_ChangeAnimation(sGo, "Lose");
-        //RPC_ChangeAnimation(tGo, "Lose");
-
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_ChangeAnimation(NetworkObject player, string animName)
-    {
-        player.GetComponent<Animator>().Play(animName);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
