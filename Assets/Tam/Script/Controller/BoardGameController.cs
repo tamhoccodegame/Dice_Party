@@ -74,13 +74,20 @@ public class BoardGameController : NetworkBehaviour
             currentNode = GameObject.Find("AddDice").GetComponent<BoardNode>();
         }
 
-        Debug.Log(currentNode.name);
-
         // Set node tiếp theo mặc định là node đầu tiên
         if (HasStateAuthority)
             RPC_SetCurrentNode(currentNode.Object.Id);
 
         toMoveNode = currentNode.nextNodes[0];
+        controller.enabled = false;
+
+        Vector3 lookDirection = toMoveNode.transform.position - feet.transform.position;
+        lookDirection.Normalize();
+        lookDirection.y = 0f;
+
+        transform.rotation = Quaternion.LookRotation(lookDirection);
+        controller.enabled = true;
+
         stepText.gameObject.SetActive(false);
 
         // Khởi tạo cached state để sync animation
@@ -334,6 +341,7 @@ public class BoardGameController : NetworkBehaviour
     private void RPC_SetCurrentNode(NetworkId nodeId)
     {
         currentNode = Runner.FindObject(nodeId).GetComponent<BoardNode>();
+        if(HasStateAuthority)
         currentNodeName = currentNode.name;
     }
 

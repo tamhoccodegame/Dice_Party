@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UI;
 
 public struct PlayerBoardData : INetworkStruct
@@ -20,13 +21,15 @@ public class TurnManager : NetworkBehaviour
     [Networked] public int currentPlayerIndex { get; set; }
     [Networked] public PlayerRef currentPlayerRef { get; set; }
 
+    public PlayableDirector introCutscene;
+    public GameObject introVolume;
+
     [Networked] public bool isFirstTry { get; set; } = true;
 
     [Header("BXH")]
     public Transform slotTemplate;
     public Transform slotContainer;
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, PlayerBoardData> playersData => default;
-    
 
     [Header("Camera")]
     public Camera cam;
@@ -63,15 +66,47 @@ public class TurnManager : NetworkBehaviour
         GetComponent<PlayerSpawner>().SpawnPlayer();
         MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
         StartCoroutine(FadeBlackScreen(1, 0));
-        cam = Camera.main;
 
         playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
+
+        if(isFirstTry)
+        Invoke(nameof(PlayCutscene), 1f);
+        else
+        {
+            if (Object.HasStateAuthority)
+            {
+                RPC_StartFirstTurn();
+
+                foreach (PlayerRef player in NetworkManager.instance.GetAllPlayers())
+                {
+                    playersData.Add(player, new PlayerBoardData { key = 0, cup = 0, health = 50 });
+                }
+            }
+
+            UpdatePlayerDataUI();
+        }
+      
+
+    }
+
+    void PlayCutscene()
+    {
+        cam.gameObject.SetActive(false);
+        introCutscene.Play();
+        introCutscene.stopped += StartGame;
+    }
+
+    private void StartGame(PlayableDirector obj)
+    {
+        Destroy(obj.gameObject);
+        Destroy(introVolume.gameObject);
+        cam.gameObject.SetActive(true);
 
         if (Object.HasStateAuthority)
         {
             RPC_StartFirstTurn();
 
-            foreach(PlayerRef player in NetworkManager.instance.GetAllPlayers())
+            foreach (PlayerRef player in NetworkManager.instance.GetAllPlayers())
             {
                 playersData.Add(player, new PlayerBoardData { key = 0, cup = 0, health = 50 });
             }
@@ -274,7 +309,7 @@ public class TurnManager : NetworkBehaviour
     IEnumerator LoadMNG()
     {
         yield return null;
-        LevelLoader.instance.LoadScene("MNG3");
+        LevelLoader.instance.LoadScene("MNG1");
         //yield return StartCoroutine(FadeBlackScreen(0, 1));
         //if (isFirstTry)
         //{

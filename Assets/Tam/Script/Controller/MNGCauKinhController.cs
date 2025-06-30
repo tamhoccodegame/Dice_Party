@@ -1,29 +1,19 @@
 ﻿using Fusion;
-using Fusion.Sockets;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.VFX;
+using UnityEngine.Playables;
 
 [RequireComponent(typeof(NetworkCharacterController))]
 public class MNGCauKinhController : NetworkBehaviour
 {
-    private CinemachineCamera cam;
+    public CinemachineCamera cam;
     private Vector3 clientCamForward;
 
     private NetworkCharacterController controller;
     private Animator animator;
+    public PlayableDirector introduceTimeline;
 
-    public float moveSpeed = 5f;
-    public float rotationSpeed = 10f;
-    public float jumpForce = 5f;
-    public float gravity = -9.81f;
-    public float verticalVelocity;
-
-    public bool isGoal = false;
+    [Networked] public bool isGoal { get; set; } = false;
 
     [Networked] private string NetworkAnim { get; set; } // Animation sync
 
@@ -41,9 +31,8 @@ public class MNGCauKinhController : NetworkBehaviour
         animator = GetComponent<Animator>();
         manager = GlassBreakManager.instance;
 
-
         if (!HasInputAuthority) return;
-        cam = FindFirstObjectByType<CinemachineCamera>();
+        cam = GameObject.Find("FreeLook Camera").GetComponent<CinemachineCamera>();
         cam.Follow = transform;
         cam.LookAt = transform;
     }
@@ -54,7 +43,9 @@ public class MNGCauKinhController : NetworkBehaviour
         
         if (manager != null && manager.Object.IsValid && manager.isGameStarted)
         {
+            cam.enabled = true;
             // Send input to host
+            if(cam.enabled)
             RPC_SendInput(cam.transform.forward);
         }
 
@@ -106,7 +97,6 @@ public class MNGCauKinhController : NetworkBehaviour
 
             controller.Move(moveDir);
 
-
             // Animation
             if (controller.Grounded)
             {
@@ -134,7 +124,8 @@ public class MNGCauKinhController : NetworkBehaviour
         if (other.name == "Goal")
         {
             manager.RequestAddRank(Object.Id);
-            SetGoal();
+            if (Object.HasInputAuthority)
+            RPC_RequestSetGoal();
         }
         else if(other.name == "Deadzone")
         {
@@ -142,9 +133,14 @@ public class MNGCauKinhController : NetworkBehaviour
         }
     }
 
-    void SetGoal()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    void RPC_RequestSetGoal()
     {
-
+        RPC_SetGoal();
     }
-
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_SetGoal()
+    {
+        isGoal = true;
+    }
 }

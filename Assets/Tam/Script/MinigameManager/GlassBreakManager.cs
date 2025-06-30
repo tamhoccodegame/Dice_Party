@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -18,7 +19,12 @@ public class GlassBreakManager : NetworkBehaviour
     public static GlassBreakManager instance;
     public GlassCouple[] glassCouples;
 
+    public PlayableDirector introCutscene;
+    public GameObject introVolume;
+
     public Image blackScreen;
+
+    public CinemachineCamera cam;
 
     [Header("Tutorial Panel")]
     public GameObject tutorialPanel;
@@ -65,7 +71,8 @@ public class GlassBreakManager : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (HasStateAuthority)
+        cam.enabled = false; 
+        if (Object.HasStateAuthority)
         {
             foreach (var glassCouple in glassCouples)
             {
@@ -207,13 +214,18 @@ public class GlassBreakManager : NetworkBehaviour
         tutorialPanel.SetActive(false);
 
         yield return new WaitForSecondsRealtime(5f);
+        introCutscene.Play();
+        introCutscene.stopped += StartGame;
+        yield return new WaitForSecondsRealtime(1f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
 
         GetComponent<PlayerSpawner>().SpawnPlayer();
+    }
 
-        yield return new WaitForSecondsRealtime(4f);
-
-
+    private void StartGame(PlayableDirector obj)
+    {
+        Destroy(obj.gameObject);
+        Destroy(introVolume.gameObject);
         if (Object.HasStateAuthority)
         {
             isGameStarted = true;
@@ -247,17 +259,25 @@ public class GlassBreakManager : NetworkBehaviour
         StartCoroutine(ReturnToBoard());
     }
 
-    [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_SpawnRewardAvatar()
     {
-        FindFirstObjectByType<CinemachineCamera>().enabled = false;
+        StartCoroutine(SpawnRewardAvatarDelayed());
+    }
 
+    IEnumerator SpawnRewardAvatarDelayed()
+    {
+        yield return new WaitForSeconds(0.2f); // Hoặc vài frame nhỏ
+
+        GameObject.Find("FreeLook Camera").SetActive(false);
         for (int i = 0; i < playerRanks.Count; i++)
         {
             NetworkObject iRankObject = Runner.FindObject(playerRanks[i]);
             NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
             iCc.gravity = 0;
             iCc.jumpImpulse = 0;
+            iCc.acceleration = 0;
+            iCc.maxSpeed = 0;
 
             if (HasStateAuthority)
             {
@@ -270,6 +290,7 @@ public class GlassBreakManager : NetworkBehaviour
 
             if (iCk.isGoal)
             {
+                Debug.Log(i);
                 if (i == 0) iAnimator.Play("Win");
                 else iAnimator.Play("Lose");
             }

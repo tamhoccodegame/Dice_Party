@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,7 @@ public class PlayerSpawner : NetworkBehaviour
     private NetworkManager networkManager;
 
     public GameObject playerPrefab;
-    public Transform spawnPosition;
+    public Transform[] spawnPosition;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -38,10 +39,21 @@ public class PlayerSpawner : NetworkBehaviour
                 Runner.Spawn(playerPrefab, spawnPosition1.position, Quaternion.identity, player);
             }
         }
-        else
+        else if (isBoardScene)
+        {
             foreach (var player in networkManager.GetAllPlayers())
             {
-                Runner.Spawn(playerPrefab, spawnPosition.position, Quaternion.identity, player);
+                Runner.Spawn(playerPrefab, spawnPosition[0].position, Quaternion.identity, player);
             }
+        }
+        else
+        {
+            List<PlayerRef> playerList = networkManager.GetAllPlayers();
+            for(int i = 0; i < playerList.Count; i++)
+            {
+                Runner.Spawn(playerPrefab, spawnPosition[i].position, Quaternion.identity, playerList[i]);
+            }
+        }
+            
     }
 }
