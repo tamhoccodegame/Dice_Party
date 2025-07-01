@@ -22,7 +22,7 @@ public class TurnManager : NetworkBehaviour
     [Networked] public PlayerRef currentPlayerRef { get; set; }
 
     public PlayableDirector introCutscene;
-    public GameObject introVolume;
+    public NetworkObject introVolume;
 
     [Networked] public bool isFirstTry { get; set; } = true;
 
@@ -63,47 +63,23 @@ public class TurnManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        if (Object.HasStateAuthority)
+        {
+            SceneRef sceneRef = SceneRef.FromIndex(gameObject.scene.buildIndex);
+            NetworkObject[] sceneObjects = FindObjectsOfType<NetworkObject>()
+                .Where(n => n.gameObject.scene == gameObject.scene)
+                .ToArray();
+
+            Runner.RegisterSceneObjects(sceneRef, sceneObjects);
+        }
+
         GetComponent<PlayerSpawner>().SpawnPlayer();
         MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
         StartCoroutine(FadeBlackScreen(1, 0));
 
         playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
 
-        if(isFirstTry)
-        PlayCutscene();
-        else
-        {
-            if (Object.HasStateAuthority)
-            {
-                RPC_StartFirstTurn();
-
-                foreach (PlayerRef player in NetworkManager.instance.GetAllPlayers())
-                {
-                    playersData.Add(player, new PlayerBoardData { key = 0, cup = 0, health = 50 });
-                }
-            }
-
-            UpdatePlayerDataUI();
-        }
-      
-
-    }
-
-    void PlayCutscene()
-    {
-        cam.gameObject.SetActive(false);
-        introCutscene.Play();
-        introCutscene.stopped += StartGame;
-    }
-
-    private void StartGame(PlayableDirector obj)
-    {
-        introCutscene.stopped -= StartGame; 
-        Destroy(obj.gameObject);
-        Destroy(introVolume.gameObject);
-        cam.gameObject.SetActive(true);
-
-        if (Object.HasStateAuthority)
+        if(Object.HasStateAuthority)
         {
             RPC_StartFirstTurn();
 
@@ -114,6 +90,34 @@ public class TurnManager : NetworkBehaviour
         }
 
         UpdatePlayerDataUI();
+    }
+
+    void PlayCutscene()
+    {
+        if (HasStateAuthority)
+        {
+            RPC_SetCamActive(false);
+
+            introCutscene.Play();
+            introCutscene.stopped += StartGame;
+        }
+        
+    }
+
+    private void StartGame(PlayableDirector obj)
+    {
+        introCutscene.stopped -= StartGame; 
+        Runner.Despawn(obj.GetComponent<NetworkObject>());
+        Runner.Despawn(introVolume);
+
+        RPC_SetCamActive(true);
+        
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_SetCamActive(bool enabled)
+    {
+        cam.gameObject.SetActive(enabled);
     }
 
     // Update camera bằng nội suy để di chuyển mượt
