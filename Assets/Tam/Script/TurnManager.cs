@@ -83,13 +83,13 @@ public class TurnManager : NetworkBehaviour
 
     private void Update()
     {
-        //if(targetCam == null) return;
-        //if(!isCameraMoving)
-        //{
-        //    Vector3 desiredPosition = targetCam.position + camOffset;
-        //    if (Vector3.Distance(cam.transform.position, desiredPosition) > 0.3f)
-        //    cam.transform.position = Vector3.Lerp(cam.transform.position, desiredPosition, Time.deltaTime * cameraLerpSpeed);
-        //}
+        if (targetCam == null) return;
+        if (!isCameraMoving)
+        {
+            Vector3 desiredPosition = targetCam.position + camOffset;
+            if (Vector3.Distance(cam.transform.position, desiredPosition) > 0.3f)
+                cam.transform.position = Vector3.Lerp(cam.transform.position, desiredPosition, Time.deltaTime * cameraLerpSpeed);
+        }
     }
 
     public override void FixedUpdateNetwork()
