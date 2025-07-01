@@ -1,11 +1,22 @@
-using Fusion;
+﻿using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class FramerateMilestone
+{
+    public float time;
+    public float speed;
+}
+
 public class CircleTrap : NetworkBehaviour
 {
-    public float changeFateCooldown = 8f;
+    public List<FramerateMilestone> framerateMilestones;
+
+    public int currentMilestoneIndex = 0;
+
+    [Networked] public float time { get; set; } = 0;
 
     public enum State
     {
@@ -18,6 +29,21 @@ public class CircleTrap : NetworkBehaviour
     [Networked] public State state { get; set; }
 
     public Animator animator;
+
+    public override void Spawned()
+    {
+        InvokeRepeating(nameof(CountDown), 1f, 1f);
+    }
+
+    void CountDown()
+    {
+        time += 1;
+        if(time >= framerateMilestones[currentMilestoneIndex].time)
+        {
+            currentMilestoneIndex++;
+            animator.speed = framerateMilestones[currentMilestoneIndex].speed;
+        }
+    }
 
     public override void FixedUpdateNetwork()
     {

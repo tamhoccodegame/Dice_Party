@@ -20,7 +20,6 @@ public class GlassBreakManager : NetworkBehaviour
     public GlassCouple[] glassCouples;
 
     public PlayableDirector introCutscene;
-    public GameObject introVolume;
 
     public Image blackScreen;
 
@@ -233,7 +232,7 @@ public class GlassBreakManager : NetworkBehaviour
     private void StartGame(PlayableDirector obj)
     {
         Destroy(obj.gameObject);
-        Destroy(introVolume.gameObject);
+        FindFirstObjectByType<GlobalVolume>().StartFadeOut();
         if (Object.HasStateAuthority)
         {
             isGameStarted = true;
