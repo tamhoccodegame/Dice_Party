@@ -11428,7 +11428,7 @@ GameObject:
   - component: {fileID: 925985843}
   m_Layer: 0
   m_Name: Main Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11495,7 +11495,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.099857576, g: 0.103195064, b: 0.11320752, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -11516,12 +11516,12 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
+  near clip plane: 0.01
+  far clip plane: 10000
+  field of view: 60.000004
   orthographic: 0
   orthographic size: 5
-  m_Depth: 10
+  m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -15399,7 +15399,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 410952625509032190, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
       propertyPath: m_Delegates.Array.size
-      value: 88
+      value: 92
       objectReference: {fileID: 0}
     - target: {fileID: 410952625509032190, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
       propertyPath: m_Delegates.Array.data[77].eventID
@@ -15423,6 +15423,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 410952625509032190, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
       propertyPath: m_Delegates.Array.data[87].eventID
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 410952625509032190, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
+      propertyPath: m_Delegates.Array.data[89].eventID
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 410952625509032190, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
+      propertyPath: m_Delegates.Array.data[91].eventID
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1163005215822299284, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
@@ -16777,6 +16785,10 @@ PrefabInstance:
     - target: {fileID: 7905671232239254236, guid: adb229365039db943931ec11621f7d78, type: 3}
       propertyPath: m_Name
       value: CloudShader
+      objectReference: {fileID: 0}
+    - target: {fileID: 7905671232239254236, guid: adb229365039db943931ec11621f7d78, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28347,7 +28359,7 @@ GameObject:
   - component: {fileID: 2077291250}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

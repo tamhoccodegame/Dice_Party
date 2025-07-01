@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.Jobs;
 using UnityEngine;
-using UnityEngine.Playables;
 using UnityEngine.UI;
 
 public struct PlayerBoardData : INetworkStruct
@@ -21,15 +21,13 @@ public class TurnManager : NetworkBehaviour
     [Networked] public int currentPlayerIndex { get; set; }
     [Networked] public PlayerRef currentPlayerRef { get; set; }
 
-    public PlayableDirector introCutscene;
-    public NetworkObject introVolume;
-
     [Networked] public bool isFirstTry { get; set; } = true;
 
     [Header("BXH")]
     public Transform slotTemplate;
     public Transform slotContainer;
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, PlayerBoardData> playersData => default;
+
 
     [Header("Camera")]
     public Camera cam;
@@ -63,23 +61,15 @@ public class TurnManager : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (Object.HasStateAuthority)
-        {
-            SceneRef sceneRef = SceneRef.FromIndex(gameObject.scene.buildIndex);
-            NetworkObject[] sceneObjects = FindObjectsOfType<NetworkObject>()
-                .Where(n => n.gameObject.scene == gameObject.scene)
-                .ToArray();
-
-            Runner.RegisterSceneObjects(sceneRef, sceneObjects);
-        }
-
         GetComponent<PlayerSpawner>().SpawnPlayer();
         MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
         StartCoroutine(FadeBlackScreen(1, 0));
+        cam = Camera.main;
+
 
         playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
 
-        if(Object.HasStateAuthority)
+        if (Object.HasStateAuthority)
         {
             RPC_StartFirstTurn();
 
@@ -90,34 +80,6 @@ public class TurnManager : NetworkBehaviour
         }
 
         UpdatePlayerDataUI();
-    }
-
-    void PlayCutscene()
-    {
-        if (HasStateAuthority)
-        {
-            RPC_SetCamActive(false);
-
-            introCutscene.Play();
-            introCutscene.stopped += StartGame;
-        }
-        
-    }
-
-    private void StartGame(PlayableDirector obj)
-    {
-        introCutscene.stopped -= StartGame; 
-        Runner.Despawn(obj.GetComponent<NetworkObject>());
-        Runner.Despawn(introVolume);
-
-        RPC_SetCamActive(true);
-        
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_SetCamActive(bool enabled)
-    {
-        cam.gameObject.SetActive(enabled);
     }
 
     // Update camera bằng nội suy để di chuyển mượt
@@ -136,8 +98,8 @@ public class TurnManager : NetworkBehaviour
         {
             Vector3 newCamPosition = playerController[currentPlayerIndex].transform.position + camOffset;
 
-            // Chỉ gửi RPC nếu khoảng cách giữa vị trí cũ và mới lớn hơn 0.2
-            if (Vector3.Distance(newCamPosition, targetCamPosition) > 0.2f)
+            // Chỉ gửi RPC nếu khoảng cách giữa vị trí cũ và mới lớn hơn 0.5
+            if (Vector3.Distance(newCamPosition, targetCamPosition) > 0.5f)
             {
                 RPC_UpdateCameraPosition(newCamPosition);
             }
@@ -185,7 +147,7 @@ public class TurnManager : NetworkBehaviour
 
     public void UpdatePlayerDataUI()
     {
-        foreach(Transform child in slotContainer)
+        foreach (Transform child in slotContainer)
         {
             if (child == slotTemplate) continue;
             Destroy(child.gameObject);
@@ -193,12 +155,12 @@ public class TurnManager : NetworkBehaviour
 
         var playerList = playersData.OrderByDescending(p => p.Value.cup).ThenByDescending(p => p.Value.key).ToList();
 
-        foreach(var player in playerList)
+        foreach (var player in playerList)
         {
             RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
-            slotRect.gameObject.SetActive(true);    
+            slotRect.gameObject.SetActive(true);
 
-            BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();   
+            BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
 
             boardSlotRect.UpdateCup(player.Value.cup);
             boardSlotRect.UpdateKey(player.Value.key);
@@ -270,7 +232,7 @@ public class TurnManager : NetworkBehaviour
 
     void UpdateTurnUI()
     {
-        if(currentPlayerRef == Runner.LocalPlayer)
+        if (currentPlayerRef == Runner.LocalPlayer)
         {
             turnNotifyText.text = "Your Turn";
         }
@@ -314,7 +276,7 @@ public class TurnManager : NetworkBehaviour
     IEnumerator LoadMNG()
     {
         yield return null;
-        LevelLoader.instance.LoadScene("MNG1");
+        LevelLoader.instance.LoadScene("MNG3");
         //yield return StartCoroutine(FadeBlackScreen(0, 1));
         //if (isFirstTry)
         //{
@@ -330,7 +292,14 @@ public class TurnManager : NetworkBehaviour
     #region Camera
     void StartFollowTarget()
     {
-        RPC_RequestFollowTarget();
+        if (!Object.HasStateAuthority)
+        {
+            RPC_RequestFollowTarget();
+        }
+        else
+        {
+            RPC_FollowTarget();
+        }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -342,7 +311,7 @@ public class TurnManager : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)] // Chạy trên tất cả client
     void RPC_RequestFollowTarget()
     {
-        if(!Object.HasStateAuthority) RPC_FollowTarget();
+        RPC_FollowTarget();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
