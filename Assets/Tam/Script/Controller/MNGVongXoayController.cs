@@ -121,14 +121,15 @@ public class MNGVongXoayController : NetworkBehaviour
 
         if (Object.HasInputAuthority)
         {
+            Debug.Log("DIEE");
             RPC_BloodEffect();
 
             VongXoayManager.instance.RequestUpdateLive(Object.Id);
 
-            if (VongXoayManager.instance.playerLives.Get(Object.Id) <= 0)
-            {
-                RPC_EnableRagdoll();
-            }
+            //if (VongXoayManager.instance.playerLives.Get(Object.Id) <= 0)
+            //{
+            //    RPC_EnableRagdoll();
+            //}
         }
     }
 

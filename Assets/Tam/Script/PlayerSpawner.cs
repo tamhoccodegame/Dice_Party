@@ -59,7 +59,7 @@ public class PlayerSpawner : NetworkBehaviour
             List<PlayerRef> playerList = networkManager.GetAllPlayers();
             for (int i = 0; i < playerList.Count; i++)
             {
-                var go = Runner.Spawn(playerPrefab, spawnPosition[i].position, Quaternion.identity, playerList[i]);
+                var go = Runner.Spawn(playerPrefab, spawnPosition[i].position, spawnPosition[i].rotation, playerList[i]);
                 spawnedCharacters.Add(go);
             }
         }

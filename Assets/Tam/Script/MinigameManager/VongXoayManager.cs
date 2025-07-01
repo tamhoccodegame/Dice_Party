@@ -101,12 +101,12 @@ public class VongXoayManager : NetworkBehaviour
         tutorialPanel.SetActive(false);
 
         yield return new WaitForSecondsRealtime(5f);
+        GetComponent<PlayerSpawner>().SpawnPlayer();
         introCutscene.Play();
         introCutscene.stopped += StartGame;
         yield return new WaitForSecondsRealtime(1f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
 
-        GetComponent<PlayerSpawner>().SpawnPlayer();
     }
 
     private void StartGame(PlayableDirector obj)
@@ -150,6 +150,7 @@ public class VongXoayManager : NetworkBehaviour
         else
         {
             playerLives.Add(player, 3);
+            RPC_UpdateUILive();
             return;
         }
 
@@ -205,6 +206,8 @@ public class VongXoayManager : NetworkBehaviour
         for (int i = 0; i < playerRanks.Count; i++)
         {
             NetworkObject iRankObject = Runner.FindObject(playerRanks[i]);
+            MNGVongXoayController iCtrl = iRankObject.GetComponent<MNGVongXoayController>();
+            iCtrl.enabled = false;
             NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
             iCc.gravity = 0;
             iCc.jumpImpulse = 0;
