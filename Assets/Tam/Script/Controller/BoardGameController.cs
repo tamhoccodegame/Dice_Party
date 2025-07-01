@@ -308,7 +308,8 @@ public class BoardGameController : NetworkBehaviour
     {
         if (currentState != State.Idle) return;
 
-        currentStep = Random.Range(1, 5);   // random số bước
+        //currentStep = Random.Range(1, 5);   // random số bước
+        currentStep = 4;
         SetMoveState(State.WaitingForAnim);
         animTimer = 1f;                     // đợi 1 giây chơi animation roll
     }

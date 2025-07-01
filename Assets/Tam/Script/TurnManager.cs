@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,7 +31,7 @@ public class TurnManager : NetworkBehaviour
     [Header("Camera")]
     public Camera cam;
     public Vector3 camOffset;
-    private Vector3 targetCamPosition; // Vị trí camera cần đến
+    private Transform targetCam; // Vị trí camera cần đến
     private float cameraLerpSpeed = 4f; // Tốc độ Lerp (tùy chỉnh)
 
     private bool isCameraMoving; // Không dùng Networked nữa
@@ -64,8 +63,6 @@ public class TurnManager : NetworkBehaviour
         GetComponent<PlayerSpawner>().SpawnPlayer();
         MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
         StartCoroutine(FadeBlackScreen(1, 0));
-        cam = Camera.main;
-
 
         playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
 
@@ -82,30 +79,66 @@ public class TurnManager : NetworkBehaviour
         UpdatePlayerDataUI();
     }
 
-    // Update camera bằng nội suy để di chuyển mượt
+    #region Camera
+
     private void Update()
     {
-        if (!isCameraMoving)
+        if(targetCam == null) return;
+        if(!isCameraMoving)
         {
-            cam.transform.position = Vector3.Lerp(cam.transform.position, targetCamPosition, Time.deltaTime * cameraLerpSpeed);
+            Vector3 desiredPosition = targetCam.position + camOffset;
+            if (Vector3.Distance(cam.transform.position, desiredPosition) > 0.3f)
+            cam.transform.position = Vector3.Lerp(cam.transform.position, desiredPosition, Time.deltaTime * cameraLerpSpeed);
         }
     }
 
-    // Chỉ Host mới cập nhật vị trí mới và gửi cho Client
     public override void FixedUpdateNetwork()
     {
-        if (!isCameraMoving && playerController.Count > 0 && playerController[currentPlayerIndex] != null)
-        {
-            Vector3 newCamPosition = playerController[currentPlayerIndex].transform.position + camOffset;
-
-            // Chỉ gửi RPC nếu khoảng cách giữa vị trí cũ và mới lớn hơn 0.5
-            if (Vector3.Distance(newCamPosition, targetCamPosition) > 0.5f)
-            {
-                RPC_UpdateCameraPosition(newCamPosition);
-            }
-        }
+        
     }
 
+    void StartFollowTarget()
+    {
+        StartCoroutine(ChangeFollowTarget());
+    }
+
+    IEnumerator ChangeFollowTarget()
+    {
+        RPC_SetIsCamMoving(true);
+        Vector3 oldTarget = cam.transform.position;
+        Vector3 newTarget = playerController[currentPlayerIndex].transform.position + camOffset;
+
+        float elapsedTime = 0f;
+        float duration = 1.5f;
+
+        while (elapsedTime < duration)
+        {
+            cam.transform.position = Vector3.Lerp(oldTarget, newTarget, elapsedTime / duration);
+            elapsedTime += Runner.DeltaTime;
+            yield return null;
+        }
+        NetworkId newTargetId = playerController[currentPlayerIndex].Object.Id;
+        cam.transform.position = newTarget;
+        RPC_ChangeCameraPosition(newTargetId);
+        RPC_SetIsCamMoving(false);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_SetIsCamMoving(bool enabled)
+    {
+        isCameraMoving = enabled;
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_ChangeCameraPosition(NetworkId newTargetId)
+    {
+        targetCam = Runner.FindObject(newTargetId).transform;
+    }
+
+    #endregion
+
+
+    #region PlayerBoardData
     public void RequestUpdateKey(PlayerRef player, int ammount)
     {
         if (HasStateAuthority)
@@ -169,11 +202,12 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
-
     public PlayerBoardData GetPlayerData(PlayerRef player)
     {
         return playersData[player];
     }
+    #endregion
+
 
     #region Turn
 
@@ -184,11 +218,11 @@ public class TurnManager : NetworkBehaviour
         {
             currentPlayerIndex = 0;
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
+            StartFollowTarget();
         }
 
         playerController[currentPlayerIndex].StartTurn();
         UpdateTurnUI();
-        StartFollowTarget();
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -220,13 +254,13 @@ public class TurnManager : NetworkBehaviour
             {
                 RPC_LoadScene();
             }
+            StartFollowTarget();
         }
 
         if (currentPlayerIndex != 0)
         {
             playerController[currentPlayerIndex].StartTurn();
             UpdateTurnUI();
-            StartFollowTarget();
         }
     }
 
@@ -246,6 +280,8 @@ public class TurnManager : NetworkBehaviour
 
     #endregion
 
+
+    #region SceneProcess
     private IEnumerator FadeBlackScreen(float from, float to)
     {
         float elapsed = 0f;
@@ -276,7 +312,7 @@ public class TurnManager : NetworkBehaviour
     IEnumerator LoadMNG()
     {
         yield return null;
-        LevelLoader.instance.LoadScene("MNG3");
+        LevelLoader.instance.LoadScene("MNG1");
         //yield return StartCoroutine(FadeBlackScreen(0, 1));
         //if (isFirstTry)
         //{
@@ -288,57 +324,6 @@ public class TurnManager : NetworkBehaviour
         //    LevelLoader.instance.LoadScene("MNG1");
         //}
     }
-
-    #region Camera
-    void StartFollowTarget()
-    {
-        if (!Object.HasStateAuthority)
-        {
-            RPC_RequestFollowTarget();
-        }
-        else
-        {
-            RPC_FollowTarget();
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateCameraPosition(Vector3 newPosition)
-    {
-        targetCamPosition = newPosition;
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)] // Chạy trên tất cả client
-    void RPC_RequestFollowTarget()
-    {
-        RPC_FollowTarget();
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_FollowTarget()
-    {
-        Debug.Log("RPC_StartFollowTarget gọi trên client: " + Runner.LocalPlayer);
-        if (!isCameraMoving) StartCoroutine(ChangeFollowTarget());
-    }
-
-    IEnumerator ChangeFollowTarget()
-    {
-        isCameraMoving = true;
-        Vector3 oldTarget = cam.transform.position;
-        Vector3 newTarget = playerController[currentPlayerIndex].transform.position + camOffset;
-
-        float elapsedTime = 0f;
-        float duration = 1.5f;
-
-        while (elapsedTime < duration)
-        {
-            cam.transform.position = Vector3.Lerp(oldTarget, newTarget, elapsedTime / duration);
-            elapsedTime += Runner.DeltaTime;
-            yield return null;
-        }
-
-        cam.transform.position = newTarget;
-        isCameraMoving = false;
-    }
     #endregion
+
 }
