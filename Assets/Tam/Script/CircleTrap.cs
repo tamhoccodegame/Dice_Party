@@ -20,6 +20,7 @@ public class CircleTrap : NetworkBehaviour
 
     public enum State
     {
+        Null,
         Spin,
         Chop,
         Chop2
@@ -32,11 +33,13 @@ public class CircleTrap : NetworkBehaviour
 
     public override void Spawned()
     {
+        state = State.Null;
         InvokeRepeating(nameof(CountDown), 1f, 1f);
     }
 
     void CountDown()
     {
+        if(!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
         time += 1;
         if(time >= framerateMilestones[currentMilestoneIndex].time)
         {
@@ -47,7 +50,9 @@ public class CircleTrap : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if(cachedState != state)
+        if (!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
+        if (state == State.Null) TryChangeState();
+        if (cachedState != state)
         {
             cachedState = state;
             switch (state)

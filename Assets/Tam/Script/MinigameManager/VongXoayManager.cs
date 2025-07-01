@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UI;
 
 public class VongXoayManager : NetworkBehaviour
@@ -25,6 +26,8 @@ public class VongXoayManager : NetworkBehaviour
 
     [Networked]
     public bool isGameStarted { get; set; } = false;
+
+    public PlayableDirector introCutscene;
 
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
@@ -98,13 +101,18 @@ public class VongXoayManager : NetworkBehaviour
         tutorialPanel.SetActive(false);
 
         yield return new WaitForSecondsRealtime(5f);
+        introCutscene.Play();
+        introCutscene.stopped += StartGame;
+        yield return new WaitForSecondsRealtime(1f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
 
         GetComponent<PlayerSpawner>().SpawnPlayer();
+    }
 
-        yield return new WaitForSecondsRealtime(4f);
-
-
+    private void StartGame(PlayableDirector obj)
+    {
+        Destroy(obj.gameObject);
+        FindFirstObjectByType<GlobalVolume>().StartFadeOut();
         if (Object.HasStateAuthority)
         {
             isGameStarted = true;

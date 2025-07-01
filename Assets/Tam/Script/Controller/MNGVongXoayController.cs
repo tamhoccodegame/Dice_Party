@@ -34,6 +34,7 @@ public class MNGVongXoayController : NetworkBehaviour
     void Update()
     {
         if (!Object.HasInputAuthority) return;
+        if (!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
 
         if (GetInput(out NetworkInputData data))
         {
