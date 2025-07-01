@@ -16,7 +16,7 @@ public class BoardGameController : NetworkBehaviour
     public BoardNode toMoveNode;          // node sẽ di chuyển tới tiếp
 
     [Networked] public int currentStep { get; set; }      // số bước xúc xắc random, sync qua network
-    private CharacterController controller;               // component điều khiển di chuyển vật lý
+    private NetworkCharacterController controller;               // component điều khiển di chuyển vật lý
     private Animator animator;                            // component điều khiển animation
     [Networked] public bool waitingForChoice { get; set; } // đang chờ người chơi chọn hướng đi (sync)
 
@@ -48,7 +48,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm Spawned() chạy khi object này spawn ---
     public override void Spawned()
     {
-        controller = GetComponent<CharacterController>();
+        controller = GetComponent<NetworkCharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
 
@@ -74,20 +74,13 @@ public class BoardGameController : NetworkBehaviour
             currentNode = GameObject.Find("AddDice").GetComponent<BoardNode>();
         }
 
+        Debug.Log(currentNode.name);
+
         // Set node tiếp theo mặc định là node đầu tiên
         if (HasStateAuthority)
             RPC_SetCurrentNode(currentNode.Object.Id);
 
         toMoveNode = currentNode.nextNodes[0];
-        controller.enabled = false;
-
-        Vector3 lookDirection = toMoveNode.transform.position - feet.transform.position;
-        lookDirection.Normalize();
-        lookDirection.y = 0f;
-
-        transform.rotation = Quaternion.LookRotation(lookDirection);
-        controller.enabled = true;
-
         stepText.gameObject.SetActive(false);
 
         // Khởi tạo cached state để sync animation
@@ -141,7 +134,7 @@ public class BoardGameController : NetworkBehaviour
             Vector3 direction = (toMoveNode.transform.position - feet.position).normalized;
             direction.y = 0;
 
-            controller.Move(direction * 12f * Runner.DeltaTime);
+            controller.Move(direction);
 
             // Đã tới node kế tiếp
             if (Vector3.Distance(feet.position, toMoveNode.transform.position) <= 0.5f)
@@ -277,7 +270,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm khi client chọn hướng ---
     public void ChooseDirection(int index)
     {
-        if(!isMyTurn) return;
+        if (!isMyTurn) return;
         ClearArrow();
         RPC_ChooseDirection(index);
     }
@@ -341,7 +334,6 @@ public class BoardGameController : NetworkBehaviour
     private void RPC_SetCurrentNode(NetworkId nodeId)
     {
         currentNode = Runner.FindObject(nodeId).GetComponent<BoardNode>();
-        if(HasStateAuthority)
         currentNodeName = currentNode.name;
     }
 
