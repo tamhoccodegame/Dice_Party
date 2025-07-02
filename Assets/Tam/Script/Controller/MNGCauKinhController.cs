@@ -108,7 +108,7 @@ public class MNGCauKinhController : NetworkBehaviour
     {
         if (other.name == "Goal")
         {
-            manager.RequestAddRank(Object.Id);
+            manager.RequestAddRank(Object.InputAuthority, Object.Id);
             if (Object.HasInputAuthority)
             RPC_RequestSetGoal();
         }

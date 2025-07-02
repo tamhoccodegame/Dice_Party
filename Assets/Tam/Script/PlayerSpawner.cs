@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using static UnityEngine.Rendering.DebugUI;
 
 public class PlayerSpawner : NetworkBehaviour
 {
@@ -13,7 +15,7 @@ public class PlayerSpawner : NetworkBehaviour
     public Transform[] spawnPosition;
 
     [Networked, Capacity(4), UnitySerializeField]
-    public NetworkLinkedList<NetworkId> spawnedCharacters => default;
+    public NetworkDictionary<PlayerRef, NetworkId> spawnedCharacters => default;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -43,7 +45,7 @@ public class PlayerSpawner : NetworkBehaviour
             {
                 Transform spawnPosition1 = GameObject.Find(boardGameData.GetNode(player)).transform;
                 var go = Runner.Spawn(playerPrefab, spawnPosition1.position, Quaternion.identity, player);
-                spawnedCharacters.Add(go);
+                spawnedCharacters.Add(player, go);
             }
         }
         else if (isBoardScene)
@@ -51,7 +53,7 @@ public class PlayerSpawner : NetworkBehaviour
             foreach (var player in networkManager.GetAllPlayers())
             {
                 var go = Runner.Spawn(playerPrefab, spawnPosition[0].position, Quaternion.identity, player);
-                spawnedCharacters.Add(go);
+                spawnedCharacters.Add(player, go);
             }
         }
         else
@@ -60,13 +62,15 @@ public class PlayerSpawner : NetworkBehaviour
             for (int i = 0; i < playerList.Count; i++)
             {
                 var go = Runner.Spawn(playerPrefab, spawnPosition[i].position, spawnPosition[i].rotation, playerList[i]);
-                spawnedCharacters.Add(go);
+                spawnedCharacters.Add(playerList[i], go);
             }
         }
     }
 
-    public List<NetworkId> GetSpawnedCharacters()
+    public Dictionary<PlayerRef, NetworkId> GetSpawnedCharacters()
     {
-        return spawnedCharacters.ToList();
+        Dictionary<PlayerRef, NetworkId> dictCopy = spawnedCharacters.ToDictionary(pair => pair.Key, pair => pair.Value);
+        return dictCopy;
+
     }
 }

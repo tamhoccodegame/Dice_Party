@@ -24,7 +24,6 @@ public class VongXoayManager : NetworkBehaviour
     [Networked]
     public bool isGameOver { get; set; } = false;
 
-    public GameObject gameOverVolume;
 
     [Networked]
     public bool isGameStarted { get; set; } = false;
@@ -34,7 +33,7 @@ public class VongXoayManager : NetworkBehaviour
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
 
-    public TextMeshProUGUI[] playerTextUI;
+    public TextMeshProUGUI[] playerLiveTextUI;
 
     [Header("Tutorial Panel")]
     public GameObject tutorialPanel;
@@ -42,6 +41,8 @@ public class VongXoayManager : NetworkBehaviour
     [Header("Game Over Panel")]
     public GameObject gameOverPanel;
     public GameOverSlotUI[] gameOverSlots;
+    public TextMeshProUGUI whoWinsText;
+    public GameObject gameOverVolume;
 
     public Transform spawnPosition;
 
@@ -111,7 +112,7 @@ public class VongXoayManager : NetworkBehaviour
     private void StartGame(PlayableDirector obj)
     {
         Destroy(obj.gameObject);
-        FindFirstObjectByType<GlobalVolume>().StartFadeOut();
+        //FindFirstObjectByType<GlobalVolume>().StartFadeOut();
         if (Object.HasStateAuthority)
         {
             isGameStarted = true;
@@ -204,6 +205,7 @@ public class VongXoayManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
     public void RPC_SpawnRewardAvatar()
     {
+        whoWinsText.text = BoardGameData.instance.GetName(playerRanks.ElementAt(0).Key) + " Wins";
         for (int i = 0; i < playerRanks.Count; i++)
         {
             #region Player
@@ -240,9 +242,9 @@ public class VongXoayManager : NetworkBehaviour
         int index = 0;
         foreach (var kvp in playerLives)
         {
-            if (index < playerTextUI.Length)
+            if (index < playerLiveTextUI.Length)
             {
-                playerTextUI[index].text = kvp.Value.ToString();
+                playerLiveTextUI[index].text = kvp.Value.ToString();
                 index++;
             }
         }
