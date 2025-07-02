@@ -6,12 +6,27 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public struct PlayerBoardData : INetworkStruct
+{
+    public int health;
+    public int key;
+    public int cup;
+}
+
 public class TurnManager : NetworkBehaviour
 {
     public static TurnManager instance;
     public List<BoardGameController> playerController;
     [Networked] public int currentPlayerIndex { get; set; }
     [Networked] public PlayerRef currentPlayerRef { get; set; }
+
+    [Networked] public bool isFirstTry { get; set; } = true;
+
+    [Header("BXH")]
+    public Transform slotTemplate;
+    public Transform slotContainer;
+    [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, PlayerBoardData> playersData => default;
+    
 
     [Header("Camera")]
     public Camera cam;
@@ -55,7 +70,14 @@ public class TurnManager : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             RPC_StartFirstTurn();
+
+            foreach(PlayerRef player in NetworkManager.instance.GetAllPlayers())
+            {
+                playersData.Add(player, new PlayerBoardData { key = 0, cup = 0, health = 50 });
+            }
         }
+
+        UpdatePlayerDataUI();
     }
 
     // Update camera bằng nội suy để di chuyển mượt
@@ -82,11 +104,76 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateCameraPosition(Vector3 newPosition)
+    public void RequestUpdateKey(PlayerRef player, int ammount)
     {
-        targetCamPosition = newPosition;
+        if (HasStateAuthority)
+        {
+            var data = playersData[player];
+            data.key += ammount;
+            playersData.Set(player, data);
+            RPC_UpdatePlayerDataUI();
+        }
     }
+
+    public void RequestUpdateCup(PlayerRef player, int ammount)
+    {
+        if (HasStateAuthority)
+        {
+            var data = playersData[player];
+            data.cup += ammount;
+            playersData.Set(player, data);
+            RPC_UpdatePlayerDataUI();
+        }
+    }
+
+    public void RequestUpdateHealth(PlayerRef player, int ammount)
+    {
+        if (HasStateAuthority)
+        {
+            var data = playersData[player];
+            data.health += ammount;
+            playersData.Set(player, data);
+            RPC_UpdatePlayerDataUI();
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_UpdatePlayerDataUI()
+    {
+        UpdatePlayerDataUI();
+    }
+
+    public void UpdatePlayerDataUI()
+    {
+        foreach(Transform child in slotContainer)
+        {
+            if (child == slotTemplate) continue;
+            Destroy(child.gameObject);
+        }
+
+        var playerList = playersData.OrderByDescending(p => p.Value.cup).ThenByDescending(p => p.Value.key).ToList();
+
+        foreach(var player in playerList)
+        {
+            RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
+            slotRect.gameObject.SetActive(true);    
+
+            BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();   
+
+            boardSlotRect.UpdateCup(player.Value.cup);
+            boardSlotRect.UpdateKey(player.Value.key);
+            boardSlotRect.UpdateHealth(player.Value.health);
+            boardSlotRect.UpdateName(player.Key.PlayerId.ToString());
+        }
+    }
+
+
+    public PlayerBoardData GetPlayerData(PlayerRef player)
+    {
+        return playersData[player];
+    }
+
+    #region Turn
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     void RPC_StartFirstTurn()
@@ -95,8 +182,9 @@ public class TurnManager : NetworkBehaviour
         {
             currentPlayerIndex = 0;
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
-            playerController[currentPlayerIndex].StartTurn();
         }
+
+        playerController[currentPlayerIndex].StartTurn();
         UpdateTurnUI();
         StartFollowTarget();
     }
@@ -154,6 +242,8 @@ public class TurnManager : NetworkBehaviour
         turnNotifyText.gameObject.SetActive(true);
     }
 
+    #endregion
+
     private IEnumerator FadeBlackScreen(float from, float to)
     {
         float elapsed = 0f;
@@ -183,18 +273,30 @@ public class TurnManager : NetworkBehaviour
 
     IEnumerator LoadMNG()
     {
-        yield return StartCoroutine(FadeBlackScreen(0, 1));
-        yield return new WaitForSecondsRealtime(2f);
+        yield return null;
+        LevelLoader.instance.LoadScene("MNG3");
+        //yield return StartCoroutine(FadeBlackScreen(0, 1));
+        //if (isFirstTry)
+        //{
+        //    LevelLoader.instance.LoadScene("MNG3");
 
-        if (HasStateAuthority)
-        {
-            Runner.LoadScene("MNG3");
-        }
+        //}
+        //else
+        //{
+        //    LevelLoader.instance.LoadScene("MNG1");
+        //}
     }
 
+    #region Camera
     void StartFollowTarget()
     {
         RPC_RequestFollowTarget();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_UpdateCameraPosition(Vector3 newPosition)
+    {
+        targetCamPosition = newPosition;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)] // Chạy trên tất cả client
@@ -229,4 +331,5 @@ public class TurnManager : NetworkBehaviour
         cam.transform.position = newTarget;
         isCameraMoving = false;
     }
+    #endregion
 }

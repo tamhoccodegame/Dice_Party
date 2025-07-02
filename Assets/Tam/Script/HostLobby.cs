@@ -11,13 +11,14 @@ public class HostLobby : NetworkBehaviour
     private NetworkManager networkManager;
 
     public Transform[] avatarStandingPosition;
-    public GameObject[] playerPrefabs;
+    public GameObject playerPrefab;
 
     public Transform playerSlotTemplate;
     public Transform playerSlotContainer;
 
     public GameObject[] hostOwnObjects;
     public Button hostStartButton;
+
 
     private Dictionary<PlayerRef, NetworkObject> spawnedAvatars = new Dictionary<PlayerRef, NetworkObject>();
     [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, NetworkBool> readyStatus => default;
@@ -64,6 +65,8 @@ public class HostLobby : NetworkBehaviour
     #region UpdatePlayerListUI
     private void NetworkManager_onPlayerListChange()
     {
+        RequestApplyCustom();
+
         if (Object.HasStateAuthority)
         {
             EnsureReadyStatusInit();
@@ -132,7 +135,7 @@ public class HostLobby : NetworkBehaviour
             //Spawn Avatar (model 3D)
             if (!spawnedAvatars.ContainsKey(player))
             {
-                var avatar = Runner.Spawn(playerPrefabs[0],
+                var avatar = Runner.Spawn(playerPrefab,
                                           avatarStandingPosition[player.PlayerId - 1].position,
                                           Quaternion.Euler(0, 180, 0), player);
                 spawnedAvatars.Add(player, avatar);
@@ -147,6 +150,18 @@ public class HostLobby : NetworkBehaviour
             bool isReady = readyStatus.Get(player);
             var readyPanel = playerSlotUI.readyPanel;
             readyPanel.SetActive(isReady);
+
+            PlayerCustom playerCustom = playerPrefab.GetComponent<PlayerCustom>();
+
+            foreach(var hair in playerCustom.hairs)
+            {
+                playerSlotUI.AddHairName(hair.name);
+            }
+
+            foreach(var bodypart in playerCustom.bodyparts)
+            {
+                playerSlotUI.AddBodypartName(bodypart.name);
+            }
 
             if (Runner.LocalPlayer != player)
             {
@@ -186,6 +201,18 @@ public class HostLobby : NetworkBehaviour
             bool isReady = readyStatus.Get(player);
             var readyPanel = playerSlotUI.readyPanel;
             readyPanel.SetActive(isReady);
+
+            PlayerCustom playerCustom = playerPrefab.GetComponent<PlayerCustom>();
+
+            foreach (var hair in playerCustom.hairs)
+            {
+                playerSlotUI.AddHairName(hair.name);
+            }
+
+            foreach (var bodypart in playerCustom.bodyparts)
+            {
+                playerSlotUI.AddBodypartName(bodypart.name);
+            }
 
             if (Runner.LocalPlayer != player)
             {
