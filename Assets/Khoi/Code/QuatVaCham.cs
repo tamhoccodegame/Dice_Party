@@ -1,13 +1,26 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class QuatVaCham : MonoBehaviour
 {
-    // Khi va chạm trigger với player
-    private void OnTriggerEnter(Collider other)
+    bool isColliding = false;
+
+    void OnTriggerEnter(Collider hitObject)
     {
-        if (other.TryGetComponent<MNGVongXoayController>(out MNGVongXoayController player))
+        if (isColliding) return;
+
+        if(hitObject.TryGetComponent<MNGVongXoayController>(out var player))
         {
+            isColliding = true;
             player.Die();
+            StartCoroutine(Reset());
         }
+        
+    }
+
+    IEnumerator Reset()
+    {
+        yield return new WaitForSecondsRealtime(1f);
+        isColliding = false;
     }
 }

@@ -16,6 +16,15 @@ public class CircleTrap : NetworkBehaviour
 
     public int currentMilestoneIndex = 0;
 
+    public AudioSource engineSound;
+    public AudioSource bladeSound;
+
+    public void PlaySound(string soundName)
+    {
+        if (soundName == "Engine") engineSound.Play();
+        else if (soundName == "Blade") bladeSound.Play();
+    }
+
     [Networked] public float time { get; set; } = 0;
 
     public enum State
@@ -34,6 +43,7 @@ public class CircleTrap : NetworkBehaviour
     public override void Spawned()
     {
         state = State.Null;
+        cachedState = state;
         InvokeRepeating(nameof(CountDown), 1f, 1f);
     }
 
@@ -57,23 +67,13 @@ public class CircleTrap : NetworkBehaviour
         if (cachedState != state)
         {
             cachedState = state;
-            switch (state)
-            {
-                case State.Spin:
-                    animator.CrossFade("SpinBase", 0.1f);
-                    break;
-                case State.Chop:
-                    animator.CrossFade("Chop", 0.1f);
-                    break;
-                case State.Chop2:
-                    animator.CrossFade("Chop2", 0.1f);
-                    break;
-            }
+            RPC_ChangeAnimation();
         }
     }
 
     public void TryChangeState()
     {
+        animator.CrossFade("PhaseTransition", 0.1f);
         if (HasStateAuthority)
         {
             StartCoroutine(ChangeStateCoroutine());
@@ -82,24 +82,29 @@ public class CircleTrap : NetworkBehaviour
 
     IEnumerator ChangeStateCoroutine()
     {
-        animator.CrossFade("PhaseTransition", 0.1f);
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSecondsRealtime(0.8f);
 
         state = (State)Random.Range(0, 3);
         if(state == cachedState)
         {
-            switch (state)
-            {
-                case State.Spin:
-                    animator.CrossFade("SpinBase", 0.1f);
-                    break;
-                case State.Chop:
-                    animator.CrossFade("Chop", 0.1f);
-                    break;
-                case State.Chop2:
-                    animator.CrossFade("Chop2", 0.1f);
-                    break;
-            }
+            RPC_ChangeAnimation();
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_ChangeAnimation()
+    {
+        switch (state)
+        {
+            case State.Spin:
+                animator.CrossFade("SpinBase", 0.1f);
+                break;
+            case State.Chop:
+                animator.CrossFade("Chop", 0.1f);
+                break;
+            case State.Chop2:
+                animator.CrossFade("Chop2", 0.1f);
+                break;
         }
     }
 }

@@ -15,8 +15,6 @@ public class MNGCauKinhController : NetworkBehaviour
 
     [Networked] public bool isGoal { get; set; } = false;
 
-    [Networked] private string NetworkAnim { get; set; } // Animation sync
-
     public string currentAnim;
 
     public LayerMask glassLayer;
@@ -64,17 +62,6 @@ public class MNGCauKinhController : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (!Object.HasStateAuthority)
-        {
-            // Client đọc networked animation state
-            if (NetworkAnim != currentAnim)
-            {
-                animator.CrossFade(NetworkAnim, 0.25f);
-                currentAnim = NetworkAnim;
-            }
-            return;
-        }
-
         Vector3 moveDir = Vector3.zero;
 
         if (GetInput(out NetworkInputData data))
@@ -82,7 +69,7 @@ public class MNGCauKinhController : NetworkBehaviour
             if(data.buttons.IsSet(NetworkInputData.JUMPBUTTON))
             {
                 controller.Jump();
-                ChangeAnim("Jump");
+                RPC_ChangeAnim("Jump");
             }
             
             // Movement
@@ -101,20 +88,18 @@ public class MNGCauKinhController : NetworkBehaviour
             if (controller.Grounded)
             {
                 if (moveDir.magnitude > 0)
-                    ChangeAnim("Run");
+                    RPC_ChangeAnim("Run");
                 else
-                    ChangeAnim("Idle");
+                    RPC_ChangeAnim("Idle");
             }
         }
     }
 
-    public void ChangeAnim(string animName, float blendTime = 0.25f)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_ChangeAnim(string animName, float blendTime = 0.25f)
     {
         if (animName == currentAnim) return;
         currentAnim = animName;
-
-        if (Object.HasStateAuthority)
-            NetworkAnim = animName;
 
         animator.CrossFade(animName, blendTime);
     }

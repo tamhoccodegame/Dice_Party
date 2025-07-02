@@ -24,6 +24,8 @@ public class VongXoayManager : NetworkBehaviour
     [Networked]
     public bool isGameOver { get; set; } = false;
 
+    public GameObject gameOverVolume;
+
     [Networked]
     public bool isGameStarted { get; set; } = false;
 
@@ -172,16 +174,18 @@ public class VongXoayManager : NetworkBehaviour
             //if (playerRanks.Count >= 2)
             playerRanks.Reverse();
 
-            RPC_SpawnRewardAvatar();
         }
     }
 
     IEnumerator ReturnToBoard()
     {
         //Volume active
+        gameOverVolume.SetActive(true); 
         yield return new WaitForSecondsRealtime(1.5f);
+        RPC_SpawnRewardAvatar();
+        yield return null;
         gameOverPanel.SetActive(true);
-        //Volume deactive
+        gameOverVolume.SetActive(false);
         yield return new WaitForSecondsRealtime(6f);
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         yield return new WaitForSecondsRealtime(3f);
@@ -206,8 +210,6 @@ public class VongXoayManager : NetworkBehaviour
         for (int i = 0; i < playerRanks.Count; i++)
         {
             NetworkObject iRankObject = Runner.FindObject(playerRanks[i]);
-            MNGVongXoayController iCtrl = iRankObject.GetComponent<MNGVongXoayController>();
-            iCtrl.enabled = false;
             NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
             iCc.gravity = 0;
             iCc.jumpImpulse = 0;

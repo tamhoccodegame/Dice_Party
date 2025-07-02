@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
@@ -9,7 +10,6 @@ public class MNGVongXoayController : NetworkBehaviour
 {
     private NetworkCharacterController controller;
     private Animator animator;
-    [Networked] private string NetworkAnim { get; set; } // Animation sync
 
     public VisualEffect bloodEffect;
 
@@ -33,42 +33,11 @@ public class MNGVongXoayController : NetworkBehaviour
 
     void Update()
     {
-        if (!Object.HasInputAuthority) return;
-        if (!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
 
-        if (GetInput(out NetworkInputData data))
-        {
-            Vector3 direction = data.direction;
-
-            if (data.buttons.IsSet(NetworkInputData.JUMPBUTTON) && controller.Grounded)
-            {
-                controller.Jump();
-                ChangeAnim("Jump");
-            }
-
-            // Luôn chạy Move
-            controller.Move(direction);
-
-            // Anim xử lý tách biệt
-            if (controller.Grounded)
-            {
-                if (direction.sqrMagnitude > 0.001f)
-                    ChangeAnim("Run");
-                else
-                    ChangeAnim("Idle");
-            }
-        }
     }
 
     public override void FixedUpdateNetwork()
     {
-        // Client đọc networked animation state
-        if (NetworkAnim != currentAnim)
-        {
-            animator.CrossFade(NetworkAnim, 0.25f);
-            currentAnim = NetworkAnim;
-        }
-
         if (!Object.HasStateAuthority) return;
 
         if (GetInput(out NetworkInputData data))
@@ -78,7 +47,8 @@ public class MNGVongXoayController : NetworkBehaviour
             if (data.buttons.IsSet(NetworkInputData.JUMPBUTTON) && controller.Grounded)
             {
                 controller.Jump();
-                ChangeAnim("Jump");
+
+                RPC_ChangeAnim("Jump");
             }
 
             // Luôn chạy Move
@@ -88,24 +58,30 @@ public class MNGVongXoayController : NetworkBehaviour
             if (controller.Grounded)
             {
                 if (direction.sqrMagnitude > 0.001f)
-                    ChangeAnim("Run");
+                    RPC_ChangeAnim("Run");
                 else
-                    ChangeAnim("Idle");
+                    RPC_ChangeAnim("Idle");
             }
         }
 
     }
 
-    public void ChangeAnim(string animName, float blendTime = 0.25f)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_ChangeAnim(string animName, float blendTime = 0.25f)
     {
         if (animName == currentAnim) return;
         currentAnim = animName;
 
-        if (HasStateAuthority)
-            NetworkAnim = animName;
-
         animator.CrossFade(animName, blendTime);
     }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestChangeAnim(string animName, float blendTime = 0.25f)
+    {
+        RPC_ChangeAnim(animName, blendTime);
+    }
+
+
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     public void RPC_BloodEffect()
@@ -118,19 +94,32 @@ public class MNGVongXoayController : NetworkBehaviour
     {
         if (VongXoayManager.instance.isGameOver) return;
 
-
         if (Object.HasInputAuthority)
         {
             Debug.Log("DIEE");
             RPC_BloodEffect();
 
+            int currentLive = VongXoayManager.instance.playerLives.Get(Object.Id);
             VongXoayManager.instance.RequestUpdateLive(Object.Id);
 
-            //if (VongXoayManager.instance.playerLives.Get(Object.Id) <= 0)
-            //{
-            //    RPC_EnableRagdoll();
-            //}
+            StartCoroutine(DelayCheckDie());
         }
+    }
+
+    IEnumerator DelayCheckDie()
+    {
+        yield return new WaitForSecondsRealtime(0.1f);
+        if (VongXoayManager.instance.playerLives.Get(Object.Id) <= 0)
+        {
+            RPC_RequestChangeAnim("Die");
+            RPC_DisableInput();
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    void RPC_DisableInput()
+    {
+        Destroy(this);
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
