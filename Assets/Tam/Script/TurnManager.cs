@@ -94,7 +94,7 @@ public class TurnManager : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        
+
     }
 
     void StartFollowTarget()
@@ -198,7 +198,13 @@ public class TurnManager : NetworkBehaviour
             boardSlotRect.UpdateCup(player.Value.cup);
             boardSlotRect.UpdateKey(player.Value.key);
             boardSlotRect.UpdateHealth(player.Value.health);
-            boardSlotRect.UpdateName(player.Key.PlayerId.ToString());
+
+            string playerName = BoardGameData.instance.GetName(player.Key);
+
+            if (string.IsNullOrEmpty(playerName))
+                boardSlotRect.UpdateName(player.Key.PlayerId.ToString());
+            else
+                boardSlotRect.UpdateName(playerName);
         }
     }
 
