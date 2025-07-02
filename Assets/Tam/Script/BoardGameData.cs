@@ -7,7 +7,8 @@ public class BoardGameData : MonoBehaviour
 {
     public static BoardGameData instance;
 
-    public Dictionary<PlayerRef, string> playerCurrentNode = new Dictionary<PlayerRef, string>();
+    public Dictionary<PlayerRef, string> playersCurrentNode = new Dictionary<PlayerRef, string>();
+    public Dictionary<PlayerRef, string> playersName = new Dictionary<PlayerRef, string>();
 
     private void Awake()
     {
@@ -17,16 +18,16 @@ public class BoardGameData : MonoBehaviour
 
     public void UpdateNode(PlayerRef player, string nodeName)
     {
-        if (!playerCurrentNode.ContainsKey(player))
+        if (!playersCurrentNode.ContainsKey(player))
         {
-            playerCurrentNode.Add(player, nodeName);
+            playersCurrentNode.Add(player, nodeName);
         }
         else
         {
-            playerCurrentNode[player] = nodeName;
+            playersCurrentNode[player] = nodeName;
         }
 
-        foreach (var kvp in playerCurrentNode)
+        foreach (var kvp in playersCurrentNode)
         {
             Debug.Log($"{kvp.Key} {kvp.Value}");
         }
@@ -34,9 +35,24 @@ public class BoardGameData : MonoBehaviour
 
     public string GetNode(PlayerRef player)
     {
-        if(playerCurrentNode.ContainsKey(player))
-        return playerCurrentNode[player];
+        if(playersCurrentNode.ContainsKey(player))
+        return playersCurrentNode[player];
 
+        return null;
+    }
+
+    public void SetName(PlayerRef player, string name)
+    {
+        if (!playersName.ContainsKey(player))
+        {
+            playersName.Add(player, name);
+        }
+    }
+
+    public string GetName(PlayerRef player)
+    {
+        if(playersName.ContainsKey(player))
+            return playersName[player];
         return null;
     }
 }

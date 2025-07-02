@@ -59,7 +59,7 @@ public class BoardGameController : NetworkBehaviour
         string currentNodeName1 = null;
         BoardGameData gameData = BoardGameData.instance;
 
-        if (gameData != null && gameData.playerCurrentNode.Count > 0)
+        if (gameData != null && gameData.playersCurrentNode.Count > 0)
         {
             currentNodeName1 = gameData.GetNode(Object.InputAuthority);
         }

@@ -19,7 +19,7 @@ public class VongXoayManager : NetworkBehaviour
     [Networked]
     [Capacity(4)]
     [UnitySerializeField]
-    public NetworkLinkedList<NetworkId> playerRanks => default;
+    public NetworkDictionary<PlayerRef, NetworkId> playerRanks => default;
 
     [Networked]
     public bool isGameOver { get; set; } = false;
@@ -34,8 +34,6 @@ public class VongXoayManager : NetworkBehaviour
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
 
-    public GameObject playerRewardPrefab;
-
     public TextMeshProUGUI[] playerTextUI;
 
     [Header("Tutorial Panel")]
@@ -43,8 +41,7 @@ public class VongXoayManager : NetworkBehaviour
 
     [Header("Game Over Panel")]
     public GameObject gameOverPanel;
-    public TextMeshProUGUI firstRankName;
-    public TextMeshProUGUI secondRankName;
+    public GameOverSlotUI[] gameOverSlots;
 
     public Transform spawnPosition;
 
@@ -121,44 +118,44 @@ public class VongXoayManager : NetworkBehaviour
         }
     }
 
-    public void RequestUpdateLive(NetworkId player)
+    public void RequestUpdateLive(PlayerRef playerRef, NetworkId playerObject)
     {
         if (isGameOver) return;
 
         if (Object.HasStateAuthority)
         {
-            UpdateLive(player);
+            UpdateLive(playerRef, playerObject);
         }
         else
         {
-            RPC_RequestUpdateLive(player);
+            RPC_RequestUpdateLive(playerRef, playerObject);
         }
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_RequestUpdateLive(NetworkId player)
+    public void RPC_RequestUpdateLive(PlayerRef playerRef, NetworkId playerObject)
     {
-        UpdateLive(player);
+        UpdateLive(playerRef, playerObject);
     }
 
-    private void UpdateLive(NetworkId player)
+    private void UpdateLive(PlayerRef playerRef, NetworkId playerObject)
     {
         if (isGameOver) return;
 
-        if (playerLives.TryGet(player, out int value))
+        if (playerLives.TryGet(playerObject, out int value))
         {
-            playerLives.Set(player, value - 1);
+            playerLives.Set(playerObject, value - 1);
         }
         else
         {
-            playerLives.Add(player, 3);
+            playerLives.Add(playerObject, 3);
             RPC_UpdateUILive();
             return;
         }
 
-        if (playerLives[player] <= 0 && !playerRanks.Contains(player))
+        if (playerLives[playerObject] <= 0 && !playerRanks.ContainsKey(playerRef))
         {
-            playerRanks.Add(player);
+            playerRanks.Add(playerRef, playerObject);
         }
 
         if (Object.HasStateAuthority)
@@ -209,7 +206,8 @@ public class VongXoayManager : NetworkBehaviour
     {
         for (int i = 0; i < playerRanks.Count; i++)
         {
-            NetworkObject iRankObject = Runner.FindObject(playerRanks[i]);
+            #region Player
+            NetworkObject iRankObject = Runner.FindObject(playerRanks.ElementAt(i).Value);
             NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
             iCc.gravity = 0;
             iCc.jumpImpulse = 0;
@@ -223,6 +221,16 @@ public class VongXoayManager : NetworkBehaviour
 
             if (i == 0) iAnimator.Play("Win");
             else iAnimator.Play("Lose");
+            #endregion
+
+            #region UISlot
+            gameOverSlots[i].gameObject.SetActive(true);
+            gameOverSlots[i].keyQtyText.text = "10";
+            gameOverSlots[i].rankText.text = $"{i + 1}";
+
+            string playerName = BoardGameData.instance.GetName(playerRanks.ElementAt(i).Key);
+            gameOverSlots[i].nameText.text = playerName;
+            #endregion
         }
     }
 

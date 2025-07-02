@@ -36,7 +36,7 @@ public class PlayerSpawner : NetworkBehaviour
         bool isBoardScene = SceneManager.GetActiveScene().name == "TuanSceneMap";
 
 
-        if (boardGameData != null && boardGameData.playerCurrentNode.Count > 0 && isBoardScene)
+        if (boardGameData != null && boardGameData.playersCurrentNode.Count > 0 && isBoardScene)
         {
             TurnManager.instance.isFirstTry = false;
             foreach (var player in networkManager.GetAllPlayers())

@@ -83,6 +83,19 @@ public class HostLobby : NetworkBehaviour
         RPC_RequestSetReady(player, ready);
     }
 
+    public void OnClickRequestUpdateUI()
+    {
+        if (Object.HasStateAuthority)
+        {
+            EnsureReadyStatusInit();
+            UpdatePlayerList();
+        }
+        else
+        {
+            RPC_RequestUpdatePlayerList();
+        }
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestSetReady(PlayerRef player, bool ready)
     {
@@ -144,7 +157,14 @@ public class HostLobby : NetworkBehaviour
             //Spawn Slot UI cho Player
             var p = Instantiate(playerSlotTemplate, playerSlotContainer);
             p.gameObject.SetActive(true);
-            p.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = player.PlayerId.ToString();
+
+
+            string playerName = BoardGameData.instance.GetName(player);
+            TextMeshProUGUI playerNameText = p.transform.Find("Name").GetComponent<TextMeshProUGUI>();
+            if (string.IsNullOrEmpty(playerName))
+                playerNameText.text = player.PlayerId.ToString();
+            else
+                playerNameText.text = playerName;
 
             PlayerSlotUI playerSlotUI = p.GetComponent<PlayerSlotUI>();
             bool isReady = readyStatus.Get(player);
@@ -278,6 +298,26 @@ public class HostLobby : NetworkBehaviour
         var playerCustoms = FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None);
         foreach (var p in playerCustoms)
             if (p.HasInputAuthority) p.RequestApplyCustom(p.currentHairIndex, p.currentColorIndex, p.currentBodypartIndex);
+    }
+
+    public void OnClickSetName(TextMeshProUGUI text)
+    {
+        PlayerRef player = Runner.LocalPlayer;
+        NetworkString<_16> name = (NetworkString<_16>)text.text;
+        RPC_RequestSetName(player, name);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RequestSetName(PlayerRef player, NetworkString<_16> name)
+    {
+        RPC_SetName(player, name);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+
+    public void RPC_SetName(PlayerRef player, NetworkString<_16> name)
+    {
+        BoardGameData.instance.SetName(player, (string)name);
     }
     #endregion
 }

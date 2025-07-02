@@ -21,7 +21,7 @@ public class MNGVongXoayController : NetworkBehaviour
         controller = GetComponent<NetworkCharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
-        VongXoayManager.instance.RequestUpdateLive(Object.Id);
+        VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
 
         Invoke(nameof(ResetGravity), 2f);
     }
@@ -100,7 +100,7 @@ public class MNGVongXoayController : NetworkBehaviour
             RPC_BloodEffect();
 
             int currentLive = VongXoayManager.instance.playerLives.Get(Object.Id);
-            VongXoayManager.instance.RequestUpdateLive(Object.Id);
+            VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
 
             StartCoroutine(DelayCheckDie());
         }
