@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -35,7 +36,7 @@ public class GlassBreakManager : NetworkBehaviour
     [Networked]
     [Capacity(4)]
     [UnitySerializeField]
-    public NetworkDictionary<NetworkId, int> playerScore => default;
+    public NetworkDictionary<NetworkId, int> playerScores => default;
 
     [Networked]
     [Capacity(4)]
@@ -96,6 +97,16 @@ public class GlassBreakManager : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             RPC_HideTutorial();
+            RPC_InitPlayerScore();
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_InitPlayerScore()
+    {
+        for(int i = 0; i < NetworkManager.instance.GetAllPlayers().Count; i++)
+        {
+            playerTextUI[i].transform.parent.gameObject.SetActive(true);
         }
     }
 
@@ -155,7 +166,7 @@ public class GlassBreakManager : NetworkBehaviour
 
         if (Object.HasStateAuthority)
         {
-            RPC_UpdateUILive();
+            RPC_UpdateUILive(playerObject);
         }
 
         if (CheckGameOver())
@@ -171,16 +182,13 @@ public class GlassBreakManager : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateUILive()
+    void RPC_UpdateUILive(NetworkId playerId)
     {
-        int index = 0;
-        foreach (var kvp in playerScore)
+        for(int i = 0; i < playerScores.Count; i++)
         {
-            if (index < playerTextUI.Length)
-            {
-                playerTextUI[index].text = kvp.Value.ToString();
-                index++;
-            }
+            if (playerScores.ElementAt(i).Key == playerId)
+                playerTextUI[i].text = playerScores.ElementAt(i).Value.ToString();
+            else continue;
         }
     }
 
@@ -291,7 +299,7 @@ public class GlassBreakManager : NetworkBehaviour
             }
 
             MNGCauKinhController iCk = iRankObject.GetComponent<MNGCauKinhController>();
-
+            iCk.enabled = false;
             Animator iAnimator = iRankObject.GetComponent<Animator>();
 
             if (iCk.isGoal)

@@ -1,4 +1,6 @@
-﻿using Fusion;
+﻿using ExitGames.Client.Photon.StructWrapping;
+using Fusion;
+using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -13,7 +15,7 @@ public class MNGCauKinhController : NetworkBehaviour
     private Animator animator;
     public PlayableDirector introduceTimeline;
 
-    [Networked] public bool isGoal { get; set; } = false;
+    public bool isGoal = false;
 
     public string currentAnim;
 
@@ -114,17 +116,28 @@ public class MNGCauKinhController : NetworkBehaviour
         }
         else if(other.name == "Deadzone")
         {
-            controller.Teleport(manager.spawnPosition.position + new Vector3(0, 3, 0));
+            StartCoroutine(DelayResetCamera());
         }
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    void RPC_RequestSetGoal()
+    IEnumerator DelayResetCamera()
     {
-        RPC_SetGoal();
+        cam.Follow = null;
+        cam.LookAt = null;
+
+        yield return new WaitForSecondsRealtime(1.5f);
+        Vector3 teleportTo = FindFirstObjectByType<PlayerSpawner>().spawnPosition[Runner.LocalPlayer.PlayerId - 1].position;
+        Vector3 delta = transform.position - teleportTo;
+
+        controller.Teleport(teleportTo);
+        cam.transform.position = transform.position;
+        yield return null;
+        cam.Follow = transform;
+        cam.LookAt = transform;
     }
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_SetGoal()
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    void RPC_RequestSetGoal()
     {
         isGoal = true;
     }

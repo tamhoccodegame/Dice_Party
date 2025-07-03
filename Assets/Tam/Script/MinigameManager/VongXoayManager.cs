@@ -63,6 +63,7 @@ public class VongXoayManager : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             RPC_HideTutorial();
+            RPC_InitPlayerLivesUI();
         }
     }
 
@@ -85,6 +86,15 @@ public class VongXoayManager : NetworkBehaviour
         }
 
         blackScreen.color = newColor;
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_InitPlayerLivesUI()
+    {
+        for(int i = 0; i < NetworkManager.instance.GetAllPlayers().Count; i++)
+        {
+            playerLiveTextUI[i].transform.parent.gameObject.SetActive(true);
+        }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -150,8 +160,6 @@ public class VongXoayManager : NetworkBehaviour
         else
         {
             playerLives.Add(playerObject, 3);
-            RPC_UpdateUILive();
-            return;
         }
 
         if (playerLives[playerObject] <= 0 && !playerRanks.ContainsKey(playerRef))
@@ -171,7 +179,6 @@ public class VongXoayManager : NetworkBehaviour
 
             //if (playerRanks.Count >= 2)
             playerRanks.Reverse();
-
         }
     }
 
