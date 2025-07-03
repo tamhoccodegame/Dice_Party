@@ -240,6 +240,18 @@ public class VongXoayManager : NetworkBehaviour
             string playerName = BoardGameData.instance.GetName(playerRanks.ElementAt(i).Key);
             gameOverSlots[i].nameText.text = playerName;
             #endregion
+
+            #region Reward
+            BoardGameData data = BoardGameData.instance;
+            if(data != null)
+            {
+                int rewardKeyQty = i == 0 ? 8 : 4;
+                data.UpdateKey(iRankObject.InputAuthority, rewardKeyQty);
+
+                //BoardItem boardItem = new ElectricGun();
+                //data.UpdateItem(iRankObject.InputAuthority, boardItem);
+            }
+            #endregion
         }
     }
 

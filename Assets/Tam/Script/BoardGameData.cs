@@ -1,5 +1,4 @@
 ﻿using Fusion;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +8,8 @@ public class BoardGameData : MonoBehaviour
 
     public Dictionary<PlayerRef, string> playersCurrentNode = new Dictionary<PlayerRef, string>();
     public Dictionary<PlayerRef, string> playersName = new Dictionary<PlayerRef, string>();
+
+    public Dictionary<PlayerRef, BoardGameStat> playersBoardStat = new Dictionary<PlayerRef, BoardGameStat>();
 
     private void Awake()
     {
@@ -54,5 +55,93 @@ public class BoardGameData : MonoBehaviour
         if(playersName.ContainsKey(player))
             return playersName[player];
         return null;
+    }
+
+    public void EnsurePlayerStat(List<PlayerRef> players)
+    {
+        foreach(var player in players)
+        {
+            if (!playersBoardStat.ContainsKey(player))
+            {
+                playersBoardStat[player] = new BoardGameStat();
+            }
+        }
+    }
+
+    public void UpdateItem(PlayerRef player, BoardItem item)
+    {
+        if (playersBoardStat.ContainsKey(player))
+        {
+            BoardGameStat stat = playersBoardStat[player];
+
+            stat.AddItem(item);
+
+            playersBoardStat[player] = stat;
+        }
+    }
+
+    public void UpdateKey(PlayerRef player, int ammount)
+    {
+        if (playersBoardStat.ContainsKey(player))
+        {
+            BoardGameStat stat = playersBoardStat[player];
+
+            stat.keyQty += ammount;
+
+            playersBoardStat[player] = stat;
+        }
+    }
+    public void UpdateCup(PlayerRef player, int ammount)
+    {
+        if (playersBoardStat.ContainsKey(player))
+        {
+            BoardGameStat inventory = playersBoardStat[player];
+
+            inventory.cupQty += ammount;
+
+            playersBoardStat[player] = inventory;
+        }
+    }
+    public void UpdateHealth(PlayerRef player, int ammount)
+    {
+        if (playersBoardStat.ContainsKey(player))
+        {
+            BoardGameStat stat = playersBoardStat[player];
+
+            stat.health += ammount;
+
+            playersBoardStat[player] = stat;
+        }
+    }
+
+    public int GetKey(PlayerRef player)
+    {
+        BoardGameStat boardGameStat = playersBoardStat[player];
+
+        if(boardGameStat != null)
+        {
+            return boardGameStat.keyQty;
+        }
+        return 0;
+    }
+    public int GetCup(PlayerRef player)
+    {
+        BoardGameStat boardGameStat = playersBoardStat[player];
+
+        if (boardGameStat != null)
+        {
+            return boardGameStat.cupQty;
+        }
+        return 0;
+    }
+    public int GetHealth(PlayerRef player)
+    {
+        BoardGameStat boardGameStat = playersBoardStat[player];
+
+        if (boardGameStat != null)
+        {
+            return boardGameStat.health;
+        }
+        return 0;
     }
 }

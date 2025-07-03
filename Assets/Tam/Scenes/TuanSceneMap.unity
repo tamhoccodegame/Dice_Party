@@ -5416,8 +5416,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1640102491}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &389321368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7872,34 +7870,16 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2193031151015711636, guid: 648b1a80b19eff94c9b2c179cc4c53cb, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 630345179}
+      addedObject: {fileID: 630345180}
     - targetCorrespondingSourceObject: {fileID: 2193031151015711636, guid: 648b1a80b19eff94c9b2c179cc4c53cb, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 630345180}
+      addedObject: {fileID: 630345181}
   m_SourcePrefab: {fileID: 100100000, guid: 648b1a80b19eff94c9b2c179cc4c53cb, type: 3}
 --- !u!1 &630345178 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2193031151015711636, guid: 648b1a80b19eff94c9b2c179cc4c53cb, type: 3}
   m_PrefabInstance: {fileID: 630345177}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &630345179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 630345178}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bff48069aeb074940b8f3b089fa4bb6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isStartNode: 0
-  nextNodes:
-  - {fileID: 644573433}
-  nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &630345180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7917,8 +7897,24 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 630345179}
+  - {fileID: 630345181}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &630345181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630345178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5598572b4513ca14a835172a2b234ada, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isStartNode: 0
+  nextNodes:
+  - {fileID: 644573433}
+  nodeEffect: {fileID: 644573435}
 --- !u!1001 &631835200
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8177,8 +8173,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1900172360}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &644573434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8198,6 +8192,11 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 644573433}
   ForceRemoteRenderTimeframe: 0
+--- !u!198 &644573435 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7317520086556139736, guid: 7c5c72945b33eb240b98da0e0c846004, type: 3}
+  m_PrefabInstance: {fileID: 644573431}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &653695421
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12937,8 +12936,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1525183171}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1067901177
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13062,8 +13059,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 389321367}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1067948987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15394,8 +15389,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1514769043}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1319338581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16887,10 +16880,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isStartNode: 0
   nextNodes:
-  - {fileID: 630345179}
+  - {fileID: 630345181}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1413405896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18109,8 +18100,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1909340796}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1514769044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18295,8 +18284,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1832211248}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1525183172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18595,8 +18582,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 2007023119}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1550027223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19554,8 +19539,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1713016509}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1606019812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20083,8 +20066,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1550027222}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1640102492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21148,8 +21129,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1067901176}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1713016510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22945,8 +22924,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1413405895}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1832211249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24283,8 +24260,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 2143979699}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1900172361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24401,8 +24376,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 2142929618}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1905081167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24522,8 +24495,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 2008890820}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &1909340797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25817,8 +25788,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1319338580}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &2007023120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25934,8 +25903,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1905081166}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &2008890821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29120,8 +29087,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1606019811}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &2142929619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29245,8 +29210,6 @@ MonoBehaviour:
   nextNodes:
   - {fileID: 1067948986}
   nodeEffect: {fileID: 0}
-  eventType: 0
-  keyPrefab: {fileID: 0}
 --- !u!114 &2143979700
 MonoBehaviour:
   m_ObjectHideFlags: 0

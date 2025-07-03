@@ -6,13 +6,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct PlayerBoardData : INetworkStruct
-{
-    public int health;
-    public int key;
-    public int cup;
-}
-
 public class TurnManager : NetworkBehaviour
 {
     public static TurnManager instance;
@@ -25,8 +18,6 @@ public class TurnManager : NetworkBehaviour
     [Header("BXH")]
     public Transform slotTemplate;
     public Transform slotContainer;
-    [Networked, Capacity(4)] public NetworkDictionary<PlayerRef, PlayerBoardData> playersData => default;
-
 
     [Header("Camera")]
     public Camera cam;
@@ -66,17 +57,35 @@ public class TurnManager : NetworkBehaviour
 
         playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
 
+        if (isFirstTry)
+        {
+            BoardGameData.instance.EnsurePlayerStat(NetworkManager.instance.GetAllPlayers());
+        }
+
         if (Object.HasStateAuthority)
         {
             RPC_StartFirstTurn();
 
-            foreach (PlayerRef player in NetworkManager.instance.GetAllPlayers())
+            if (isFirstTry)
             {
-                playersData.Add(player, new PlayerBoardData { key = 0, cup = 0, health = 50 });
+                StartCoroutine(DelayUpdatePlayerUI());
             }
-        }
 
-        UpdatePlayerDataUI();
+            RPC_UpdatePlayerDataUI();
+        }
+    }
+
+    IEnumerator DelayUpdatePlayerUI()
+    {
+        foreach (var player in NetworkManager.instance.GetAllPlayers())
+        {
+            RPC_UpdateKey(player, 0);
+            RPC_UpdateCup(player, 0);
+            RPC_UpdateHealth(player, 50);
+        }
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        RPC_UpdatePlayerDataUI();
     }
 
     #region Camera
@@ -143,9 +152,16 @@ public class TurnManager : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            var data = playersData[player];
-            data.key += ammount;
-            playersData.Set(player, data);
+            RPC_UpdateKey(player, ammount);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_UpdateKey(PlayerRef player, int ammount)
+    {
+        BoardGameData.instance.UpdateKey(player, ammount);
+        if (HasStateAuthority)
+        {
             RPC_UpdatePlayerDataUI();
         }
     }
@@ -154,9 +170,16 @@ public class TurnManager : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            var data = playersData[player];
-            data.cup += ammount;
-            playersData.Set(player, data);
+            RPC_UpdateCup(player, ammount);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_UpdateCup(PlayerRef player, int ammount)
+    {
+        BoardGameData.instance.UpdateCup(player, ammount);
+        if (HasStateAuthority)
+        {
             RPC_UpdatePlayerDataUI();
         }
     }
@@ -165,9 +188,16 @@ public class TurnManager : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            var data = playersData[player];
-            data.health += ammount;
-            playersData.Set(player, data);
+            RPC_UpdateHealth(player, ammount);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_UpdateHealth(PlayerRef player, int ammount)
+    {
+        BoardGameData.instance.UpdateHealth(player, ammount);
+        if (HasStateAuthority)
+        {
             RPC_UpdatePlayerDataUI();
         }
     }
@@ -185,33 +215,28 @@ public class TurnManager : NetworkBehaviour
             if (child == slotTemplate) continue;
             Destroy(child.gameObject);
         }
+        Debug.Log("playersBoardStat count: " + BoardGameData.instance.playersBoardStat.Count);
 
-        var playerList = playersData.OrderByDescending(p => p.Value.cup).ThenByDescending(p => p.Value.key).ToList();
-
-        foreach (var player in playerList)
+        foreach (var kvp in BoardGameData.instance.playersBoardStat)
         {
             RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
             slotRect.gameObject.SetActive(true);
 
             BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
 
-            boardSlotRect.UpdateCup(player.Value.cup);
-            boardSlotRect.UpdateKey(player.Value.key);
-            boardSlotRect.UpdateHealth(player.Value.health);
+            boardSlotRect.UpdateCup(kvp.Value.cupQty);
+            boardSlotRect.UpdateKey(kvp.Value.keyQty);
+            boardSlotRect.UpdateHealth(kvp.Value.health);
 
-            string playerName = BoardGameData.instance.GetName(player.Key);
+            string playerName = BoardGameData.instance.GetName(kvp.Key);
 
             if (string.IsNullOrEmpty(playerName))
-                boardSlotRect.UpdateName(player.Key.PlayerId.ToString());
+                boardSlotRect.UpdateName(kvp.Key.PlayerId.ToString());
             else
                 boardSlotRect.UpdateName(playerName);
         }
     }
 
-    public PlayerBoardData GetPlayerData(PlayerRef player)
-    {
-        return playersData[player];
-    }
     #endregion
 
 
