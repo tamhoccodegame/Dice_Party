@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Coins : MonoBehaviour
 {
@@ -14,30 +15,32 @@ public class Coins : MonoBehaviour
         transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime, Space.World);
     }
 
-
     public int value = 1;
-    private float lifetime = 0f;
+    private float lifetime = 2f;
     [Tooltip("Optional pickup effect.")]
     public GameObject pickupVFX;
-    
+
+    //[Header("SFX")]
+    //public AudioClip pickupSFX;
+
 
     [Tooltip("Auto destroy delay after pickup (for VFX to play).")]
     public float destroyDelay = 0.1f;
 
     private bool isCollected = false;
-
-
- 
+    private bool canBeCollected = false;
 
     private void Start()
     {
-        if (lifetime > 0)
+        if (lifetime > 2)
             Destroy(gameObject, lifetime);
+
+        StartCoroutine(EnablePickupAfterDelay(0.8f));
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (!other.CompareTag("Player")||isCollected) return;
+        if (!collision.collider.CompareTag("Player") || isCollected || !canBeCollected) return;
 
         isCollected = true;
 
@@ -46,17 +49,25 @@ public class Coins : MonoBehaviour
         if (pickupVFX != null)
             Instantiate(pickupVFX, transform.position, Quaternion.identity);
 
+        Audio_Manager.Instance.Play("Coin_PickUp", transform.position);
+
+
         // Hide the coin visuals immediately
         GetComponent<MeshRenderer>().enabled = false;
         GetComponent<Collider>().enabled = false;
 
-        // Destroy after a short delay
         Destroy(gameObject, destroyDelay);
     }
+
 
     public void SetLifetime(float time)
     {
         lifetime = time;
     }
 
+    private IEnumerator EnablePickupAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        canBeCollected = true;
+    }
 }
