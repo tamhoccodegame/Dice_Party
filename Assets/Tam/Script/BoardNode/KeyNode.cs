@@ -10,6 +10,7 @@ public class KeyNode : BoardNode
         if(nodeEffect != null) 
         nodeEffect.Play();
         TurnManager.instance.RequestUpdateKey(player, 2);
+        TurnManager.instance.RequestUpdateCup(player, 1);
         EndTurn(player);
     }
 }

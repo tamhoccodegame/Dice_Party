@@ -187,6 +187,7 @@ public class VongXoayManager : NetworkBehaviour
         //Volume active
         gameOverVolume.SetActive(true); 
         yield return new WaitForSecondsRealtime(1.5f);
+        if(HasStateAuthority) 
         RPC_SpawnRewardAvatar();
         yield return null;
         gameOverPanel.SetActive(true);

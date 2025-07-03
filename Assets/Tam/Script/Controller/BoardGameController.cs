@@ -288,7 +288,7 @@ public class BoardGameController : NetworkBehaviour
     {
         Debug.Log("Gọi sự kiện của node: " + currentNode.name);
         if (HasStateAuthority)
-            currentNode.RPC_ProcessNode(Runner.LocalPlayer);
+            currentNode.RPC_ProcessNode(TurnManager.instance.currentPlayerRef);
     }
 
     void OnItemUsed(NetworkId itemPrefab)

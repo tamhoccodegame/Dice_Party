@@ -215,9 +215,14 @@ public class TurnManager : NetworkBehaviour
             if (child == slotTemplate) continue;
             Destroy(child.gameObject);
         }
+
+        #region UpdatePlayerBoardStatUI
         Debug.Log("playersBoardStat count: " + BoardGameData.instance.playersBoardStat.Count);
 
-        foreach (var kvp in BoardGameData.instance.playersBoardStat)
+        Dictionary<PlayerRef, BoardGameStat> dictCopy = BoardGameData.instance.playersBoardStat;
+        dictCopy.OrderByDescending(d => d.Value.cupQty);
+
+        foreach (var kvp in dictCopy)
         {
             RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
             slotRect.gameObject.SetActive(true);
@@ -235,6 +240,7 @@ public class TurnManager : NetworkBehaviour
             else
                 boardSlotRect.UpdateName(playerName);
         }
+        #endregion
     }
 
     #endregion
