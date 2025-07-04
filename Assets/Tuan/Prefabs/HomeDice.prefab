@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1658644906916879731}
   - component: {fileID: 4620882099132848737}
   - component: {fileID: 5906027124141511208}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HomeDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,8 +95,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2786791757822288985}
-  - component: {fileID: 5842161579011601351}
-  m_Layer: 0
+  - component: {fileID: 8380472433618276046}
+  - component: {fileID: 2925107483905642398}
+  m_Layer: 7
   m_Name: HomeDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,27 +122,44 @@ Transform:
   - {fileID: 1658644906916879731}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &5842161579011601351
-Animator:
-  serializedVersion: 5
+--- !u!114 &8380472433618276046
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3307749865203416803}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5dde39c187c042d40a46df76513ad520, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d11ff4ca87a3443a32f16a644975c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpPower: 7
+  jumpDuration: 1.5
+  rotationDuration: 1
+  shakeStrength: 0.2
+  shakeDuration: 0.5
+--- !u!65 &2925107483905642398
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3307749865203416803}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3503614730466760622
 GameObject:
   m_ObjectHideFlags: 0
@@ -153,7 +171,7 @@ GameObject:
   - component: {fileID: 4633167982904512778}
   - component: {fileID: 6328035362309357201}
   - component: {fileID: 6515716566898804532}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5053,7 +5071,7 @@ GameObject:
   - component: {fileID: 5167024674077644339}
   - component: {fileID: 3070585897084672999}
   - component: {fileID: 3528055749629216288}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HomeVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5165,7 +5183,7 @@ GameObject:
   - component: {fileID: 436000811619953574}
   - component: {fileID: 6219302256184356480}
   - component: {fileID: 227740939447221365}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HomeDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}

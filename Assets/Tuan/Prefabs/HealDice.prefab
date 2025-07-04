@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2918993091323064491}
   - component: {fileID: 7431904410244339203}
   - component: {fileID: 5997606900904116567}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4911,7 +4911,7 @@ GameObject:
   - component: {fileID: 5081452933047027904}
   - component: {fileID: 8256951410223990314}
   - component: {fileID: 4139934110321095751}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HealDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9829,7 +9829,7 @@ GameObject:
   - component: {fileID: 8470592798126215176}
   - component: {fileID: 5994546953257464432}
   - component: {fileID: 1396445478641934967}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HealDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9913,8 +9913,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 339385870060812071}
-  - component: {fileID: 8039646430222685663}
-  m_Layer: 0
+  - component: {fileID: 6279243504950639948}
+  - component: {fileID: 4733700830510838211}
+  m_Layer: 7
   m_Name: HealDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9940,27 +9941,44 @@ Transform:
   - {fileID: 8470592798126215176}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &8039646430222685663
-Animator:
-  serializedVersion: 5
+--- !u!114 &6279243504950639948
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1152478444512259485}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5dde39c187c042d40a46df76513ad520, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d11ff4ca87a3443a32f16a644975c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpPower: 7
+  jumpDuration: 1.5
+  rotationDuration: 1
+  shakeStrength: 0.2
+  shakeDuration: 0.5
+--- !u!65 &4733700830510838211
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1152478444512259485}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2974042130830473273
 GameObject:
   m_ObjectHideFlags: 0
@@ -9972,7 +9990,7 @@ GameObject:
   - component: {fileID: 6900437622952083532}
   - component: {fileID: 4094701737991096666}
   - component: {fileID: 9196167388239313051}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: plus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14891,7 +14909,7 @@ GameObject:
   - component: {fileID: 5267245290362849108}
   - component: {fileID: 4657387912079190317}
   - component: {fileID: 5884195819450132074}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HealVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}

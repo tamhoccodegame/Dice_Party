@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8500633859638211162}
   - component: {fileID: 3034602094311743788}
   - component: {fileID: 7105887923373582447}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ChanllengeDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,8 +95,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2907664878025873765}
-  - component: {fileID: 3038253197020725338}
-  m_Layer: 0
+  - component: {fileID: 7351183543876688480}
+  - component: {fileID: 2034220118815821658}
+  m_Layer: 7
   m_Name: ChanllengeDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,27 +122,44 @@ Transform:
   - {fileID: 2330705286731643048}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &3038253197020725338
-Animator:
-  serializedVersion: 5
+--- !u!114 &7351183543876688480
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2527022286765867999}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5dde39c187c042d40a46df76513ad520, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d11ff4ca87a3443a32f16a644975c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpPower: 7
+  jumpDuration: 1.5
+  rotationDuration: 1
+  shakeStrength: 0.2
+  shakeDuration: 0.5
+--- !u!65 &2034220118815821658
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2527022286765867999}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3179574348767152239
 GameObject:
   m_ObjectHideFlags: 0
@@ -153,7 +171,7 @@ GameObject:
   - component: {fileID: 2330705286731643048}
   - component: {fileID: 4557437182998775232}
   - component: {fileID: 6365519428966038379}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ChanllengeDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5071,7 +5089,7 @@ GameObject:
   - component: {fileID: 7150125388846126630}
   - component: {fileID: 594497718198014305}
   - component: {fileID: 5889572859792922296}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ChanllengeVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5182,7 +5200,7 @@ GameObject:
   - component: {fileID: 5819796551602699280}
   - component: {fileID: 3365402658640248151}
   - component: {fileID: 6506988023499403908}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}

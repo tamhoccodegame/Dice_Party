@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8602332942265914766}
   - component: {fileID: 670340634084263663}
   - component: {fileID: 3963263397715345028}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RotateVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,8 +120,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4459870336142081058}
-  - component: {fileID: 6143643714130466012}
-  m_Layer: 0
+  - component: {fileID: 3078824803392976904}
+  - component: {fileID: 7640266878311373003}
+  m_Layer: 7
   m_Name: RotateDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -146,27 +147,44 @@ Transform:
   - {fileID: 4490125635846012606}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &6143643714130466012
-Animator:
-  serializedVersion: 5
+--- !u!114 &3078824803392976904
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3940496688837076632}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5dde39c187c042d40a46df76513ad520, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d11ff4ca87a3443a32f16a644975c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpPower: 7
+  jumpDuration: 1.5
+  rotationDuration: 1
+  shakeStrength: 0.2
+  shakeDuration: 0.5
+--- !u!65 &7640266878311373003
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3940496688837076632}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7555424050677437533
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,7 +196,7 @@ GameObject:
   - component: {fileID: 4490125635846012606}
   - component: {fileID: 6595605043312221255}
   - component: {fileID: 4216212005744311195}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RotateDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -264,7 +282,7 @@ GameObject:
   - component: {fileID: 4509755348744000684}
   - component: {fileID: 1055703992845905215}
   - component: {fileID: 4178170061760761007}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5164,7 +5182,7 @@ GameObject:
   - component: {fileID: 8607824549639731941}
   - component: {fileID: 6720350409132410449}
   - component: {fileID: 368356291510558789}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RotateDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}

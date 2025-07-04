@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6374216591251018582}
   - component: {fileID: 6300231009695443487}
   - component: {fileID: 502376629470529734}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PlusDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4927,8 +4927,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1523596127001643310}
-  - component: {fileID: 8900254619602551503}
-  m_Layer: 0
+  - component: {fileID: 4912060802489473858}
+  - component: {fileID: 1757119930153820174}
+  m_Layer: 7
   m_Name: PlusDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4953,27 +4954,44 @@ Transform:
   - {fileID: 7582742088799572897}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &8900254619602551503
-Animator:
-  serializedVersion: 5
+--- !u!114 &4912060802489473858
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2193031151015711636}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5dde39c187c042d40a46df76513ad520, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d11ff4ca87a3443a32f16a644975c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpPower: 7
+  jumpDuration: 1.5
+  rotationDuration: 1
+  shakeStrength: 0.2
+  shakeDuration: 0.5
+--- !u!65 &1757119930153820174
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2193031151015711636}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5750219322758953605
 GameObject:
   m_ObjectHideFlags: 0
@@ -4985,7 +5003,7 @@ GameObject:
   - component: {fileID: 2361722830042943277}
   - component: {fileID: 1033564060859482132}
   - component: {fileID: 1748120411635248322}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9885,7 +9903,7 @@ GameObject:
   - component: {fileID: 5279601240583311744}
   - component: {fileID: 5400576733459209779}
   - component: {fileID: 1942036445027192596}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CheckRaceVFX 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9996,7 +10014,7 @@ GameObject:
   - component: {fileID: 7582742088799572897}
   - component: {fileID: 3621105378976276050}
   - component: {fileID: 1393046942646112576}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PlusDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}

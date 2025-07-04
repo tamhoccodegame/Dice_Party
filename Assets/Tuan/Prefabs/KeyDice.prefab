@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5613258699242121459}
   - component: {fileID: 7401957120469516675}
   - component: {fileID: 6283594144818593968}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: KeyDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 4955410455056507746}
   - component: {fileID: 180584041372860944}
   - component: {fileID: 8914565495020681073}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CheckGoldVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -208,7 +208,7 @@ GameObject:
   - component: {fileID: 6200619074580897185}
   - component: {fileID: 5361201591755989272}
   - component: {fileID: 1796969706414950930}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: KeyDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5124,8 +5124,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1496001727043469834}
-  - component: {fileID: 9014119418472822138}
-  m_Layer: 0
+  - component: {fileID: 4954097685400465291}
+  - component: {fileID: 4173100656544739844}
+  m_Layer: 7
   m_Name: KeyDice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5150,27 +5151,44 @@ Transform:
   - {fileID: 5613258699242121459}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &9014119418472822138
-Animator:
-  serializedVersion: 5
+--- !u!114 &4954097685400465291
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2272361821866055856}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5dde39c187c042d40a46df76513ad520, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d11ff4ca87a3443a32f16a644975c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpPower: 7
+  jumpDuration: 1.5
+  rotationDuration: 1
+  shakeStrength: 0.2
+  shakeDuration: 0.5
+--- !u!65 &4173100656544739844
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2272361821866055856}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4347252923347827436
 GameObject:
   m_ObjectHideFlags: 0
@@ -5182,7 +5200,7 @@ GameObject:
   - component: {fileID: 3505202753225307684}
   - component: {fileID: 3686108718744667979}
   - component: {fileID: 564700696264452226}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
