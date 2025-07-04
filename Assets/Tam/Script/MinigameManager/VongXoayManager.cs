@@ -196,6 +196,7 @@ public class VongXoayManager : NetworkBehaviour
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         yield return new WaitForSecondsRealtime(3f);
 
+        if(HasStateAuthority)
         Runner.LoadScene("TuanSceneMap");
     }
 

@@ -28,6 +28,7 @@ public class KeyNode : BoardNode
     IEnumerator ProcessCoroutine(PlayerRef playerRef, NetworkId playerObject, int keyQty)
     {
         Transform playerTransform = Runner.FindObject(playerObject).transform;
+        List<bool> collected = new List<bool>();
 
         for (int i = 0; i < keyQty; i++)
         {
@@ -44,7 +45,10 @@ public class KeyNode : BoardNode
             Rigidbody rb = key.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                Vector3 randomDir = (Random.insideUnitSphere + Vector3.up * 1.5f).normalized;
+                Vector2 circle = Random.insideUnitCircle.normalized;
+                float y = Random.Range(0.5f, 1f); // Chỉ từ giữa tới trên
+                Vector3 randomDir = new Vector3(circle.x, y, circle.y).normalized;
+
                 float explosionForce = 20f;
                 rb.AddForce(randomDir * explosionForce, ForceMode.Impulse);
             }
@@ -52,16 +56,14 @@ public class KeyNode : BoardNode
             // Bắt đầu bay về player
             KeyPickupMover mover = key.GetComponent<KeyPickupMover>();
 
-            bool collected = false;
             mover.Init(playerTransform, () =>
             {
                 TurnManager.instance.RequestUpdateKey(playerRef, 1);
-                collected = true;
+                collected.Add(true);
             });
-
-            yield return new WaitUntil(() => collected);
-            yield return new WaitForSeconds(0.15f);
         }
+        yield return new WaitUntil(() => collected.Count >= keyQty);
+        yield return new WaitForSeconds(0.15f);
 
 
         yield return new WaitForSeconds(0.3f); // Delay nhẹ cho mượt

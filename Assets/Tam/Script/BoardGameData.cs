@@ -17,6 +17,11 @@ public class BoardGameData : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void Start()
+    {
+        
+    }
+
     public void UpdateNode(PlayerRef player, string nodeName)
     {
         if (!playersCurrentNode.ContainsKey(player))

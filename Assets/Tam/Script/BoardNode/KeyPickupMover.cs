@@ -3,7 +3,7 @@
 public class KeyPickupMover : MonoBehaviour
 {
     public Transform target;
-    public float moveSpeed = 12f;
+    public float moveSpeed = 15f;
     public System.Action onArrive;
 
     private bool isMoving = false;
@@ -11,8 +11,11 @@ public class KeyPickupMover : MonoBehaviour
     private float delayBeforeMove = 3f; // Đợi nửa giây sau khi spawn rồi mới bay về player
     private float timer = 0f;
 
+    Collider col;
+
     public void Init(Transform targetTransform, System.Action onDone)
     {
+        col = GetComponentInChildren<Collider>();
         target = targetTransform;
         onArrive = onDone;
         isMoving = false;
@@ -65,5 +68,6 @@ public class KeyPickupMover : MonoBehaviour
     void StartMoveToPlayer()
     {
         isMoving = true;
+        col.enabled = false;
     }
 }

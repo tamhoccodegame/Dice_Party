@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 
 // Bắt buộc object này phải có CharacterController
 [RequireComponent(typeof(CharacterController))]
@@ -38,12 +39,15 @@ public class BoardGameController : NetworkBehaviour
 
     // --- State Machine cho việc di chuyển ---
     private enum State { Idle, Rolling, WaitingForAnim, Moving, UsingItem }
-    [Networked] private State currentState { get; set; }  // state hiện tại, sync toàn bộ clients
+    [Networked, UnitySerializeField] private State currentState { get; set; }  // state hiện tại, sync toàn bộ clients
 
     private State cachedMoveState;   // lưu state cũ để kiểm tra thay đổi (chỉ dùng cho animation)
     private float animTimer = 0f;        // thời gian chờ khi chơi animation roll dice
 
     public Transform feet;
+
+    public Transform gunSpawnPoint;
+    private BoardItem currentItem;
 
     // --- Hàm Spawned() chạy khi object này spawn ---
     public override void Spawned()
@@ -98,6 +102,12 @@ public class BoardGameController : NetworkBehaviour
             UpdateAnimation();
         }
 
+        if (currentState == State.UsingItem && currentItem != null)
+        {
+            currentItem.Tick(this); // Giao quyền xử lý input cho item
+            return;
+        }
+
         if (HasInputAuthority && isMyTurn)
         {
             if (currentState != State.Idle) return;
@@ -108,11 +118,51 @@ public class BoardGameController : NetworkBehaviour
                 RPC_RequestDiceRoll();
                 RPC_HideDice();
             }
-            else if (Input.GetKeyDown(KeyCode.Q))
-            {
-                RPC_HideDice();
-            }
+            //else if (Input.GetKeyDown(KeyCode.Q))
+            //{
+            //    RPC_HideDice();
+            //    UseSelectedItem();
+            //}
         }
+    }
+    void UseSelectedItem()
+    {
+        // Ví dụ: inventory đang giữ 1 item là ElectricGun
+        BoardItem selectedItem = BoardGameData.instance.playersBoardStat
+                                 [TurnManager.instance.currentPlayerRef]
+                                 .GetSelectedItem();
+
+        
+        selectedItem.Use(this); // Gọi logic của item
+    }
+
+    public void SetUsingItem(BoardItem item)
+    {
+        currentItem = item;
+        Debug.Log(currentItem);
+        Debug.Log("Đù má m sao m ko chịu chuyển state?");
+        RPC_RequestSetState(State.UsingItem);
+        Debug.Log(currentState.ToString());
+    }
+
+    public void ClearUsingItem()
+    {
+        currentItem = null;
+        RPC_RequestSetState(State.Idle);
+        //EndTurn(); // kết thúc lượt
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    void RPC_RequestSetState(State newState)
+    {
+        SetMoveState(newState);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_FireGun()
+    {
+        Debug.Log($"{name} fired gun!");
+        // Gọi hiệu ứng điện, giảm máu player khác, v.v...
     }
 
     // --- FixedUpdateNetwork() chạy trên State Authority (host) ---
@@ -193,6 +243,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Đổi state ---
     private void SetMoveState(State newState)
     {
+        if (!HasStateAuthority) return;
         currentState = newState;
     }
 
@@ -293,11 +344,6 @@ public class BoardGameController : NetworkBehaviour
             NetworkId playerObject = PlayerSpawner.instance.spawnedCharacters[playerRef];
             currentNode.ProcessNode(playerRef, playerObject);
         }
-    }
-
-    void OnItemUsed(NetworkId itemPrefab)
-    {
-
     }
 
     private void ShowDice()

@@ -69,6 +69,11 @@ public class TurnManager : NetworkBehaviour
             if (isFirstTry)
             {
                 StartCoroutine(DelayUpdatePlayerUI());
+
+                foreach (var player in NetworkManager.instance.GetAllPlayers())
+                {
+                    BoardGameData.instance.UpdateItem(player, new ElectricGun());
+                }
             }
 
             RPC_UpdatePlayerDataUI();
