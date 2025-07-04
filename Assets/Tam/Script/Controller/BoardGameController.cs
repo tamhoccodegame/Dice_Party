@@ -75,7 +75,7 @@ public class BoardGameController : NetworkBehaviour
         }
         else
         {
-            currentNode = GameObject.Find("AddDice").GetComponent<BoardNode>();
+            currentNode = FindFirstObjectByType<PlayerSpawner>().spawnPosition[0].GetComponent<BoardNode>();
         }
 
         Debug.Log(currentNode.name);
@@ -187,7 +187,7 @@ public class BoardGameController : NetworkBehaviour
             controller.Move(direction);
 
             // Đã tới node kế tiếp
-            if (Vector3.Distance(feet.position, toMoveNode.transform.position) <= 0.5f)
+            if (Vector3.Distance(feet.position, toMoveNode.transform.Find("circle").position) <= 0.4f)
             {
                 currentNode = toMoveNode;
                 if (HasStateAuthority)
@@ -284,6 +284,7 @@ public class BoardGameController : NetworkBehaviour
             boardGameData.UpdateNode(playerRef, currentNodeName);
         }
 
+        if(HasInputAuthority) 
         TurnManager.instance.RequestNextTurn();
     }
 
@@ -359,7 +360,7 @@ public class BoardGameController : NetworkBehaviour
         if (currentState != State.Idle) return;
 
         //currentStep = Random.Range(1, 5);   // random số bước
-        currentStep = 4;
+        currentStep = 1;
         SetMoveState(State.WaitingForAnim);
         animTimer = 1f;                     // đợi 1 giây chơi animation roll
     }

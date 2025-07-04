@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UI;
 
 public class TurnManager : NetworkBehaviour
@@ -29,6 +30,8 @@ public class TurnManager : NetworkBehaviour
 
     public TextMeshProUGUI turnNotifyText;
 
+    public PlayableDirector introCutscene;
+
     public enum GameState
     {
         BoardGame,
@@ -38,11 +41,7 @@ public class TurnManager : NetworkBehaviour
     public GameState currentState;
 
     public Image blackScreen;
-
     public float fadeDuration = 1f;
-
-    public void FadeIn() => StartCoroutine(FadeBlackScreen(0, 1));
-    public void FadeOut() => StartCoroutine(FadeBlackScreen(1, 0));
 
     private void Awake()
     {
@@ -60,8 +59,47 @@ public class TurnManager : NetworkBehaviour
         if (isFirstTry)
         {
             BoardGameData.instance.EnsurePlayerStat(NetworkManager.instance.GetAllPlayers());
+            if (HasStateAuthority) StartCoroutine(DelayPlayIntroCutscene());
         }
+        else
+        {
+            if (Object.HasStateAuthority)
+            {
+                RPC_StartFirstTurn();
 
+                if (isFirstTry)
+                {
+                    StartCoroutine(DelayUpdatePlayerUI());
+
+                    foreach (var player in NetworkManager.instance.GetAllPlayers())
+                    {
+                        BoardGameData.instance.UpdateItem(player, new ElectricGun());
+                    }
+                }
+
+                RPC_UpdatePlayerDataUI();
+            }
+        }
+       
+    }
+
+    IEnumerator DelayPlayIntroCutscene()
+    {
+        yield return new WaitForSecondsRealtime(1f);
+        RPC_PlayIntroCutscene();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_PlayIntroCutscene()
+    {
+        introCutscene.Play();
+        introCutscene.stopped += IntroCutscene_stopped;
+    }
+
+    private void IntroCutscene_stopped(PlayableDirector obj)
+    {
+        Destroy(obj.gameObject);
+        FindObjectOfType<GlobalVolume>().StartFadeOut();
         if (Object.HasStateAuthority)
         {
             RPC_StartFirstTurn();
@@ -86,7 +124,7 @@ public class TurnManager : NetworkBehaviour
         {
             RPC_UpdateKey(player, 0);
             RPC_UpdateCup(player, 0);
-            RPC_UpdateHealth(player, 50);
+            RPC_UpdateHealth(player, 30);
         }
         yield return new WaitForSecondsRealtime(0.5f);
 
