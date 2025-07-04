@@ -22,8 +22,7 @@ public class BoardNode : NetworkBehaviour
 
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public virtual void RPC_ProcessNode(PlayerRef player)
+    public virtual void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
     {
 
     }
