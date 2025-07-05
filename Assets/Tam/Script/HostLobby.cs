@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ public class HostLobby : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             EnsureReadyStatusInit();
-            UpdatePlayerList();
+            RPC_UpdatePlayerList();
 
             foreach(var go in hostOwnObjects)
             {
@@ -70,7 +71,7 @@ public class HostLobby : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             EnsureReadyStatusInit();
-            UpdatePlayerList();
+            RPC_UpdatePlayerList();
         }
         else
         {
@@ -95,7 +96,7 @@ public class HostLobby : NetworkBehaviour
 
         if (Object.HasStateAuthority)
         {
-            UpdatePlayerList();
+            RPC_UpdatePlayerList();
         }
     }
 
@@ -119,69 +120,9 @@ public class HostLobby : NetworkBehaviour
         RPC_UpdatePlayerList();
     }
 
-    void UpdatePlayerList()
-    {
-        List<PlayerRef> players = networkManager.GetAllPlayers();
-        players.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
-
-        foreach (Transform child in playerSlotContainer)
-        {
-            if (child == playerSlotTemplate) continue;
-            Destroy(child.gameObject);
-        }
-
-        foreach (PlayerRef player in players)
-        {
-            //Spawn Avatar (model 3D)
-            if (!spawnedAvatars.ContainsKey(player))
-            {
-                var avatar = Runner.Spawn(playerPrefab,
-                                          avatarStandingPosition[player.PlayerId - 1].position,
-                                          Quaternion.Euler(0, 180, 0), player);
-                spawnedAvatars.Add(player, avatar);
-            }
-
-            //Spawn Slot UI cho Player
-            var p = Instantiate(playerSlotTemplate, playerSlotContainer);
-            p.gameObject.SetActive(true);
-            p.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = player.PlayerId.ToString();
-
-            PlayerSlotUI playerSlotUI = p.GetComponent<PlayerSlotUI>();
-            bool isReady = readyStatus.Get(player);
-            var readyPanel = playerSlotUI.readyPanel;
-            readyPanel.SetActive(isReady);
-
-            PlayerCustom playerCustom = playerPrefab.GetComponent<PlayerCustom>();
-
-            foreach(var hair in playerCustom.hairs)
-            {
-                playerSlotUI.AddHairName(hair.name);
-            }
-
-            foreach(var bodypart in playerCustom.bodyparts)
-            {
-                playerSlotUI.AddBodypartName(bodypart.name);
-            }
-
-            if (Runner.LocalPlayer != player)
-            {
-                playerSlotUI.unreadyButton.SetActive(false);
-                playerSlotUI.unreadyPanel.SetActive(!isReady);
-                playerSlotUI.adjustAppearancePanel.SetActive(false);
-                playerSlotUI.afterJoinPanel.SetActive(false);
-                playerSlotUI.customizePanel.SetActive(false);
-            }
-        }
-
-        if (Object.HasStateAuthority)
-            RPC_UpdatePlayerList();
-    }
-
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     void RPC_UpdatePlayerList()
     {
-        if (Object.HasStateAuthority) return;
-
         List<PlayerRef> players = networkManager.GetAllPlayers();
         players.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
 
@@ -193,9 +134,27 @@ public class HostLobby : NetworkBehaviour
 
         foreach (PlayerRef player in players)
         {
+            if (Object.HasStateAuthority)
+            {
+                //Spawn Avatar (model 3D)
+                if (!spawnedAvatars.ContainsKey(player))
+                {
+                    var avatar = Runner.Spawn(playerPrefab,
+                                              avatarStandingPosition[player.PlayerId - 1].position,
+                                              Quaternion.Euler(0, 180, 0), player);
+                    spawnedAvatars.Add(player, avatar);
+                }
+            }
+
             var p = Instantiate(playerSlotTemplate, playerSlotContainer);
             p.gameObject.SetActive(true);
-            p.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = player.PlayerId.ToString();
+
+            string playerName = BoardGameData.instance.GetName(player);
+            TextMeshProUGUI playerNameText = p.transform.Find("Name").GetComponent<TextMeshProUGUI>();
+            if (string.IsNullOrEmpty(playerName))
+                playerNameText.text = player.PlayerId.ToString();
+            else
+                playerNameText.text = playerName;
 
             PlayerSlotUI playerSlotUI = p.GetComponent<PlayerSlotUI>();
             bool isReady = readyStatus.Get(player);
@@ -279,6 +238,34 @@ public class HostLobby : NetworkBehaviour
         foreach (var p in playerCustoms)
             if (p.HasInputAuthority) p.RequestApplyCustom(p.currentHairIndex, p.currentColorIndex, p.currentBodypartIndex);
     }
+
+    public void OnClickSetName(TextMeshProUGUI text)
+    {
+        PlayerRef player = Runner.LocalPlayer;
+        NetworkString<_16> name = (NetworkString<_16>)text.text;
+        RPC_RequestSetName(player, name);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_RequestSetName(PlayerRef player, NetworkString<_16> name)
+    {
+        RPC_SetName(player, name);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+
+    public void RPC_SetName(PlayerRef player, NetworkString<_16> name)
+    {
+        BoardGameData.instance.UpdateName(player, (string)name);
+        if (Object.HasStateAuthority) RPC_UpdatePlayerList();
+    }
+
+    IEnumerator UpdateDelayAfterSetName()
+    {
+        yield return new WaitForSecondsRealtime(0.3f);
+        RPC_UpdatePlayerList();
+    }
+
     #endregion
 }
 

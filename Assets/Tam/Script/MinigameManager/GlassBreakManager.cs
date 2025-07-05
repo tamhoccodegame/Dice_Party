@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Linq;
 using TMPro;
+using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -17,34 +20,39 @@ public class GlassBreakManager : NetworkBehaviour
     public static GlassBreakManager instance;
     public GlassCouple[] glassCouples;
 
+    public PlayableDirector introCutscene;
+
     public Image blackScreen;
+
+    public CinemachineCamera cam;
 
     [Header("Tutorial Panel")]
     public GameObject tutorialPanel;
 
-    [Networked]
-    [Capacity(4)]
-    [UnitySerializeField]
-    public NetworkDictionary<PlayerRef, int> playerScore => default;
+    public TextMeshProUGUI countDownText;
+
+    [Networked] public int time { get; set; }
 
     [Networked]
     [Capacity(4)]
     [UnitySerializeField]
-    public NetworkLinkedList<PlayerRef> playerRanks => default;
+    public NetworkDictionary<NetworkId, int> playerScores => default;
+
+    [Networked]
+    [Capacity(4)]
+    [UnitySerializeField]
+    public NetworkDictionary<PlayerRef, NetworkId> playerRanks => default;
 
     [Header("Avatar Standing Position")]
-    public Transform firstRankPosition;
-    public Transform secondRankPosition;
-    public Transform thirdRankPosition;
-
-    public GameObject playerRewardPrefab;
+    public Transform[] rankPositions;
 
     public TextMeshProUGUI[] playerTextUI;
 
     [Header("Game Over Panel")]
     public GameObject gameOverPanel;
-    public TextMeshProUGUI firstRankName;
-    public TextMeshProUGUI secondRankName;
+    public GameOverSlotUI[] gameOverSlots;
+    public TextMeshProUGUI whoWinsText;
+    public GameObject gameOverVolume;
 
     public Transform spawnPosition;
 
@@ -61,7 +69,8 @@ public class GlassBreakManager : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (HasStateAuthority)
+        cam.enabled = false; 
+        if (Object.HasStateAuthority)
         {
             foreach (var glassCouple in glassCouples)
             {
@@ -76,8 +85,10 @@ public class GlassBreakManager : NetworkBehaviour
                     glassCouple.glass2.SetBreakable(true);
                 }
             }
-
         }
+
+        countDownText.text = time.ToString();
+        InvokeRepeating(nameof(CountDown), 0f, 1f);
 
         MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
         instance = this;
@@ -86,71 +97,98 @@ public class GlassBreakManager : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             RPC_HideTutorial();
+            RPC_InitPlayerScore();
         }
     }
 
-    //Khi mà đến đích thì sẽ gọi hàm này
-    public void RequestAddRank(PlayerRef player)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_InitPlayerScore()
     {
+        for(int i = 0; i < NetworkManager.instance.GetAllPlayers().Count; i++)
+        {
+            playerTextUI[i].transform.parent.gameObject.SetActive(true);
+        }
+    }
+
+    void CountDown()
+    {
+        if (!isGameStarted || isGameOver) return;
+
         if (HasStateAuthority)
         {
-            UpdateRank(player);
+            time -= 1;
+
+            CheckTimeOut();
+        }
+        countDownText.text = time.ToString();
+    }
+
+    void CheckTimeOut()
+    {
+        if(time <= 0)
+        {
+            foreach (var p in PlayerSpawner.instance.GetSpawnedCharacters())
+            {
+                UpdateRank(p.Key, p.Value);
+            }
+        }
+
+    }
+
+    //Khi mà đến đích thì sẽ gọi hàm này
+    public void RequestAddRank(PlayerRef playerRef, NetworkId playerObject)
+    {
+        if (Object.HasStateAuthority)
+        {
+            UpdateRank(playerRef, playerObject);
         }
         else
         {
-            RPC_RequestUpdateRank(player);
+            RPC_RequestUpdateRank(playerRef, playerObject);
         }
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
 
-    public void RPC_RequestUpdateRank(PlayerRef player)
+    public void RPC_RequestUpdateRank(PlayerRef playerRef, NetworkId playerObject)
     {
-        UpdateRank(player);
+        UpdateRank(playerRef, playerObject);
     }
 
-    public void UpdateRank(PlayerRef player)
+    public void UpdateRank(PlayerRef playerRef, NetworkId playerObject)
     {
         if (isGameOver) return;
 
-        if(!playerRanks.Contains(player))
+        if (!playerRanks.ContainsKey(playerRef))
         {
-            playerRanks.Add(player);
+            playerRanks.Add(playerRef, playerObject);
         }
 
         if (Object.HasStateAuthority)
         {
-            RPC_UpdateUILive();
+            RPC_UpdateUILive(playerObject);
         }
 
         if (CheckGameOver())
         {
-            StartCoroutine(ReturnToBoard());
-
             isGameOver = true;
             RPC_ShowGameOverPanel();
 
-            if (Object.HasStateAuthority && playerRanks.Count >= 2)
+            //if (playerRanks.Count >= 2)
             {
-                PlayerRef firstRankRef = playerRanks[^1]; 
-                PlayerRef secondRankRef = playerRanks[^2]; 
-                //PlayerRef thirdRankRef = playerRanks[^3];
-                SpawnRewardAvatar(firstRankRef, secondRankRef/*, thirdRankRef*/);
+                RPC_SpawnRewardAvatar();
             }
         }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateUILive()
+    void RPC_UpdateUILive(NetworkId playerId)
     {
-        int index = 0;
-        foreach (var kvp in playerScore)
+        for(int i = 0; i < playerScores.Count; i++)
         {
-            if (index < playerTextUI.Length)
-            {
-                playerTextUI[index].text = kvp.Value.ToString();
-                index++;
-            }
+            if (playerScores.ElementAt(i).Key == playerId)
+                playerTextUI[i].text = playerScores.ElementAt(i).Value.ToString();
+            else continue;
         }
     }
 
@@ -189,13 +227,18 @@ public class GlassBreakManager : NetworkBehaviour
         tutorialPanel.SetActive(false);
 
         yield return new WaitForSecondsRealtime(5f);
+        introCutscene.Play();
+        introCutscene.stopped += StartGame;
+        yield return new WaitForSecondsRealtime(1f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
 
         GetComponent<PlayerSpawner>().SpawnPlayer();
+    }
 
-        yield return new WaitForSecondsRealtime(4f);
-
-
+    private void StartGame(PlayableDirector obj)
+    {
+        Destroy(obj.gameObject);
+        FindFirstObjectByType<GlobalVolume>().StartFadeOut();
         if (Object.HasStateAuthority)
         {
             isGameStarted = true;
@@ -204,11 +247,18 @@ public class GlassBreakManager : NetworkBehaviour
 
     IEnumerator ReturnToBoard()
     {
+        gameOverVolume.SetActive(true);
+        //Play SFX
+        yield return new WaitForSecondsRealtime(2f);
+        gameOverVolume.SetActive(false);
+        gameOverPanel.SetActive(true);
+
         yield return new WaitForSecondsRealtime(6f);
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         yield return new WaitForSecondsRealtime(3f);
 
-        Runner.LoadScene("TuanSceneMap");
+        if (HasStateAuthority)
+            Runner.LoadScene("TuanSceneMap");
     }
 
     bool CheckGameOver()
@@ -219,40 +269,61 @@ public class GlassBreakManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     void RPC_ShowGameOverPanel()
     {
-        gameOverPanel.SetActive(true);
-    }
-
-    public void SpawnRewardAvatar(PlayerRef firstRank, PlayerRef secondRank/*, PlayerRef thirdRank*/)
-    {
-        MNGCauKinhController[] players = FindObjectsByType<MNGCauKinhController>(FindObjectsSortMode.None);
-
-        foreach (var player in players)
-        {
-            NetworkObject networkObject = player.GetComponent<NetworkObject>();
-            Runner.Despawn(networkObject);
-        }
-
-        // Spawn phần thưởng avatar cho người chơi ở vị trí xếp hạng
-        var fGo = Runner.Spawn(playerRewardPrefab, firstRankPosition.position, playerRewardPrefab.transform.rotation, firstRank);
-        firstRankName.text = firstRank.PlayerId.ToString();
-
-        var sGo = Runner.Spawn(playerRewardPrefab, secondRankPosition.position, playerRewardPrefab.transform.rotation, secondRank);
-        secondRankName.text = secondRank.PlayerId.ToString();
-
-        //var tGo = Runner.Spawn(playerRewardPrefab, thirdRankPosition.position, playerRewardPrefab.transform.rotation, thirdRank);
-        //secondRankName.text = thirdRank.PlayerId.ToString();
-
-
-        RPC_ChangeAnimation(fGo, "Win");
-        RPC_ChangeAnimation(sGo, "Lose");
-        //RPC_ChangeAnimation(tGo, "Lose");
-
+        StartCoroutine(ReturnToBoard());
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_ChangeAnimation(NetworkObject player, string animName)
+    public void RPC_SpawnRewardAvatar()
     {
-        player.GetComponent<Animator>().Play(animName);
+        StartCoroutine(SpawnRewardAvatarDelayed());
     }
 
+    IEnumerator SpawnRewardAvatarDelayed()
+    {
+        yield return new WaitForSeconds(0.2f); // Hoặc vài frame nhỏ
+
+        #region Player
+        GameObject.Find("FreeLook Camera").SetActive(false);
+        for (int i = 0; i < playerRanks.Count; i++)
+        {
+            NetworkObject iRankObject = Runner.FindObject(playerRanks.ElementAt(i).Value);
+            NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
+            iCc.gravity = 0;
+            iCc.jumpImpulse = 0;
+            iCc.acceleration = 0;
+            iCc.maxSpeed = 0;
+
+            if (HasStateAuthority)
+            {
+                iCc.Teleport(rankPositions[i].position, Quaternion.Euler(0, -90, 0));
+            }
+
+            MNGCauKinhController iCk = iRankObject.GetComponent<MNGCauKinhController>();
+            iCk.enabled = false;
+            Animator iAnimator = iRankObject.GetComponent<Animator>();
+
+            if (iCk.isGoal)
+            {
+                Debug.Log(i);
+                if (i == 0) iAnimator.Play("Win");
+                else iAnimator.Play("Lose");
+            }
+            else
+            {
+                iAnimator.Play("Lose");
+            }
+            #endregion
+
+            #region UISlot
+            gameOverSlots[i].gameObject.SetActive(true);
+            gameOverSlots[i].keyQtyText.text = "10";
+            gameOverSlots[i].rankText.text = $"{i + 1}";
+
+            string playerName = BoardGameData.instance.GetName(playerRanks.ElementAt(i).Key);
+            gameOverSlots[i].nameText.text = playerName;
+            #endregion
+        }
+
+
+    }
 }

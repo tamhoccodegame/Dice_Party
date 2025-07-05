@@ -33,6 +33,15 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         customData = GetComponent<CustomData>();
         sessionNameInput.onValueChanged.AddListener(UpdateSessionName);
+        MusicManager.instance.PlayMusic(MusicManager.MusicType.Menu);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            runnerInstance.Shutdown();
+        }
     }
 
     public List<PlayerRef> GetAllPlayers()

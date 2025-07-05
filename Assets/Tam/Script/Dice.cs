@@ -2,7 +2,7 @@ using Fusion;
 using TMPro;
 using UnityEngine;
 
-public class Dice : NetworkBehaviour
+public class Dice : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -14,10 +14,5 @@ public class Dice : NetworkBehaviour
     void Update()
     {
         transform.Rotate(new Vector3(90, 90, 90) * 10f * Time.deltaTime);
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-        transform.Rotate(new Vector3(90, 90, 90) * 10f * Runner.DeltaTime);
     }
 }
