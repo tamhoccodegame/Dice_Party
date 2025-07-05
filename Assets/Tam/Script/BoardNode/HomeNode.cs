@@ -26,7 +26,8 @@ public class HomeNode : BoardNode
         yield return new WaitForSecondsRealtime(1f);
         CharacterController controller = Runner.FindObject(playerObject)
                                                .GetComponent<CharacterController>();
-        CameraFollow.instance.StartFollowTarget(transform);
+        if(HasStateAuthority)
+        CameraFollow.instance.RPC_StartFollowTarget(transform);
         if (nodeEffect != null) nodeEffect.Play();
 
         portalVFX.SetActive(true);
@@ -56,7 +57,8 @@ public class HomeNode : BoardNode
         bCtrl.RPC_SetCurrentNode(teleportTo.GetComponent<NetworkObject>().Id);
 
         yield return new WaitForSecondsRealtime(1f);
-        CameraFollow.instance.StartFollowTarget(controller.transform);
+        if (HasStateAuthority)
+            CameraFollow.instance.RPC_StartFollowTarget(controller.transform);
 
         yield return new WaitForSeconds(4f);
 

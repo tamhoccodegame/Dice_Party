@@ -121,7 +121,8 @@ public class TurnManager : NetworkBehaviour
 
     IEnumerator ShowChestGoldAndStartFirstTurnCoroutine()
     {
-        CameraFollow.instance.StartFollowTarget(chestGold);
+        if(HasStateAuthority)
+        CameraFollow.instance.RPC_StartFollowTarget(chestGold);
         yield return new WaitForSecondsRealtime(3f);
         chestGold.GetComponent<ChestGoldNode>().chest.Play("FlyDown");
         yield return new WaitForSecondsRealtime(3f);
@@ -249,7 +250,7 @@ public class TurnManager : NetworkBehaviour
         {
             currentPlayerIndex = 0;
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
-            CameraFollow.instance.StartFollowTarget(playerController[currentPlayerIndex].transform);
+            CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].transform);
         }
 
         playerController[currentPlayerIndex].StartTurn();
@@ -306,7 +307,7 @@ public class TurnManager : NetworkBehaviour
             {
                 RPC_LoadScene(isFirstTry ? "MNG3" : "MNG1");
             }
-            CameraFollow.instance.StartFollowTarget(playerController[currentPlayerIndex].transform);
+            CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].transform);
         }
 
         if (currentPlayerIndex != 0)

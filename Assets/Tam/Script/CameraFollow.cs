@@ -29,13 +29,15 @@ public class CameraFollow : NetworkBehaviour
         }
     }
 
-    public void StartFollowTarget(Transform target)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_StartFollowTarget(Transform target)
     {
         StartCoroutine(ChangeFollowTarget(target));
     }
 
     IEnumerator ChangeFollowTarget(Transform target)
     {
+        if(HasStateAuthority)
         RPC_SetIsCamMoving(true);
         Vector3 oldTarget = transform.position;
         Vector3 newTarget = target.position + camOffset;
@@ -52,8 +54,13 @@ public class CameraFollow : NetworkBehaviour
 
         NetworkId newTargetId = target.GetComponent<NetworkObject>().Id;
         transform.position = newTarget;
-        RPC_ChangeCameraPosition(newTargetId);
-        RPC_SetIsCamMoving(false);
+
+        if (HasStateAuthority)
+        {
+            RPC_ChangeCameraPosition(newTargetId);
+            RPC_SetIsCamMoving(false);
+        }
+            
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
