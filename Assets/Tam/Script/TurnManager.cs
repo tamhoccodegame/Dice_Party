@@ -126,6 +126,7 @@ public class TurnManager : NetworkBehaviour
         yield return new WaitForSecondsRealtime(3f);
         chestGold.GetComponent<ChestGoldNode>().chest.Play("FlyDown");
         yield return new WaitForSecondsRealtime(3f);
+        if(HasStateAuthority)
         RPC_StartFirstTurn();
     }
 
