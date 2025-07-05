@@ -30,17 +30,17 @@ public class CameraFollow : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_StartFollowTarget(Transform target)
+    public void RPC_StartFollowTarget(NetworkId targetId)
     {
-        StartCoroutine(ChangeFollowTarget(target));
+        StartCoroutine(ChangeFollowTarget(targetId));
     }
 
-    IEnumerator ChangeFollowTarget(Transform target)
+    IEnumerator ChangeFollowTarget(NetworkId targetId)
     {
         if(HasStateAuthority)
         RPC_SetIsCamMoving(true);
         Vector3 oldTarget = transform.position;
-        Vector3 newTarget = target.position + camOffset;
+        Vector3 newTarget = Runner.FindObject(targetId).transform.position + camOffset;
 
         float elapsedTime = 0f;
         float duration = 1.5f;
@@ -52,7 +52,7 @@ public class CameraFollow : NetworkBehaviour
             yield return null;
         }
 
-        NetworkId newTargetId = target.GetComponent<NetworkObject>().Id;
+        NetworkId newTargetId = Runner.FindObject(targetId).Id;
         transform.position = newTarget;
 
         if (HasStateAuthority)
