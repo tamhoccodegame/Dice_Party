@@ -24,6 +24,7 @@ public class TrapNode : BoardNode
 
     IEnumerator ProcessCoroutine(PlayerRef playerRef, NetworkId playerObject)
     {
+        //Animator animator = Runner.FindObject(playerObject).GetComponent<Animator>();
         if (nodeEffect != null) nodeEffect.Play();
         theDeath.Play("Attack");
         yield return new WaitForSecondsRealtime(1.5f);

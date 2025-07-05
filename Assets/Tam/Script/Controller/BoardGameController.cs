@@ -358,8 +358,15 @@ public class BoardGameController : NetworkBehaviour
     {
         if (currentState != State.Idle) return;
 
-        //currentStep = Random.Range(1, 5);   // random số bước
-        currentStep = 9;
+        if (Object.HasStateAuthority)
+        {
+            currentStep = 3;
+        }
+        else
+        {
+            currentStep = 2;
+        }
+
         SetMoveState(State.WaitingForAnim);
         animTimer = 1f;                     // đợi 1 giây chơi animation roll
     }
@@ -382,7 +389,7 @@ public class BoardGameController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_SetCurrentNode(NetworkId nodeId)
+    public void RPC_SetCurrentNode(NetworkId nodeId)
     {
         currentNode = Runner.FindObject(nodeId).GetComponent<BoardNode>();
         currentNodeName = currentNode.name;

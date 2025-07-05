@@ -1,13 +1,14 @@
 using Fusion;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class ChestGoldNode : BoardNode
 {
     private NetworkCharacterController controller;
     public Animator chest;
+    private AudioSource audioSource;
 
     public override void Spawned()
     {
@@ -15,6 +16,7 @@ public class ChestGoldNode : BoardNode
         {
             chest.Play("FlyDown");
         }
+        audioSource = GetComponent<AudioSource>();
     }
 
     public override void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
@@ -52,9 +54,10 @@ public class ChestGoldNode : BoardNode
         }
 
         chest.Play("Open");
-
-        yield return new WaitForSecondsRealtime(1.5f);
+        audioSource.Play(); 
+        yield return new WaitForSecondsRealtime(4f);
         chest.Play("Close");
+        TurnManager.instance.RequestUpdateCup(playerRef, 1);
         yield return new WaitForSecondsRealtime(1.5f);
         chest.Play("FlyUp");
 

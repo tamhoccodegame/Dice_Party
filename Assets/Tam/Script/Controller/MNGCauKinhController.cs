@@ -49,10 +49,10 @@ public class MNGCauKinhController : NetworkBehaviour
             RPC_SendInput(cam.transform.forward);
         }
 
-        if (Physics.Raycast(feet.position, Vector3.down, out RaycastHit hit, 0.1f, glassLayer))
-        {
-            hit.collider.gameObject.GetComponent<BreakGlass>().TryBreak();
-        }
+        //if (Physics.Raycast(feet.position, Vector3.down, out RaycastHit hit, 0.1f, glassLayer))
+        //{
+        //    hit.collider.gameObject.GetComponent<BreakGlass>().TryBreak();
+        //}
 
     }
 

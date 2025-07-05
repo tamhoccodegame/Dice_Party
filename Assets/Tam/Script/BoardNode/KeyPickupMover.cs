@@ -8,7 +8,7 @@ public class KeyPickupMover : MonoBehaviour
 
     private bool isMoving = false;
     private Rigidbody rb;
-    private float delayBeforeMove = 3f; // Đợi nửa giây sau khi spawn rồi mới bay về player
+    private float delayBeforeMove = 3f;
     private float timer = 0f;
 
     Collider col;

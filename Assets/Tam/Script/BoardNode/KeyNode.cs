@@ -46,10 +46,10 @@ public class KeyNode : BoardNode
             if (rb != null)
             {
                 Vector2 circle = Random.insideUnitCircle.normalized;
-                float y = Random.Range(0.5f, 1f); // Chỉ từ giữa tới trên
+                float y = Random.Range(1f, 2f); // Chỉ từ giữa tới trên
                 Vector3 randomDir = new Vector3(circle.x, y, circle.y).normalized;
 
-                float explosionForce = 20f;
+                float explosionForce = 50f;
                 rb.AddForce(randomDir * explosionForce, ForceMode.Impulse);
             }
 

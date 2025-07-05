@@ -75,7 +75,7 @@ public class TurnManager : NetworkBehaviour
                 RPC_UpdatePlayerDataUI();
             }
         }
-       
+
     }
 
     IEnumerator DelayPlayIntroCutscene()
@@ -256,6 +256,20 @@ public class TurnManager : NetworkBehaviour
         UpdateTurnUI();
     }
 
+    public bool CheckWin()
+    {
+        BoardGameData data = BoardGameData.instance;
+        foreach (var player in NetworkManager.instance.GetAllPlayers())
+        {
+            if (data.playersBoardStat[player].cupQty >= 1)
+            {
+                data.winner = player;
+                return true;
+            }
+        }
+        return false;
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestNextTurn()
     {
@@ -264,6 +278,13 @@ public class TurnManager : NetworkBehaviour
 
     public void RequestNextTurn()
     {
+        if (Object.HasStateAuthority)
+            if (CheckWin())
+            {
+                RPC_LoadScene("Win");
+                return;
+            }
+
         if (Object.HasStateAuthority)
         {
             RPC_NextTurn();
@@ -283,7 +304,7 @@ public class TurnManager : NetworkBehaviour
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
             if (currentPlayerIndex == 0)
             {
-                RPC_LoadScene();
+                RPC_LoadScene(isFirstTry ? "MNG3" : "MNG1");
             }
             CameraFollow.instance.StartFollowTarget(playerController[currentPlayerIndex].transform);
         }
@@ -335,25 +356,15 @@ public class TurnManager : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_LoadScene()
+    void RPC_LoadScene(string sceneName)
     {
-        StartCoroutine(LoadMNG());
+        StartCoroutine(LoadSceneCoroutine(sceneName));
     }
 
-    IEnumerator LoadMNG()
+    IEnumerator LoadSceneCoroutine(string sceneName)
     {
         yield return null;
-        LevelLoader.instance.LoadScene("MNG3");
-        //yield return StartCoroutine(FadeBlackScreen(0, 1));
-        //if (isFirstTry)
-        //{
-        //    LevelLoader.instance.LoadScene("MNG3");
-
-        //}
-        //else
-        //{
-        //    LevelLoader.instance.LoadScene("MNG1");
-        //}
+        LevelLoader.instance.LoadScene(sceneName);
     }
     #endregion
 

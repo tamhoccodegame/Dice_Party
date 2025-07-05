@@ -21,7 +21,9 @@ public class MNGVongXoayController : NetworkBehaviour
         controller = GetComponent<NetworkCharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
-        VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
+
+        if (VongXoayManager.instance != null)
+            VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
 
         Invoke(nameof(ResetGravity), 2f);
     }

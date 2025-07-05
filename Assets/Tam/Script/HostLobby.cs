@@ -256,7 +256,7 @@ public class HostLobby : NetworkBehaviour
 
     public void RPC_SetName(PlayerRef player, NetworkString<_16> name)
     {
-        BoardGameData.instance.SetName(player, (string)name);
+        BoardGameData.instance.UpdateName(player, (string)name);
         if (Object.HasStateAuthority) RPC_UpdatePlayerList();
     }
 

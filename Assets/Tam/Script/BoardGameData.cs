@@ -11,6 +11,8 @@ public class BoardGameData : MonoBehaviour
 
     public Dictionary<PlayerRef, BoardGameStat> playersBoardStat = new Dictionary<PlayerRef, BoardGameStat>();
 
+    public PlayerRef winner;
+
     private void Awake()
     {
         instance = this;
@@ -47,11 +49,16 @@ public class BoardGameData : MonoBehaviour
         return null;
     }
 
-    public void SetName(PlayerRef player, string name)
+    public void UpdateName(PlayerRef player, string name)
     {
+        if (name == "" || name == null) return;
         if (!playersName.ContainsKey(player))
         {
             playersName.Add(player, name);
+        }
+        else
+        {
+            playersName[player] = name;
         }
     }
 
