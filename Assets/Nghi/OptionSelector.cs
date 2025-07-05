@@ -28,7 +28,7 @@ public class OptionSelector : MonoBehaviour
         leftButton.onClick.AddListener(SelectPrevious);
         rightButton.onClick.AddListener(SelectNext);
 
-        LoadSavedIndex();
+        //LoadSavedIndex();
         UpdateDisplay();
     }
 
