@@ -354,11 +354,11 @@ public class BoardGameController : NetworkBehaviour
     #region RPC
     // --- RPC: Client gửi yêu cầu lắc xúc xắc ---
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestDiceRoll()
+    private void RPC_RequestDiceRoll(RpcInfo info = default)
     {
         if (currentState != State.Idle) return;
 
-        if (Object.HasStateAuthority)
+        if (info.Source == Object.StateAuthority)
         {
             currentStep = 3;
         }
