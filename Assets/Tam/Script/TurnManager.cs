@@ -20,14 +20,6 @@ public class TurnManager : NetworkBehaviour
     public Transform slotTemplate;
     public Transform slotContainer;
 
-    [Header("Camera")]
-    public Camera cam;
-    public Vector3 camOffset;
-    private Transform targetCam; // Vị trí camera cần đến
-    private float cameraLerpSpeed = 4f; // Tốc độ Lerp (tùy chỉnh)
-
-    private bool isCameraMoving; // Không dùng Networked nữa
-
     public TextMeshProUGUI turnNotifyText;
 
     public PlayableDirector introCutscene;
@@ -42,6 +34,9 @@ public class TurnManager : NetworkBehaviour
 
     public Image blackScreen;
     public float fadeDuration = 1f;
+
+    [Header("Demo")]
+    public Transform chestGold;
 
     private void Awake()
     {
@@ -99,11 +94,10 @@ public class TurnManager : NetworkBehaviour
     private void IntroCutscene_stopped(PlayableDirector obj)
     {
         Destroy(obj.gameObject);
-        FindObjectOfType<GlobalVolume>().StartFadeOut();
+        FindFirstObjectByType<GlobalVolume>().StartFadeOut();
         if (Object.HasStateAuthority)
         {
-            RPC_StartFirstTurn();
-
+            RPC_ShowChestGoldAndStartFirstTurn();
             if (isFirstTry)
             {
                 StartCoroutine(DelayUpdatePlayerUI());
@@ -116,6 +110,22 @@ public class TurnManager : NetworkBehaviour
 
             RPC_UpdatePlayerDataUI();
         }
+
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_ShowChestGoldAndStartFirstTurn()
+    {
+        StartCoroutine(ShowChestGoldAndStartFirstTurnCoroutine());
+    }
+
+    IEnumerator ShowChestGoldAndStartFirstTurnCoroutine()
+    {
+        CameraFollow.instance.StartFollowTarget(chestGold);
+        yield return new WaitForSecondsRealtime(3f);
+        chestGold.GetComponent<ChestGoldNode>().chest.Play("FlyDown");
+        yield return new WaitForSecondsRealtime(3f);
+        RPC_StartFirstTurn();
     }
 
     IEnumerator DelayUpdatePlayerUI()
@@ -130,65 +140,6 @@ public class TurnManager : NetworkBehaviour
 
         RPC_UpdatePlayerDataUI();
     }
-
-    #region Camera
-
-    private void Update()
-    {
-        if (targetCam == null) return;
-        if (!isCameraMoving)
-        {
-            Vector3 desiredPosition = targetCam.position + camOffset;
-            if (Vector3.Distance(cam.transform.position, desiredPosition) > 0.3f)
-                cam.transform.position = Vector3.Lerp(cam.transform.position, desiredPosition, Time.deltaTime * cameraLerpSpeed);
-        }
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-
-    }
-
-    void StartFollowTarget()
-    {
-        StartCoroutine(ChangeFollowTarget());
-    }
-
-    IEnumerator ChangeFollowTarget()
-    {
-        RPC_SetIsCamMoving(true);
-        Vector3 oldTarget = cam.transform.position;
-        Vector3 newTarget = playerController[currentPlayerIndex].transform.position + camOffset;
-
-        float elapsedTime = 0f;
-        float duration = 1.5f;
-
-        while (elapsedTime < duration)
-        {
-            cam.transform.position = Vector3.Lerp(oldTarget, newTarget, elapsedTime / duration);
-            elapsedTime += Runner.DeltaTime;
-            yield return null;
-        }
-        NetworkId newTargetId = playerController[currentPlayerIndex].Object.Id;
-        cam.transform.position = newTarget;
-        RPC_ChangeCameraPosition(newTargetId);
-        RPC_SetIsCamMoving(false);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_SetIsCamMoving(bool enabled)
-    {
-        isCameraMoving = enabled;
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_ChangeCameraPosition(NetworkId newTargetId)
-    {
-        targetCam = Runner.FindObject(newTargetId).transform;
-    }
-
-    #endregion
-
 
     #region PlayerBoardData
     public void RequestUpdateKey(PlayerRef player, int ammount)
@@ -298,7 +249,7 @@ public class TurnManager : NetworkBehaviour
         {
             currentPlayerIndex = 0;
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
-            StartFollowTarget();
+            CameraFollow.instance.StartFollowTarget(playerController[currentPlayerIndex].transform);
         }
 
         playerController[currentPlayerIndex].StartTurn();
@@ -334,7 +285,7 @@ public class TurnManager : NetworkBehaviour
             {
                 RPC_LoadScene();
             }
-            StartFollowTarget();
+            CameraFollow.instance.StartFollowTarget(playerController[currentPlayerIndex].transform);
         }
 
         if (currentPlayerIndex != 0)

@@ -1,0 +1,70 @@
+﻿using Fusion;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CameraFollow : NetworkBehaviour
+{
+    public static CameraFollow instance; 
+
+    public Vector3 camOffset;
+    private Transform targetCam; // Vị trí camera cần đến
+    private float cameraLerpSpeed = 4f; // Tốc độ Lerp (tùy chỉnh)
+
+    private bool isCameraMoving; // Không dùng Networked nữa
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
+    private void Update()
+    {
+        if (targetCam == null) return;
+        if (!isCameraMoving)
+        {
+            Vector3 desiredPosition = targetCam.position + camOffset;
+            if (Vector3.Distance(transform.position, desiredPosition) > 0.3f)
+                transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * cameraLerpSpeed);
+        }
+    }
+
+    public void StartFollowTarget(Transform target)
+    {
+        StartCoroutine(ChangeFollowTarget(target));
+    }
+
+    IEnumerator ChangeFollowTarget(Transform target)
+    {
+        RPC_SetIsCamMoving(true);
+        Vector3 oldTarget = transform.position;
+        Vector3 newTarget = target.position + camOffset;
+
+        float elapsedTime = 0f;
+        float duration = 1.5f;
+
+        while (elapsedTime < duration)
+        {
+            transform.position = Vector3.Lerp(oldTarget, newTarget, elapsedTime / duration);
+            elapsedTime += Runner.DeltaTime;
+            yield return null;
+        }
+
+        NetworkId newTargetId = target.GetComponent<NetworkObject>().Id;
+        transform.position = newTarget;
+        RPC_ChangeCameraPosition(newTargetId);
+        RPC_SetIsCamMoving(false);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_SetIsCamMoving(bool enabled)
+    {
+        isCameraMoving = enabled;
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_ChangeCameraPosition(NetworkId newTargetId)
+    {
+        targetCam = Runner.FindObject(newTargetId).transform;
+    }
+}

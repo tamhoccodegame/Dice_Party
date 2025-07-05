@@ -140,7 +140,6 @@ public class BoardGameController : NetworkBehaviour
     {
         currentItem = item;
         Debug.Log(currentItem);
-        Debug.Log("Đù má m sao m ko chịu chuyển state?");
         RPC_RequestSetState(State.UsingItem);
         Debug.Log(currentState.ToString());
     }
@@ -360,7 +359,7 @@ public class BoardGameController : NetworkBehaviour
         if (currentState != State.Idle) return;
 
         //currentStep = Random.Range(1, 5);   // random số bước
-        currentStep = 1;
+        currentStep = 9;
         SetMoveState(State.WaitingForAnim);
         animTimer = 1f;                     // đợi 1 giây chơi animation roll
     }
