@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem.LowLevel;
 
 // Bắt buộc object này phải có CharacterController
 [RequireComponent(typeof(CharacterController))]
@@ -35,7 +34,8 @@ public class BoardGameController : NetworkBehaviour
     // --- Quản lý xúc xắc và UI hiển thị bước ---
     [Header("Dice and Step")]
     public GameObject dice;         // xúc xắc đang spawn trên scene
-    public TextMeshPro stepText;     // text hiện số bước trên UI
+    public GameObject stepTextPrefab
+        ;     // text hiện số bước trên UI
 
     // --- State Machine cho việc di chuyển ---
     private enum State { Idle, Rolling, WaitingForAnim, Moving, UsingItem }
@@ -85,7 +85,6 @@ public class BoardGameController : NetworkBehaviour
             RPC_SetCurrentNode(currentNode.Object.Id);
 
         toMoveNode = currentNode.nextNodes[0];
-        stepText.gameObject.SetActive(false);
 
         // Khởi tạo cached state để sync animation
         cachedMoveState = currentState;
@@ -380,12 +379,13 @@ public class BoardGameController : NetworkBehaviour
     IEnumerator HideDiceCoroutine()
     {
         yield return new WaitForSecondsRealtime(0.2f);
-        stepText.gameObject.SetActive(true);
+        var step = Instantiate(stepTextPrefab, dice.transform.position - new Vector3(0, 1.5f, 0), Quaternion.identity)
+                   .GetComponent<StepText>();
+        step.Init(currentStep.ToString());
         rollDiceEffect.Play();
         dice.SetActive(false);
-        stepText.text = currentStep.ToString();
         yield return new WaitForSeconds(0.5f);
-        stepText.gameObject.SetActive(false);
+        
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
