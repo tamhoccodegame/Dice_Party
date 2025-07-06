@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,8 +11,8 @@ public class BreakGlass : NetworkBehaviour
 
     public void SetBreakable(bool isBreakable)
     {
-        if(HasStateAuthority)
-        this.isBreakable = isBreakable;
+        if (HasStateAuthority)
+            this.isBreakable = isBreakable;
     }
 
     public void TryBreak()

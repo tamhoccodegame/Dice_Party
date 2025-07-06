@@ -4034,8 +4034,7 @@ MonoBehaviour:
   SortKey: 3463238776
   ObjectInterest: 1
   Flags: 262145
-  NestedObjects:
-  - {fileID: 3291502924328451009}
+  NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 6313809305522371884}
   - {fileID: -6553507065160089101}
@@ -4145,7 +4144,9 @@ MonoBehaviour:
   rollDiceEffect: {fileID: 5714308519246576880}
   dice: {fileID: 4177470746245077836}
   stepText: {fileID: 6770067897922902656}
+  _currentState: 0
   feet: {fileID: 5339602891216914746}
+  gunSpawnPoint: {fileID: 8093806596086079961}
 --- !u!114 &-9195892410077921398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4159,11 +4160,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stateAuthorityChangeErrorCorrectionDelta: 0
-  gravity: 0
-  jumpImpulse: 0
-  acceleration: 50
+  gravity: -1000
+  jumpImpulse: 8
+  acceleration: 30
   braking: 50
-  maxSpeed: 8
+  maxSpeed: 6
   rotationSpeed: 15
 --- !u!1 &2713937601389622726
 GameObject:
@@ -16091,22 +16092,13 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8979980477152368548, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+    - {fileID: -8663478987385893353, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
---- !u!114 &3291502924328451009 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: -8663478987385893353, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
-  m_PrefabInstance: {fileID: 3055947139127195094}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4177470746245077836}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &3653135278160626166 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1790863190301242400, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}

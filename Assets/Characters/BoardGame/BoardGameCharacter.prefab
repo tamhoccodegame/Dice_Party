@@ -2964,9 +2964,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0e1f0a1304070f42b048a3e9f9ea9a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 40
-  rotationSpeed: 20
   currentNode: {fileID: 0}
+  currentNodeId: 0
   _currentNodeName: 
   toMoveNode: {fileID: 0}
   _currentStep: 0
@@ -13262,6 +13261,14 @@ PrefabInstance:
       propertyPath: SortKey
       value: 3786454941
       objectReference: {fileID: 0}
+    - target: {fileID: -8663478987385893353, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8663478987385893353, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+      propertyPath: NetworkedBehaviours.Array.data[0]
+      value: 
+      objectReference: {fileID: 152388229640831936}
     - target: {fileID: 1410115114858327706, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
       propertyPath: m_Name
       value: Dice
@@ -13331,6 +13338,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+--- !u!114 &152388229640831936 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8979980477152368548, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+  m_PrefabInstance: {fileID: 9115893555086054500}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7859789439665928958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &7374719666135441476 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1790863190301242400, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}

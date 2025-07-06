@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 
 // Bắt buộc object này phải có CharacterController
 [RequireComponent(typeof(CharacterController))]
@@ -38,12 +39,15 @@ public class BoardGameController : NetworkBehaviour
 
     // --- State Machine cho việc di chuyển ---
     private enum State { Idle, Rolling, WaitingForAnim, Moving, UsingItem }
-    [Networked] private State currentState { get; set; }  // state hiện tại, sync toàn bộ clients
+    [Networked, UnitySerializeField] private State currentState { get; set; }  // state hiện tại, sync toàn bộ clients
 
     private State cachedMoveState;   // lưu state cũ để kiểm tra thay đổi (chỉ dùng cho animation)
     private float animTimer = 0f;        // thời gian chờ khi chơi animation roll dice
 
     public Transform feet;
+
+    public Transform gunSpawnPoint;
+    private BoardItem currentItem;
 
     // --- Hàm Spawned() chạy khi object này spawn ---
     public override void Spawned()
@@ -59,7 +63,7 @@ public class BoardGameController : NetworkBehaviour
         string currentNodeName1 = null;
         BoardGameData gameData = BoardGameData.instance;
 
-        if (gameData != null && gameData.playerCurrentNode.Count > 0)
+        if (gameData != null && gameData.playersCurrentNode.Count > 0)
         {
             currentNodeName1 = gameData.GetNode(Object.InputAuthority);
         }
@@ -71,7 +75,7 @@ public class BoardGameController : NetworkBehaviour
         }
         else
         {
-            currentNode = GameObject.Find("AddDice").GetComponent<BoardNode>();
+            currentNode = FindFirstObjectByType<PlayerSpawner>().spawnPosition[0].GetComponent<BoardNode>();
         }
 
         Debug.Log(currentNode.name);
@@ -98,6 +102,12 @@ public class BoardGameController : NetworkBehaviour
             UpdateAnimation();
         }
 
+        if (currentState == State.UsingItem && currentItem != null)
+        {
+            currentItem.Tick(this); // Giao quyền xử lý input cho item
+            return;
+        }
+
         if (HasInputAuthority && isMyTurn)
         {
             if (currentState != State.Idle) return;
@@ -108,11 +118,50 @@ public class BoardGameController : NetworkBehaviour
                 RPC_RequestDiceRoll();
                 RPC_HideDice();
             }
-            else if (Input.GetKeyDown(KeyCode.Q))
-            {
-                RPC_HideDice();
-            }
+            //else if (Input.GetKeyDown(KeyCode.Q))
+            //{
+            //    RPC_HideDice();
+            //    UseSelectedItem();
+            //}
         }
+    }
+    void UseSelectedItem()
+    {
+        // Ví dụ: inventory đang giữ 1 item là ElectricGun
+        BoardItem selectedItem = BoardGameData.instance.playersBoardStat
+                                 [TurnManager.instance.currentPlayerRef]
+                                 .GetSelectedItem();
+
+        
+        selectedItem.Use(this); // Gọi logic của item
+    }
+
+    public void SetUsingItem(BoardItem item)
+    {
+        currentItem = item;
+        Debug.Log(currentItem);
+        RPC_RequestSetState(State.UsingItem);
+        Debug.Log(currentState.ToString());
+    }
+
+    public void ClearUsingItem()
+    {
+        currentItem = null;
+        RPC_RequestSetState(State.Idle);
+        //EndTurn(); // kết thúc lượt
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    void RPC_RequestSetState(State newState)
+    {
+        SetMoveState(newState);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_FireGun()
+    {
+        Debug.Log($"{name} fired gun!");
+        // Gọi hiệu ứng điện, giảm máu player khác, v.v...
     }
 
     // --- FixedUpdateNetwork() chạy trên State Authority (host) ---
@@ -137,7 +186,7 @@ public class BoardGameController : NetworkBehaviour
             controller.Move(direction);
 
             // Đã tới node kế tiếp
-            if (Vector3.Distance(feet.position, toMoveNode.transform.position) <= 0.5f)
+            if (Vector3.Distance(feet.position, toMoveNode.transform.Find("circle").position) <= 0.4f)
             {
                 currentNode = toMoveNode;
                 if (HasStateAuthority)
@@ -193,6 +242,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Đổi state ---
     private void SetMoveState(State newState)
     {
+        if (!HasStateAuthority) return;
         currentState = newState;
     }
 
@@ -233,6 +283,7 @@ public class BoardGameController : NetworkBehaviour
             boardGameData.UpdateNode(playerRef, currentNodeName);
         }
 
+        if(HasInputAuthority) 
         TurnManager.instance.RequestNextTurn();
     }
 
@@ -270,7 +321,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Hàm khi client chọn hướng ---
     public void ChooseDirection(int index)
     {
-        if(!isMyTurn) return;
+        if (!isMyTurn) return;
         ClearArrow();
         RPC_ChooseDirection(index);
     }
@@ -288,12 +339,11 @@ public class BoardGameController : NetworkBehaviour
     {
         Debug.Log("Gọi sự kiện của node: " + currentNode.name);
         if (HasStateAuthority)
-            currentNode.RPC_ProcessNode(Runner.LocalPlayer);
-    }
-
-    void OnItemUsed(NetworkId itemPrefab)
-    {
-
+        {
+            PlayerRef playerRef = TurnManager.instance.currentPlayerRef;
+            NetworkId playerObject = PlayerSpawner.instance.spawnedCharacters[playerRef];
+            currentNode.ProcessNode(playerRef, playerObject);
+        }
     }
 
     private void ShowDice()
@@ -304,11 +354,19 @@ public class BoardGameController : NetworkBehaviour
     #region RPC
     // --- RPC: Client gửi yêu cầu lắc xúc xắc ---
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestDiceRoll()
+    private void RPC_RequestDiceRoll(RpcInfo info = default)
     {
         if (currentState != State.Idle) return;
 
-        currentStep = Random.Range(1, 5);   // random số bước
+        if (info.Source == Object.StateAuthority)
+        {
+            currentStep = 3;
+        }
+        else
+        {
+            currentStep = 2;
+        }
+
         SetMoveState(State.WaitingForAnim);
         animTimer = 1f;                     // đợi 1 giây chơi animation roll
     }
@@ -331,7 +389,7 @@ public class BoardGameController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_SetCurrentNode(NetworkId nodeId)
+    public void RPC_SetCurrentNode(NetworkId nodeId)
     {
         currentNode = Runner.FindObject(nodeId).GetComponent<BoardNode>();
         currentNodeName = currentNode.name;

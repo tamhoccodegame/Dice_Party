@@ -1,38 +1,28 @@
-﻿using Fusion;
-using Fusion.Sockets;
-using System;
+﻿using ExitGames.Client.Photon.StructWrapping;
+using Fusion;
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.VFX;
+using UnityEngine.Playables;
 
 [RequireComponent(typeof(NetworkCharacterController))]
 public class MNGCauKinhController : NetworkBehaviour
 {
-    private CinemachineCamera cam;
+    public CinemachineCamera cam;
     private Vector3 clientCamForward;
 
     private NetworkCharacterController controller;
     private Animator animator;
-
-    public float moveSpeed = 5f;
-    public float rotationSpeed = 10f;
-    public float jumpForce = 5f;
-    public float gravity = -9.81f;
-    public float verticalVelocity;
+    public PlayableDirector introduceTimeline;
 
     public bool isGoal = false;
-
-    [Networked] private string NetworkAnim { get; set; } // Animation sync
 
     public string currentAnim;
 
     public LayerMask glassLayer;
-    public Transform feet;
 
     GlassBreakManager manager;
+    public Transform feet;
 
     public override void Spawned()
     {
@@ -41,9 +31,8 @@ public class MNGCauKinhController : NetworkBehaviour
         animator = GetComponent<Animator>();
         manager = GlassBreakManager.instance;
 
-
         if (!HasInputAuthority) return;
-        cam = FindFirstObjectByType<CinemachineCamera>();
+        cam = GameObject.Find("FreeLook Camera").GetComponent<CinemachineCamera>();
         cam.Follow = transform;
         cam.LookAt = transform;
     }
@@ -54,36 +43,27 @@ public class MNGCauKinhController : NetworkBehaviour
         
         if (manager != null && manager.Object.IsValid && manager.isGameStarted)
         {
+            cam.enabled = true;
             // Send input to host
+            if(cam.enabled)
             RPC_SendInput(cam.transform.forward);
         }
 
-        if (Physics.Raycast(feet.position, Vector3.down, out RaycastHit hit, 0.1f, glassLayer))
-        {
-            hit.collider.gameObject.GetComponent<BreakGlass>().TryBreak();
-        }
+        //if (Physics.Raycast(feet.position, Vector3.down, out RaycastHit hit, 0.1f, glassLayer))
+        //{
+        //    hit.collider.gameObject.GetComponent<BreakGlass>().TryBreak();
+        //}
+
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_SendInput(Vector3 camForward)
     {
-        //moveInput = input;
         clientCamForward = camForward; 
     }
 
     public override void FixedUpdateNetwork()
     {
-        if (!Object.HasStateAuthority)
-        {
-            // Client đọc networked animation state
-            if (NetworkAnim != currentAnim)
-            {
-                animator.CrossFade(NetworkAnim, 0.25f);
-                currentAnim = NetworkAnim;
-            }
-            return;
-        }
-
         Vector3 moveDir = Vector3.zero;
 
         if (GetInput(out NetworkInputData data))
@@ -91,7 +71,7 @@ public class MNGCauKinhController : NetworkBehaviour
             if(data.buttons.IsSet(NetworkInputData.JUMPBUTTON))
             {
                 controller.Jump();
-                ChangeAnim("Jump");
+                RPC_ChangeAnim("Jump");
             }
             
             // Movement
@@ -106,25 +86,22 @@ public class MNGCauKinhController : NetworkBehaviour
 
             controller.Move(moveDir);
 
-
             // Animation
             if (controller.Grounded)
             {
                 if (moveDir.magnitude > 0)
-                    ChangeAnim("Run");
+                    RPC_ChangeAnim("Run");
                 else
-                    ChangeAnim("Idle");
+                    RPC_ChangeAnim("Idle");
             }
         }
     }
 
-    public void ChangeAnim(string animName, float blendTime = 0.25f)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_ChangeAnim(string animName, float blendTime = 0.25f)
     {
         if (animName == currentAnim) return;
         currentAnim = animName;
-
-        if (Object.HasStateAuthority)
-            NetworkAnim = animName;
 
         animator.CrossFade(animName, blendTime);
     }
@@ -133,18 +110,35 @@ public class MNGCauKinhController : NetworkBehaviour
     {
         if (other.name == "Goal")
         {
-            manager.RequestAddRank(Object.Id);
-            SetGoal();
+            manager.RequestAddRank(Object.InputAuthority, Object.Id);
+            if (Object.HasInputAuthority)
+            RPC_RequestSetGoal();
         }
         else if(other.name == "Deadzone")
         {
-            controller.Teleport(manager.spawnPosition.position + new Vector3(0, 3, 0));
+            StartCoroutine(DelayResetCamera());
         }
     }
 
-    void SetGoal()
+    IEnumerator DelayResetCamera()
     {
+        cam.Follow = null;
+        cam.LookAt = null;
 
+        yield return new WaitForSecondsRealtime(1.5f);
+        Vector3 teleportTo = FindFirstObjectByType<PlayerSpawner>().spawnPosition[Runner.LocalPlayer.PlayerId - 1].position;
+        Vector3 delta = transform.position - teleportTo;
+
+        controller.Teleport(teleportTo);
+        cam.transform.position = transform.position;
+        yield return null;
+        cam.Follow = transform;
+        cam.LookAt = transform;
     }
 
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    void RPC_RequestSetGoal()
+    {
+        isGoal = true;
+    }
 }
