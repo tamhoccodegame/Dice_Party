@@ -1,123 +1,89 @@
 ﻿using Fusion;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 
+[RequireComponent(typeof(NetworkCharacterController))]
 [RequireComponent(typeof(CharacterController))]
 public class MNGVongXoayController : NetworkBehaviour
 {
-    private CharacterController controller;
+    private NetworkCharacterController controller;
     private Animator animator;
-
-    public float moveSpeed = 5f;
-    public float rotationSpeed = 10f;
-    public float jumpForce = 5f;
-    public float gravity = -9.81f;
-    public float verticalVelocity;
-
-    [Networked] private Vector2 moveInput { get; set; }
-    [Networked] private bool jumpRequest { get; set; }
-    [Networked] private string NetworkAnim { get; set; } // Animation sync
 
     public VisualEffect bloodEffect;
 
     public string currentAnim;
 
-    VongXoayManager manager;
-
     public override void Spawned()
     {
         bloodEffect.Stop();
-        controller = GetComponent<CharacterController>();
+        controller = GetComponent<NetworkCharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
-        manager = VongXoayManager.instance;
+
+        if (VongXoayManager.instance != null)
+            VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
+
+        Invoke(nameof(ResetGravity), 2f);
+    }
+
+    void ResetGravity()
+    {
+
     }
 
     void Update()
     {
-        if (!Object.HasInputAuthority) return;
 
-        if (manager != null && manager.Object.IsValid && manager.isGameStarted)
-        {
-            // Collect input on client
-            Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-            bool jump = Input.GetKeyDown(KeyCode.Space);
-
-            // Send input to host
-            RPC_SendInput(input, jump);
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_SendInput(Vector2 input, bool jump)
-    {
-        moveInput = input;
-        if (jump) jumpRequest = true;
     }
 
     public override void FixedUpdateNetwork()
     {
-        if (!Object.HasStateAuthority)
+        if (!Object.HasStateAuthority) return;
+
+        if (GetInput(out NetworkInputData data))
         {
-            // Client đọc networked animation state
-            if (NetworkAnim != currentAnim)
+            Vector3 direction = data.direction;
+
+            if (data.buttons.IsSet(NetworkInputData.JUMPBUTTON) && controller.Grounded)
             {
-                animator.CrossFade(NetworkAnim, 0.25f);
-                currentAnim = NetworkAnim;
+                controller.Jump();
+
+                RPC_ChangeAnim("Jump");
             }
-            return;
+
+            // Luôn chạy Move
+            controller.Move(direction);
+
+            // Anim xử lý tách biệt
+            if (controller.Grounded)
+            {
+                if (direction.sqrMagnitude > 0.001f)
+                    RPC_ChangeAnim("Run");
+                else
+                    RPC_ChangeAnim("Idle");
+            }
         }
 
-        // Gravity
-        if (controller.isGrounded && verticalVelocity < 0)
-        {
-            verticalVelocity = -2f;
-        }
-        else
-        {
-            verticalVelocity += gravity * Runner.DeltaTime;
-        }
-
-        // Jump
-        if (jumpRequest && controller.isGrounded)
-        {
-            ChangeAnim("Jump");
-            verticalVelocity = jumpForce;
-        }
-        jumpRequest = false; // reset jump request
-
-        // Movement
-        Vector3 movement = new Vector3(moveInput.x, verticalVelocity, moveInput.y);
-        controller.Move(movement * moveSpeed * Runner.DeltaTime);
-
-        // Rotation
-        Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
-        if (moveDirection.magnitude > 0)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Runner.DeltaTime);
-        }
-
-        // Animation
-        if (controller.isGrounded)
-        {
-            if (moveDirection.magnitude > 0)
-                ChangeAnim("Run");
-            else
-                ChangeAnim("Idle");
-        }
     }
 
-    public void ChangeAnim(string animName, float blendTime = 0.25f)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_ChangeAnim(string animName, float blendTime = 0.25f)
     {
         if (animName == currentAnim) return;
         currentAnim = animName;
 
-        if (Object.HasStateAuthority)
-            NetworkAnim = animName;
-
         animator.CrossFade(animName, blendTime);
     }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestChangeAnim(string animName, float blendTime = 0.25f)
+    {
+        RPC_ChangeAnim(animName, blendTime);
+    }
+
+
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     public void RPC_BloodEffect()
@@ -125,21 +91,37 @@ public class MNGVongXoayController : NetworkBehaviour
         bloodEffect.Play();
     }
 
+    [ContextMenu("Die Simu")]
     public void Die()
     {
         if (VongXoayManager.instance.isGameOver) return;
 
-        RPC_BloodEffect();
-
         if (Object.HasInputAuthority)
         {
-            VongXoayManager.instance.RequestUpdateLive(Runner.LocalPlayer);
+            Debug.Log("DIEE");
+            RPC_BloodEffect();
 
-            if (VongXoayManager.instance.playerLives.Get(Runner.LocalPlayer) <= 0)
-            {
-                RPC_EnableRagdoll();
-            }
+            int currentLive = VongXoayManager.instance.playerLives.Get(Object.Id);
+            VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
+
+            StartCoroutine(DelayCheckDie());
         }
+    }
+
+    IEnumerator DelayCheckDie()
+    {
+        yield return new WaitForSecondsRealtime(0.1f);
+        if (VongXoayManager.instance.playerLives.Get(Object.Id) <= 0)
+        {
+            RPC_RequestChangeAnim("Die");
+            RPC_DisableInput();
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    void RPC_DisableInput()
+    {
+        Destroy(this);
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]

@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class PlayerSetup : NetworkBehaviour
 {
-    public Transform hair;
-    public Transform color;
-    public Transform bodypart;
+    public GameObject[] hairs;
+    public GameObject[] colors;
+    public GameObject[] bodyparts;
 
 
     private void Start()
@@ -37,17 +37,17 @@ public class PlayerSetup : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_UpdateCustom(int hairIndex, int colorIndex, int bodyPartIndex)
     {
-        for (int i = 0; i < hair.childCount; i++)
+        for (int i = 0; i < hairs.Length; i++)
         {
-            hair.GetChild(i).gameObject.SetActive(i == hairIndex);
+            hairs[i].SetActive(i == hairIndex);
         }
-        for (int i = 0; i < color.childCount; i++)
+        for (int i = 0; i < colors.Length; i++)
         {
-            color.GetChild(i).gameObject.SetActive(i == colorIndex);
+            colors[i].SetActive(i == colorIndex);
         }
-        for (int i = 0; i < bodypart.childCount; i++)
+        for (int i = 0; i < bodyparts.Length; i++)
         {
-            bodypart.GetChild(i).gameObject.SetActive(i == bodyPartIndex);
+            bodyparts[i].SetActive(i == bodyPartIndex);
         }
     }
 

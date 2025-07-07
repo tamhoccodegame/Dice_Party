@@ -31,21 +31,21 @@ public class VongXoay : NetworkBehaviour
         if (manager != null && manager.Object.IsValid && manager.isGameStarted)
         {
             // Tăng tốc dần theo thời gian
-            currentSpeed += acceleration * Time.deltaTime;
+            currentSpeed += acceleration * Runner.DeltaTime;
 
             // Quay thuận chiều (kim đồng hồ)
             if (canh1Holder != null)
-                canh1Holder.RotateAround(transform.position, Vector3.up, currentSpeed * Time.deltaTime);
+                canh1Holder.RotateAround(transform.position, Vector3.up, currentSpeed * Runner.DeltaTime);
 
             if (canh3Holder != null)
-                canh3Holder.RotateAround(transform.position, Vector3.up, currentSpeed * Time.deltaTime);
+                canh3Holder.RotateAround(transform.position, Vector3.up, currentSpeed * Runner.DeltaTime);
 
             // Quay ngược chiều
             if (canh2Holder != null)
-                canh2Holder.RotateAround(transform.position, Vector3.up, -currentSpeed * Time.deltaTime);
+                canh2Holder.RotateAround(transform.position, Vector3.up, -currentSpeed * Runner.DeltaTime);
 
             if (canh4Holder != null)
-                canh4Holder.RotateAround(transform.position, Vector3.up, -currentSpeed * Time.deltaTime);
+                canh4Holder.RotateAround(transform.position, Vector3.up, -currentSpeed * Runner.DeltaTime);
         }
 
     }

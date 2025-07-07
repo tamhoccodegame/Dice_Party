@@ -887,7 +887,6 @@ GameObject:
   - component: {fileID: 5198384255179246608}
   - component: {fileID: 5605685285817751349}
   - component: {fileID: 6770067897922902656}
-  - component: {fileID: 3657268301434853531}
   m_Layer: 3
   m_Name: StepText
   m_TagString: Untagged
@@ -902,13 +901,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1277169844122601226}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2935424376565863942}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.31}
@@ -976,7 +975,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sample text
+  m_text: 1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1048,18 +1047,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 5605685285817751349}
   m_maskType: 0
---- !u!114 &3657268301434853531
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1277169844122601226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4a24990025876944a2a7a6e18897c31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1378349192836123811
 GameObject:
   m_ObjectHideFlags: 0
@@ -2842,11 +2829,11 @@ GameObject:
   m_Component:
   - component: {fileID: 2935424376565863942}
   - component: {fileID: 9105315542713420924}
-  - component: {fileID: -1359556976780472910}
   - component: {fileID: -5833059894958035310}
   - component: {fileID: 5673406980010025986}
   - component: {fileID: 2450850399698432518}
   - component: {fileID: 4076572559471206847}
+  - component: {fileID: 6383939286248508818}
   m_Layer: 3
   m_Name: BoardGameCharacter
   m_TagString: Untagged
@@ -2878,6 +2865,7 @@ Transform:
   - {fileID: 5198384255179246608}
   - {fileID: 7374719666135441476}
   - {fileID: 1376241668772365163}
+  - {fileID: 55684509557963458}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &9105315542713420924
@@ -2901,23 +2889,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &-1359556976780472910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2591654762118859964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stateAuthorityChangeErrorCorrectionDelta: 0
-  SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
 --- !u!114 &-5833059894958035310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2936,9 +2907,9 @@ MonoBehaviour:
   NestedObjects:
   - {fileID: 8738965838245190259}
   NetworkedBehaviours:
-  - {fileID: -1359556976780472910}
   - {fileID: 2450850399698432518}
   - {fileID: 4076572559471206847}
+  - {fileID: 6383939286248508818}
   ForceRemoteRenderTimeframe: 0
 --- !u!143 &5673406980010025986
 CharacterController:
@@ -2978,9 +2949,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b8d48cade35023408dfbd668f812fb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hair: {fileID: 5616962125916618925}
-  color: {fileID: 8536833452002015234}
-  bodypart: {fileID: 2766755286650585113}
+  hairs: []
+  colors: []
+  bodyparts: []
 --- !u!114 &4076572559471206847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2993,9 +2964,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0e1f0a1304070f42b048a3e9f9ea9a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 8
-  rotationSpeed: 20
   currentNode: {fileID: 0}
+  currentNodeId: 0
   _currentNodeName: 
   toMoveNode: {fileID: 0}
   _currentStep: 0
@@ -3005,6 +2975,26 @@ MonoBehaviour:
   rollDiceEffect: {fileID: 7433801954753670725}
   dice: {fileID: 7859789439665928958}
   stepText: {fileID: 6770067897922902656}
+  feet: {fileID: 55684509557963458}
+--- !u!114 &6383939286248508818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 378411a89480da345945c2f888327a2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  gravity: -20
+  jumpImpulse: 8
+  acceleration: 30
+  braking: 10
+  maxSpeed: 8
+  rotationSpeed: 15
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0
@@ -5227,6 +5217,37 @@ SkinnedMeshRenderer:
     m_Center: {x: 0, y: -0.16753714, z: 1.3265339}
     m_Extent: {x: 0.2187107, y: 0.07172324, z: 0.08011973}
   m_DirtyAABB: 0
+--- !u!1 &3824294675031859375
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 55684509557963458}
+  m_Layer: 3
+  m_Name: Feet
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &55684509557963458
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3824294675031859375}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2935424376565863942}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3904933067228506324
 GameObject:
   m_ObjectHideFlags: 0
@@ -13240,6 +13261,14 @@ PrefabInstance:
       propertyPath: SortKey
       value: 3786454941
       objectReference: {fileID: 0}
+    - target: {fileID: -8663478987385893353, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8663478987385893353, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+      propertyPath: NetworkedBehaviours.Array.data[0]
+      value: 
+      objectReference: {fileID: 152388229640831936}
     - target: {fileID: 1410115114858327706, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
       propertyPath: m_Name
       value: Dice
@@ -13309,6 +13338,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+--- !u!114 &152388229640831936 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8979980477152368548, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}
+  m_PrefabInstance: {fileID: 9115893555086054500}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7859789439665928958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &7374719666135441476 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1790863190301242400, guid: 10106d521b15bb941b130bcacc41ebea, type: 3}

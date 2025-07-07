@@ -22,12 +22,26 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public static CustomData customData;
 
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        instance = this;
         customData = GetComponent<CustomData>();
         sessionNameInput.onValueChanged.AddListener(UpdateSessionName);
+        MusicManager.instance.PlayMusic(MusicManager.MusicType.Menu);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            runnerInstance.Shutdown();
+        }
     }
 
     public List<PlayerRef> GetAllPlayers()
@@ -95,6 +109,14 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             players.Add(player);
             onPlayerListChange?.Invoke();
+
+            foreach(var p in FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None))
+            {
+                if (p.HasInputAuthority)
+                {
+                    p.RequestApplyCustom(p.currentHairIndex, p.currentColorIndex, p.currentBodypartIndex);
+                }
+            }
         }
     }
 
@@ -143,6 +165,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
+        
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
@@ -179,6 +202,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
+        SceneManager.LoadScene("UI_StartScene");
     }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
