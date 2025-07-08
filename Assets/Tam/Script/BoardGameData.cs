@@ -2,6 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class Inventory
+{
+    public List<BoardItem> items = new ();
+
+    private BoardItem selectedItem;
+
+    public void AddItem(BoardItem item)
+    {
+        items.Add(item);
+    }
+
+    public void SetSelectedItem(BoardItem item)
+    {
+        selectedItem = item;
+    }
+
+    public BoardItem GetSelectedItem()
+    {
+        return selectedItem;
+    }
+
+    public List<BoardItem> GetItemList()
+    {
+        return items;
+    }
+}
+
 public class BoardGameData : MonoBehaviour
 {
     public static BoardGameData instance;
@@ -10,6 +37,7 @@ public class BoardGameData : MonoBehaviour
     public Dictionary<PlayerRef, string> playersName = new Dictionary<PlayerRef, string>();
 
     public Dictionary<PlayerRef, BoardGameStat> playersBoardStat = new Dictionary<PlayerRef, BoardGameStat>();
+    public Dictionary<PlayerRef, Inventory> playersInventory = new Dictionary<PlayerRef, Inventory>();
 
     public PlayerRef winner;
 
@@ -69,13 +97,14 @@ public class BoardGameData : MonoBehaviour
         return null;
     }
 
-    public void EnsurePlayerStat(List<PlayerRef> players)
+    public void EnsurePlayerStatAndInventory(List<PlayerRef> players)
     {
         foreach(var player in players)
         {
             if (!playersBoardStat.ContainsKey(player))
             {
                 playersBoardStat[player] = new BoardGameStat();
+                playersInventory[player] = new Inventory();
             }
         }
     }
@@ -84,11 +113,9 @@ public class BoardGameData : MonoBehaviour
     {
         if (playersBoardStat.ContainsKey(player))
         {
-            BoardGameStat stat = playersBoardStat[player];
-
-            stat.AddItem(item);
-
-            playersBoardStat[player] = stat;
+            Inventory inventory = playersInventory[player];
+            inventory.AddItem(item);
+            inventory.SetSelectedItem(item);
         }
     }
 

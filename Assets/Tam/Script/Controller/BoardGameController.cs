@@ -117,19 +117,20 @@ public class BoardGameController : NetworkBehaviour
                 RPC_RequestDiceRoll();
                 RPC_HideDice();
             }
-            //else if (Input.GetKeyDown(KeyCode.Q))
-            //{
-            //    RPC_HideDice();
-            //    UseSelectedItem();
-            //}
+            else if (Input.GetKeyDown(KeyCode.Q))
+            {
+                RPC_HideDice();
+                UseSelectedItem();
+            }
         }
+
+        Debug.Log(currentState.ToString());
     }
+
     void UseSelectedItem()
     {
         // Ví dụ: inventory đang giữ 1 item là ElectricGun
-        BoardItem selectedItem = BoardGameData.instance.playersBoardStat
-                                 [TurnManager.instance.currentPlayerRef]
-                                 .GetSelectedItem();
+        BoardItem selectedItem = BoardGameData.instance.playersInventory[TurnManager.instance.currentPlayerRef].GetSelectedItem();
 
         
         selectedItem.Use(this); // Gọi logic của item
@@ -140,7 +141,6 @@ public class BoardGameController : NetworkBehaviour
         currentItem = item;
         Debug.Log(currentItem);
         RPC_RequestSetState(State.UsingItem);
-        Debug.Log(currentState.ToString());
     }
 
     public void ClearUsingItem()

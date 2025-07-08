@@ -53,7 +53,7 @@ public class TurnManager : NetworkBehaviour
 
         if (isFirstTry)
         {
-            BoardGameData.instance.EnsurePlayerStat(NetworkManager.instance.GetAllPlayers());
+            BoardGameData.instance.EnsurePlayerStatAndInventory(NetworkManager.instance.GetAllPlayers());
             if (HasStateAuthority) StartCoroutine(DelayPlayIntroCutscene());
         }
         else
