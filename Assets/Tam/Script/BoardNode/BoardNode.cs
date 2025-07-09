@@ -29,7 +29,7 @@ public class BoardNode : NetworkBehaviour
 
     protected void EndTurn(PlayerRef player)
     {
-        BoardGameController[] players = FindObjectsByType<BoardGameController>(FindObjectsSortMode.None);
+        NewBoardGameController[] players = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.None);
 
         foreach (var p in players)
         {

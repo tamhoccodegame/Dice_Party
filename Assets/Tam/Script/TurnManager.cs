@@ -10,7 +10,7 @@ using UnityEngine.UI;
 public class TurnManager : NetworkBehaviour
 {
     public static TurnManager instance;
-    public List<BoardGameController> playerController;
+    public List<NewBoardGameController> playerController;
     [Networked] public int currentPlayerIndex { get; set; }
     [Networked] public PlayerRef currentPlayerRef { get; set; }
 
@@ -49,7 +49,7 @@ public class TurnManager : NetworkBehaviour
         MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
         StartCoroutine(FadeBlackScreen(1, 0));
 
-        playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
+        playerController = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.InstanceID).ToList();
 
         if (isFirstTry)
         {

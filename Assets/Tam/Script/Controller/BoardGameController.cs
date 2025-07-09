@@ -1,7 +1,6 @@
 ﻿using Fusion;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 // Bắt buộc object này phải có CharacterController
@@ -34,8 +33,7 @@ public class BoardGameController : NetworkBehaviour
     // --- Quản lý xúc xắc và UI hiển thị bước ---
     [Header("Dice and Step")]
     public GameObject dice;         // xúc xắc đang spawn trên scene
-    public GameObject stepTextPrefab
-        ;     // text hiện số bước trên UI
+    public GameObject stepTextPrefab;     // text hiện số bước trên UI
 
     // --- State Machine cho việc di chuyển ---
     private enum State { Idle, Rolling, WaitingForAnim, Moving, UsingItem }
@@ -236,8 +234,6 @@ public class BoardGameController : NetworkBehaviour
 
         }
     }
-
-
     // --- Đổi state ---
     private void SetMoveState(State newState)
     {
@@ -272,7 +268,7 @@ public class BoardGameController : NetworkBehaviour
     public void EndTurn()
     {
         BoardGameData boardGameData = BoardGameData.instance;
-        BoardGameController[] players = FindObjectsByType<BoardGameController>(FindObjectsSortMode.None);
+        NewBoardGameController[] players = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.None);
 
         // Lưu trạng thái node hiện tại vào data để đồng bộ map
         foreach (var player in players)
@@ -302,7 +298,7 @@ public class BoardGameController : NetworkBehaviour
 
             ArrowPointer arrow = Instantiate(arrowDirectionPrefab, midPoint, Quaternion.identity).GetComponent<ArrowPointer>();
             arrow.transform.rotation = Quaternion.LookRotation((next.transform.position - currentNode.transform.position), Vector3.up);
-            arrow.Setup(this, i);
+            //arrow.Setup(this, i);
             spawnedArrows.Add(arrow.gameObject);
         }
     }
