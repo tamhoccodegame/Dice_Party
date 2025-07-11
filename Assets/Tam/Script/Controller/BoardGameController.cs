@@ -101,7 +101,7 @@ public class BoardGameController : NetworkBehaviour
 
         if (currentState == State.UsingItem && currentItem != null)
         {
-            currentItem.Tick(this); // Giao quyền xử lý input cho item
+            //currentItem.Tick(this); // Giao quyền xử lý input cho item
             return;
         }
 
@@ -131,7 +131,7 @@ public class BoardGameController : NetworkBehaviour
         BoardItem selectedItem = BoardGameData.instance.playersInventory[TurnManager.instance.currentPlayerRef].GetSelectedItem();
 
         
-        selectedItem.Use(this); // Gọi logic của item
+        //selectedItem.Use(this); // Gọi logic của item
     }
 
     public void SetUsingItem(BoardItem item)

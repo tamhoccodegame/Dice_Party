@@ -8,6 +8,6 @@ public abstract class BoardItem
     public string itemName;
     public GameObject itemPrefab;
 
-    public abstract void Use(BoardGameController controller);
-    public abstract void Tick(BoardGameController controller);
+    public abstract void Use(NewBoardGameController controller);
+    public abstract void Tick(NewBoardGameController controller);
 }

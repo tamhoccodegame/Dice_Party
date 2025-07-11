@@ -3991,6 +3991,7 @@ MonoBehaviour:
   arrowDirectionPrefab: {fileID: 9035063740964656231, guid: e788408d93fc4df4c869f756e543deab, type: 3}
   spawnedArrows: []
   rollDiceEffect: {fileID: 5714308519246576880}
+  gunSpawnPoint: {fileID: 2852378781093316953}
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0
@@ -4667,6 +4668,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2994077577949248436
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2852378781093316953}
+  m_Layer: 3
+  m_Name: GunSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2852378781093316953
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994077577949248436}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.773359, y: -0, z: 0.6339683, w: 0}
+  m_LocalPosition: {x: 1.686, y: -0.06, z: -0.014}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8093806596086079961}
+  m_LocalEulerAnglesHint: {x: 0, y: -258.687, z: -180}
 --- !u!1 &3018203933035504227
 GameObject:
   m_ObjectHideFlags: 0
@@ -10733,6 +10765,7 @@ Transform:
   - {fileID: 2587766814923461780}
   - {fileID: 5262639414972325752}
   - {fileID: 4108640020523232700}
+  - {fileID: 2852378781093316953}
   m_Father: {fileID: 8869416843177938360}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6464695342959024423

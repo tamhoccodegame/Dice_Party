@@ -40,6 +40,9 @@ public class NewBoardGameController : NetworkBehaviour
     [Header("Effect")]
     public ParticleSystem rollDiceEffect;
 
+    public BoardItem currentItem;
+    public Transform gunSpawnPoint;
+
     public override void Spawned()
     {
         animator = GetComponent<Animator>();

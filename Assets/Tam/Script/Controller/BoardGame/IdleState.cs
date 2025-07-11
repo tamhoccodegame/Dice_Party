@@ -26,9 +26,15 @@ public class IdleState : BoardState
 
     public override void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && controller.isMyTurn)
+        if (!controller.isMyTurn) return;
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             controller.RPC_RequestRollDice();
+        }
+        else if(Input.GetKeyDown(KeyCode.Q))
+        {
+            controller.ChangeState(controller.itemState);
         }
     }
 
