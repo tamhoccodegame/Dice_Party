@@ -7,13 +7,12 @@ public class PlayerMovements : MonoBehaviour
     public float runSpeed = 5f;
     public float jumpHeight = 1.2f;
     public float gravity = -30f;
-    public float fallMultiplier = 3.5f;
-    public float accelerationTime = 0.07f;
-    public float rotationSpeed = 12f;
+    public float accelerationTime = 0.05f;
+    public float rotationSpeed = 15f;
 
     [Header("Ground Check")]
     public Transform groundCheck;
-    public float groundDistance = 0.3f;
+    public float groundRayLength = 1f;
     public LayerMask groundMask;
 
     [Header("Jump Assist")]
@@ -35,6 +34,7 @@ public class PlayerMovements : MonoBehaviour
     private bool isGrounded;
     private bool wasGrounded;
     private bool isJumping;
+    private bool hasTriggeredJumpAir;
 
     private float coyoteTimer;
     private float jumpBufferTimer;
@@ -46,48 +46,57 @@ public class PlayerMovements : MonoBehaviour
         cam = Camera.main.transform;
 
         if (!animator) Debug.LogError("Animator not found!");
-        if (!cam) Debug.LogError("Main Camera not tagged or missing!");
+        if (!cam) Debug.LogError("Main Camera not found!");
     }
 
     void Update()
     {
-        UpdateGroundCheck();
-
-        // Buffer input Jump
-        if (Input.GetKeyDown(KeyCode.Space))
-            jumpBufferTimer = jumpBufferTime;
-        else
-            jumpBufferTimer -= Time.deltaTime;
-
+        CacheInputs();
         UpdateCoyoteTime();
         HandleJump();
-
-        HandleMovement();
+        HandleMovement();       // ⬅️ Move trước
+        UpdateGroundCheck();    // ⬅️ Check sau khi Move
         HandleRotation();
         HandleAnimation();
+    }
+
+
+    void CacheInputs()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            jumpBufferTimer = jumpBufferTime;
+        }
+        else
+        {
+            jumpBufferTimer -= Time.deltaTime;
+        }
     }
 
     void UpdateGroundCheck()
     {
         wasGrounded = isGrounded;
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        isGrounded = Physics.Raycast(groundCheck.position, Vector3.down, groundRayLength, groundMask);
 
-        if (isGrounded && verticalVelocity < 0f)
+        Debug.DrawRay(groundCheck.position, Vector3.down * groundRayLength, isGrounded ? Color.green : Color.red, 0.1f);
+
+        if (!wasGrounded && isGrounded)
         {
+            Debug.Log("🟢 Landed - Trigger JumpEnd");
+
             verticalVelocity = -2f;
             isJumping = false;
+            hasTriggeredJumpAir = false;
 
-            if (!wasGrounded)
-                animator.ResetTrigger("isJump");
+            animator.ResetTrigger("JumpStart");
+            animator.ResetTrigger("JumpAir");
+            animator.SetTrigger("JumpEnd");
         }
     }
 
     void UpdateCoyoteTime()
     {
-        if (isGrounded)
-            coyoteTimer = coyoteTime;
-        else
-            coyoteTimer -= Time.deltaTime;
+        coyoteTimer = isGrounded ? coyoteTime : coyoteTimer - Time.deltaTime;
     }
 
     void HandleJump()
@@ -99,8 +108,14 @@ public class PlayerMovements : MonoBehaviour
             coyoteTimer = 0f;
 
             verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            animator.SetTrigger("isJump");
+            animator.ResetTrigger("JumpEnd");
+            animator.SetTrigger("JumpStart");
+
+            Debug.Log("🔼 Jump Triggered");
         }
+
+        // Áp lực trọng lực
+        verticalVelocity += gravity * Time.deltaTime;
     }
 
     void HandleMovement()
@@ -125,17 +140,6 @@ public class PlayerMovements : MonoBehaviour
         Vector3 targetVelocity = moveDir * targetSpeed;
 
         horizontalVelocity = Vector3.SmoothDamp(horizontalVelocity, targetVelocity, ref velocitySmooth, accelerationTime);
-
-        // Gravity
-        if (!isGrounded)
-        {
-            float gravityMultiplier = (verticalVelocity < 0f) ? fallMultiplier : 1f;
-            verticalVelocity += gravity * gravityMultiplier * Time.deltaTime;
-        }
-        else
-        {
-            verticalVelocity += gravity * Time.deltaTime;
-        }
 
         Vector3 finalMove = horizontalVelocity + Vector3.up * verticalVelocity;
         controller.Move(finalMove * Time.deltaTime);
@@ -173,29 +177,40 @@ public class PlayerMovements : MonoBehaviour
 
         animator.SetFloat("VelocityX", currentAnimVelocity.x);
         animator.SetFloat("VelocityZ", currentAnimVelocity.y);
-        animator.SetBool("IsGrounded", isGrounded);
         animator.SetFloat("VerticalSpeed", verticalVelocity);
+        animator.SetBool("IsGrounded", isGrounded);
+
+        if (!isGrounded && verticalVelocity < 0f && isJumping && !hasTriggeredJumpAir)
+        {
+            animator.SetTrigger("JumpAir");
+            hasTriggeredJumpAir = true;
+        }
     }
 
 
     //[Header("Movement Settings")]
     //public float walkSpeed = 2f;
     //public float runSpeed = 5f;
-    //public float jumpHeight = 1.5f;
-    //public float gravity = -9.81f;
-    //public float accelerationTime = 0.1f;
-    //public float rotationSpeed = 10f;
+    //public float jumpHeight = 1.2f;
+    //public float gravity = -30f;
+    //public float fallMultiplier = 3f;
+    //public float accelerationTime = 0.05f;
+    //public float rotationSpeed = 15f;
 
     //[Header("Ground Check")]
     //public Transform groundCheck;
-    //public float groundDistance = 0.3f;
+    //public float groundRayLength = 0.45f;
     //public LayerMask groundMask;
+
+    //[Header("Jump Assist")]
+    //public float coyoteTime = 0.15f;
+    //public float jumpBufferTime = 0.15f;
 
     //private CharacterController controller;
     //private Animator animator;
     //private Transform cam;
 
-    //private Vector3 velocity;
+    //private Vector3 horizontalVelocity;
     //private Vector3 velocitySmooth;
     //private float verticalVelocity;
 
@@ -207,40 +222,105 @@ public class PlayerMovements : MonoBehaviour
     //private bool wasGrounded;
     //private bool isJumping;
 
+    //private float coyoteTimer;
+    //private float jumpBufferTimer;
+
+    //private bool jumpPressed;
+
     //void Start()
     //{
     //    controller = GetComponent<CharacterController>();
     //    animator = GetComponentInChildren<Animator>();
     //    cam = Camera.main.transform;
 
-    //    if (animator == null) Debug.LogError("Animator not found!");
-    //    if (cam == null) Debug.LogError("Main Camera not tagged or missing!");
+    //    if (!animator) Debug.LogError("Animator not found!");
+    //    if (!cam) Debug.LogError("Main Camera not found!");
     //}
 
     //void Update()
     //{
+    //    CacheInputs();
     //    UpdateGroundCheck();
+    //    UpdateCoyoteTime();
+    //    HandleJump();
     //    HandleMovement();
     //    HandleRotation();
     //    HandleAnimation();
     //}
 
+    //void CacheInputs()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.Space))
+    //    {
+    //        jumpBufferTimer = jumpBufferTime;
+    //        jumpPressed = true;
+    //    }
+    //    else
+    //    {
+    //        jumpBufferTimer -= Time.deltaTime;
+    //    }
+    //}
+
     //void UpdateGroundCheck()
     //{
     //    wasGrounded = isGrounded;
-    //    isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+    //    isGrounded = Physics.Raycast(groundCheck.position, Vector3.down, groundRayLength, groundMask);
 
-    //    if (isGrounded && verticalVelocity < 0)
+    //    //if (!wasGrounded && isGrounded)
+    //    //{
+    //    //    Debug.Log("🟢 Landed - Trigger JumpEnd");
+
+    //    //    verticalVelocity = -2f;
+    //    //    isJumping = false;
+
+    //    //    animator.ResetTrigger("JumpStart");
+    //    //    animator.ResetTrigger("JumpAir");
+    //    //    animator.SetTrigger("JumpEnd");
+    //    //}
+
+    //    if (!wasGrounded && isGrounded)
     //    {
+    //        Debug.Log("🟢 Landed - Trigger JumpEnd");
+
     //        verticalVelocity = -2f;
     //        isJumping = false;
 
-    //        // Nếu vừa mới chạm đất
-    //        if (!wasGrounded)
-    //        {
-    //            animator.ResetTrigger("isJump");
-    //        }
+    //        animator.ResetTrigger("JumpStart");
+    //        animator.ResetTrigger("JumpAir");
+    //        animator.SetTrigger("JumpEnd");
     //    }
+    //}
+
+    //void UpdateCoyoteTime()
+    //{
+    //    coyoteTimer = isGrounded ? coyoteTime : coyoteTimer - Time.deltaTime;
+    //}
+
+    //void HandleJump()
+    //{
+    //    if (jumpBufferTimer > 0f && coyoteTimer > 0f && !isJumping)
+    //    {
+    //        isJumping = true;
+    //        jumpBufferTimer = 0f;
+    //        coyoteTimer = 0f;
+
+    //        verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+    //        animator.ResetTrigger("JumpEnd");
+    //        animator.SetTrigger("JumpStart");
+
+    //        Debug.Log("🔼 Jump Triggered");
+    //    }
+
+    //    // Gravity
+    //    float gravityMultiplier = verticalVelocity < 0f ? fallMultiplier : 1f;
+    //    verticalVelocity += gravity * gravityMultiplier * Time.deltaTime;
+
+    //    // Variable Jump Height
+    //    if (isJumping && verticalVelocity > 0f && !Input.GetKey(KeyCode.Space))
+    //    {
+    //        verticalVelocity += gravity * (fallMultiplier - 1f) * Time.deltaTime * 2f;
+    //    }
+
     //}
 
     //void HandleMovement()
@@ -248,14 +328,13 @@ public class PlayerMovements : MonoBehaviour
     //    float horizontal = Input.GetAxisRaw("Horizontal");
     //    float vertical = Input.GetAxisRaw("Vertical");
     //    bool isRunning = Input.GetKey(KeyCode.LeftShift);
-    //    bool isJumpPressed = Input.GetKeyDown(KeyCode.Space);
 
     //    Vector3 inputDir = new Vector3(horizontal, 0f, vertical).normalized;
 
     //    Vector3 camForward = cam.forward;
     //    Vector3 camRight = cam.right;
-    //    camForward.y = 0;
-    //    camRight.y = 0;
+    //    camForward.y = 0f;
+    //    camRight.y = 0f;
     //    camForward.Normalize();
     //    camRight.Normalize();
 
@@ -265,32 +344,11 @@ public class PlayerMovements : MonoBehaviour
     //    float targetSpeed = (isRunning && inputDir != Vector3.zero) ? runSpeed : walkSpeed;
     //    Vector3 targetVelocity = moveDir * targetSpeed;
 
-    //    velocity = Vector3.SmoothDamp(velocity, targetVelocity, ref velocitySmooth, accelerationTime);
+    //    horizontalVelocity = Vector3.SmoothDamp(horizontalVelocity, targetVelocity, ref velocitySmooth, accelerationTime);
 
-    //    // Jump
-    //    if (isGrounded && isJumpPressed && !isJumping)
-    //    {
-    //        isJumping = true;
-    //        verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-    //        animator.SetTrigger("isJump"); // Nhảy vào JumpStart
-    //    }
-
-    //    // Gravity
-    //    verticalVelocity += gravity * Time.deltaTime;
-
-    //    Vector3 finalMove = velocity + Vector3.up * verticalVelocity;
+    //    Vector3 finalMove = horizontalVelocity + Vector3.up * verticalVelocity;
     //    controller.Move(finalMove * Time.deltaTime);
     //}
-
-    ////void HandleRotation()
-    ////{
-    ////    Vector3 flatVelocity = new Vector3(velocity.x, 0f, velocity.z);
-    ////    if (flatVelocity.magnitude > 0.1f)
-    ////    {
-    ////        Quaternion targetRotation = Quaternion.LookRotation(flatVelocity);
-    ////        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-    ////    }
-    ////}
 
     //void HandleRotation()
     //{
@@ -308,29 +366,53 @@ public class PlayerMovements : MonoBehaviour
     //        camForward.Normalize();
     //        camRight.Normalize();
 
-    //        Vector3 targetDirection = camForward * inputDir.z + camRight * inputDir.x;
-
-    //        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+    //        Vector3 targetDir = camForward * inputDir.z + camRight * inputDir.x;
+    //        Quaternion targetRotation = Quaternion.LookRotation(targetDir);
     //        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     //    }
     //}
 
+    ////void HandleAnimation()
+    ////{
+    ////    Vector3 localVelocity = transform.InverseTransformDirection(horizontalVelocity);
+    ////    float normalizedX = Mathf.SmoothDamp(currentAnimVelocity.x, localVelocity.x / runSpeed, ref velocityXSmooth, 0.05f);
+    ////    float normalizedZ = Mathf.SmoothDamp(currentAnimVelocity.y, localVelocity.z / runSpeed, ref velocityZSmooth, 0.05f);
+
+    ////    currentAnimVelocity = new Vector2(normalizedX, normalizedZ);
+
+    ////    animator.SetFloat("VelocityX", currentAnimVelocity.x);
+    ////    animator.SetFloat("VelocityZ", currentAnimVelocity.y);
+    ////    animator.SetFloat("VerticalSpeed", verticalVelocity);
+    ////    animator.SetBool("IsGrounded", isGrounded);
+
+    ////    if (!isGrounded && verticalVelocity < 0f && isJumping)
+    ////    {
+    ////        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("JumpAir"))
+    ////        {
+    ////            animator.SetTrigger("JumpAir");
+    ////        }
+    ////    }
+    ////}
 
     //void HandleAnimation()
     //{
-    //    // Blend cho 2DMoveBlendTree
-    //    Vector3 localVelocity = transform.InverseTransformDirection(velocity);
-    //    float normalizedX = Mathf.SmoothDamp(currentAnimVelocity.x, localVelocity.x / runSpeed, ref velocityXSmooth, 0.1f);
-    //    float normalizedZ = Mathf.SmoothDamp(currentAnimVelocity.y, localVelocity.z / runSpeed, ref velocityZSmooth, 0.1f);
+    //    Vector3 localVelocity = transform.InverseTransformDirection(horizontalVelocity);
+    //    float normalizedX = Mathf.SmoothDamp(currentAnimVelocity.x, localVelocity.x / runSpeed, ref velocityXSmooth, 0.05f);
+    //    float normalizedZ = Mathf.SmoothDamp(currentAnimVelocity.y, localVelocity.z / runSpeed, ref velocityZSmooth, 0.05f);
 
     //    currentAnimVelocity = new Vector2(normalizedX, normalizedZ);
 
     //    animator.SetFloat("VelocityX", currentAnimVelocity.x);
     //    animator.SetFloat("VelocityZ", currentAnimVelocity.y);
-
-    //    // Animation Jump các state riêng
-    //    animator.SetBool("IsGrounded", isGrounded);
     //    animator.SetFloat("VerticalSpeed", verticalVelocity);
+    //    animator.SetBool("IsGrounded", isGrounded);
+
+    //    // GỌI JumpAir CHỈ 1 LẦN DUY NHẤT
+    //    if (!isGrounded && verticalVelocity < 0f && isJumping &&
+    //        !animator.GetCurrentAnimatorStateInfo(0).IsName("JumpAir"))
+    //    {
+    //        animator.SetTrigger("JumpAir");
+    //    }
     //}
 
 }
