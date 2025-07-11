@@ -11,9 +11,7 @@ public class ItemState : BoardState
 
     public override void Enter()
     {
-        BoardItem item = BoardGameData.instance.playersInventory[controller.Object.InputAuthority].GetSelectedItem();
-        controller.currentItem = item;
-        controller.currentItem.Use(controller);
+        controller.RequestSetUsingItem(0);
     }
 
     public override void Exit()

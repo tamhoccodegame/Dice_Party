@@ -54,7 +54,25 @@ public class TurnManager : NetworkBehaviour
         if (isFirstTry)
         {
             BoardGameData.instance.EnsurePlayerStatAndInventory(NetworkManager.instance.GetAllPlayers());
-            if (HasStateAuthority) StartCoroutine(DelayPlayIntroCutscene());
+            if (HasStateAuthority && introCutscene.gameObject.activeSelf) StartCoroutine(DelayPlayIntroCutscene());
+            else
+            {
+                if (Object.HasStateAuthority)
+                {
+                    RPC_ShowChestGoldAndStartFirstTurn();
+                    if (isFirstTry)
+                    {
+                        StartCoroutine(DelayUpdatePlayerUI());
+
+                        foreach (var player in NetworkManager.instance.GetAllPlayers())
+                        {
+                            BoardGameData.instance.UpdateItem(player, new ElectricGun());
+                        }
+                    }
+
+                    RPC_UpdatePlayerDataUI();
+                }
+            }
         }
         else
         {
@@ -66,10 +84,10 @@ public class TurnManager : NetworkBehaviour
                 {
                     StartCoroutine(DelayUpdatePlayerUI());
 
-                    foreach (var player in NetworkManager.instance.GetAllPlayers())
-                    {
-                        BoardGameData.instance.UpdateItem(player, new ElectricGun());
-                    }
+                    //foreach (var player in NetworkManager.instance.GetAllPlayers())
+                    //{
+                    //    BoardGameData.instance.UpdateItem(player, new ElectricGun());
+                    //}
                 }
 
                 RPC_UpdatePlayerDataUI();

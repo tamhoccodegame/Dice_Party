@@ -1,21 +1,19 @@
-﻿using System.Collections;
+﻿using Fusion;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.VFX;
 
 public class ElectricGun : BoardItem
 {
-    private GameObject spawnedGun;
     public override void Use(NewBoardGameController controller)
     {
         if (!controller.HasInputAuthority) return;
-        controller.RPC_ChangeAnimation("GunAim");
-        itemPrefab = ItemDatabase.instance.GetItemPrefab("ElectricGun");
 
-        spawnedGun = Object.Instantiate(itemPrefab,
-            controller.gunSpawnPoint.position,
-            controller.gunSpawnPoint.rotation,
-            controller.gunSpawnPoint);
-        spawnedGun.GetComponent<VisualEffect>().Stop();
+        //controller.RequestChangeAnimation("GunAim");
+
+        controller.RPC_SetItemPosition(0);
+
+        GetComponent<VisualEffect>().Stop();
     }
 
     public override void Tick(NewBoardGameController controller)
@@ -33,15 +31,15 @@ public class ElectricGun : BoardItem
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            controller.StartCoroutine(FireGunCoroutine(controller));
+            controller.RPC_RequestTriggerItem();
         }
     }
 
-    IEnumerator FireGunCoroutine(NewBoardGameController controller)
+    public override IEnumerator ProcessCoroutine(NewBoardGameController controller)
     {
-        spawnedGun.GetComponent<VisualEffect>().Play();
+        GetComponent<VisualEffect>().Play();
         yield return new WaitForSecondsRealtime(5f);
-        Object.Destroy(spawnedGun);
         controller.ChangeState(controller.idleState);
+        ItemDatabase.instance.ReturnItemPosition(this);
     }
 }

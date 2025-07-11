@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class ItemInfo
+public class ItemDictionary
 {
-    public string itemName;
-    public GameObject itemPrefab;
+    public int itemId;
+    public BoardItem item;
 }
 
 public class ItemDatabase : MonoBehaviour
 {
     public static ItemDatabase instance;
-
-    public List<ItemInfo> itemInfos;
+    public List<ItemDictionary> itemDictionary;
 
     private void Awake()
     {
@@ -21,20 +20,35 @@ public class ItemDatabase : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public GameObject GetItemPrefab(string itemName)
+    public int GetIdByItem(BoardItem _item)
     {
-        ItemInfo itemInfo = null;
-        foreach(ItemInfo item in itemInfos)
+        foreach(var item in itemDictionary)
         {
-            if (item.itemName == itemName)
-            {
-                itemInfo = item;
-                break;
-            }
+            if(item.item == _item) return item.itemId;
         }
+        return -1;
+    }
 
-        if (itemInfo != null)
-            return itemInfo.itemPrefab;
+    public BoardItem GetItemByItemId(int itemId)
+    {
+        foreach(var item in itemDictionary)
+        {
+            if(item.itemId == itemId) return item.item;
+        }
         return null;
     }
+
+    public void ReturnItemPosition(BoardItem _item)
+    {
+        foreach(var item in itemDictionary)
+        {
+            if(item.item == _item)
+            {
+                item.item.transform.position = transform.position;
+                item.item.transform.SetParent(transform);
+                return;
+            }
+        }
+    }
+
 }

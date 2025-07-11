@@ -85,6 +85,26 @@ public class NewBoardGameController : NetworkBehaviour
 
         if (Object.HasStateAuthority)
         RPC_ChangeAnimation(newState.ToString());
+        else
+        RPC_RequestChangeAnimation(currentState.ToString());
+    }
+
+    public void RequestChangeAnimation(string animName)
+    {
+        if (Object.HasStateAuthority)
+        {
+            RPC_ChangeAnimation(animName);
+        }
+        else
+        {
+            RPC_RequestChangeAnimation(animName);
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestChangeAnimation(string animName)
+    {
+        RPC_ChangeAnimation(animName);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -274,5 +294,62 @@ public class NewBoardGameController : NetworkBehaviour
         currentNode = Runner.FindObject(nodeId).GetComponent<BoardNode>();
         currentNodeName = currentNode.name;
     }
+    #endregion
+
+    #region ItemRef
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestUsingItem(int itemId)
+    {
+        RPC_SetUsingItem(itemId);
+    }
+
+    public void RequestSetUsingItem(int itemId)
+    {
+        if (Object.HasStateAuthority)
+        {
+            RPC_SetUsingItem(itemId);
+        }
+        else
+        {
+            RPC_RequestUsingItem(itemId);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_SetUsingItem(int itemId)
+    {
+        BoardItem item = ItemDatabase.instance.GetItemByItemId(itemId);
+
+        //if (item != null)
+        {
+            currentItem = item;
+            currentItem.Use(this);
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_SetItemPosition(int itemId)
+    {
+        var itemTransform = ItemDatabase.instance.GetItemByItemId(itemId).transform;
+
+        itemTransform.SetParent(gunSpawnPoint);
+        itemTransform.transform.localPosition = Vector3.zero;
+        itemTransform.localRotation = Quaternion.identity;
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestTriggerItem()
+    {
+        RPC_TriggerItem();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+
+    public void RPC_TriggerItem()
+    {
+        StartCoroutine(currentItem.ProcessCoroutine(this));
+    }
+
     #endregion
 }

@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BoardItem
+[RequireComponent(typeof(NetworkObject), typeof(NetworkTransform))]
+public abstract class BoardItem : NetworkBehaviour
 {
-    public string itemName;
-    public GameObject itemPrefab;
-
     public abstract void Use(NewBoardGameController controller);
     public abstract void Tick(NewBoardGameController controller);
+
+    public abstract IEnumerator ProcessCoroutine(NewBoardGameController controller);
 }
