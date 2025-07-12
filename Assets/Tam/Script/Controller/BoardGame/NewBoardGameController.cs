@@ -18,6 +18,17 @@ public class NewBoardGameController : NetworkBehaviour
     public ItemState itemState;
     public NodeState nodeState;
 
+    public enum NetworkState
+    {
+        Idle,
+        Moving,
+        ChooseDirection,
+        Item,
+        Node,
+    }
+
+    [Networked, UnitySerializeField] public NetworkState networkState { get; set; }
+
     [Networked] public int StepsLeft { get; set; }
     public bool isMyTurn => Runner.LocalPlayer == TurnManager.instance.currentPlayerRef;
 
@@ -74,24 +85,59 @@ public class NewBoardGameController : NetworkBehaviour
 
         toMoveNode = currentNode.nextNodes[0];
 
-        ChangeState(idleState);
+        if(HasStateAuthority)
+        RPC_ChangeNetworkState(NetworkState.Idle);
     }
 
-    public void ChangeState(BoardState newState)
+    public void RequestChangeState(NetworkState newState)
+    {
+        if (HasStateAuthority)
+        {
+            networkState = newState;
+            RPC_ChangeNetworkState(newState);
+        }
+        else
+        {
+            RPC_RequestChangeNetworkState(newState);
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    void RPC_RequestChangeNetworkState(NetworkState newState)
+    {
+        networkState = newState;
+        RPC_ChangeNetworkState(networkState);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_ChangeNetworkState(NetworkState newState)
     {
         currentState?.Exit();
-        currentState = newState;
-        currentState.Enter();
+        switch (newState)
+        {
+            case NetworkState.Idle:
+                currentState = idleState;
+                break;
+            case NetworkState.Moving:
+                currentState = movingState;
+                break;
+            case NetworkState.ChooseDirection:
+                currentState = chooseDirectionState;
+                break;
+            case NetworkState.Item:
+                currentState = itemState;
+                break;
+            case NetworkState.Node:
+                currentState = nodeState;
+                break;
+        }
 
-        if (Object.HasStateAuthority)
-        RPC_ChangeAnimation(newState.ToString());
-        else
-        RPC_RequestChangeAnimation(currentState.ToString());
+        currentState.Enter();
     }
 
     public void RequestChangeAnimation(string animName)
     {
-        if (Object.HasStateAuthority)
+        if (HasStateAuthority)
         {
             RPC_ChangeAnimation(animName);
         }
@@ -117,13 +163,13 @@ public class NewBoardGameController : NetworkBehaviour
     {
         if (Object.HasInputAuthority)
         {
-            Debug.Log(currentState);
             currentState?.Update();
         }
     }
 
     public override void FixedUpdateNetwork()
     {
+        if (!HasStateAuthority) return;
         currentState?.FixedUpdateNetwork();
     }
 
@@ -146,7 +192,7 @@ public class NewBoardGameController : NetworkBehaviour
         {
             if(currentNode.nextNodes.Count > 1)
             {
-                ChangeState(chooseDirectionState);
+                RPC_ChangeNetworkState(NetworkState.ChooseDirection);
                 yield break;
             }
             StepsLeft = 3;
@@ -154,7 +200,8 @@ public class NewBoardGameController : NetworkBehaviour
 
         RPC_ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
-        ChangeState(movingState);
+
+        RequestChangeState(NetworkState.Moving);
     }
 
     // Di chuyển từng bước
@@ -177,7 +224,7 @@ public class NewBoardGameController : NetworkBehaviour
             {
                 if(currentNode.nextNodes.Count > 1)
                 {
-                    ChangeState(chooseDirectionState);
+                    RequestChangeState(NetworkState.ChooseDirection);
                     return true;
                 }
                 else
@@ -262,7 +309,7 @@ public class NewBoardGameController : NetworkBehaviour
     void RPC_ChooseDirection(int index)
     {
         toMoveNode = currentNode.nextNodes[index];
-        ChangeState(movingState);
+        RequestChangeState(NetworkState.Moving);
     }
 
     private void ShowDice()
@@ -271,7 +318,7 @@ public class NewBoardGameController : NetworkBehaviour
     }
 
     #region RPC
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_HideDice()
     {
         StartCoroutine(HideDiceCoroutine());
@@ -306,7 +353,7 @@ public class NewBoardGameController : NetworkBehaviour
 
     public void RequestSetUsingItem(int itemId)
     {
-        if (Object.HasStateAuthority)
+        if (HasStateAuthority)
         {
             RPC_SetUsingItem(itemId);
         }
@@ -320,7 +367,6 @@ public class NewBoardGameController : NetworkBehaviour
     public void RPC_SetUsingItem(int itemId)
     {
         BoardItem item = ItemDatabase.instance.GetItemByItemId(itemId);
-
         //if (item != null)
         {
             currentItem = item;
@@ -328,9 +374,28 @@ public class NewBoardGameController : NetworkBehaviour
         }
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RequestSetItemPosition(int itemId)
+    {
+        if (HasStateAuthority)
+        {
+            RPC_SetItemPosition(itemId);
+        }
+        else
+        {
+            RPC_RequestSetItemPosition(itemId);
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestSetItemPosition(int itemId)
+    {
+        RPC_SetItemPosition(itemId);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_SetItemPosition(int itemId)
     {
+        Debug.Log("Alo em");
         var itemTransform = ItemDatabase.instance.GetItemByItemId(itemId).transform;
 
         itemTransform.SetParent(gunSpawnPoint);

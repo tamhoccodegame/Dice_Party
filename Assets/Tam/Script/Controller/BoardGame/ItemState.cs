@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +11,7 @@ public class ItemState : BoardState
 
     public override void Enter()
     {
+        controller.RequestChangeAnimation("GunAim");
         controller.RequestSetUsingItem(0);
     }
 
@@ -20,10 +21,7 @@ public class ItemState : BoardState
 
     public override void FixedUpdateNetwork()
     {
-        if(controller.currentItem != null)
-        {
-            controller.currentItem.Tick(controller);
-        }
+        controller.currentItem.Tick(controller);
     }
 
     public override void HandleInput()

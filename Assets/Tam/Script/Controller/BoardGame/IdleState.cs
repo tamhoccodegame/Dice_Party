@@ -10,6 +10,7 @@ public class IdleState : BoardState
 
     public override void Enter()
     {
+        controller.RequestChangeAnimation("Idle");
     }
 
     public override void Exit()
@@ -34,7 +35,7 @@ public class IdleState : BoardState
         }
         else if(Input.GetKeyDown(KeyCode.Q))
         {
-            controller.ChangeState(controller.itemState);
+            controller.RequestChangeState(NewBoardGameController.NetworkState.Item);
         }
     }
 

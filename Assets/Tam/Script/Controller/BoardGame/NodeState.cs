@@ -10,6 +10,7 @@ public class NodeState : BoardState
 
     public override void Enter()
     {
+        controller.RequestChangeAnimation("Idle");
         controller.currentNode.ProcessNode(controller.Object.InputAuthority, controller.Object.Id);
     }
 

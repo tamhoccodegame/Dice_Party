@@ -7,26 +7,28 @@ public class ElectricGun : BoardItem
 {
     public override void Use(NewBoardGameController controller)
     {
-        if (!controller.HasInputAuthority) return;
+        controller.RequestChangeAnimation("GunAim");
 
-        //controller.RequestChangeAnimation("GunAim");
-
-        controller.RPC_SetItemPosition(0);
+        controller.RequestSetItemPosition(0);
 
         GetComponent<VisualEffect>().Stop();
     }
 
     public override void Tick(NewBoardGameController controller)
     {
+
         controller.GetComponent<CharacterController>().enabled = false;
 
-        float h = Input.GetAxisRaw("Horizontal");
-
-        float rotationSpeed = 90f; // độ/giây, quay 90 độ mỗi giây nếu giữ A hoặc D
-
-        if (Mathf.Abs(h) > 0.01f)
+        if(GetInput(out NetworkInputData inputData))
         {
-            controller.transform.Rotate(0f, h * rotationSpeed * Time.deltaTime, 0f);
+            float rotationSpeed = 90f; // độ/giây, quay 90 độ mỗi giây nếu giữ A hoặc D
+
+            Vector2 direction = inputData.direction;
+
+            if (direction.x != 0)
+            {
+                controller.transform.Rotate(0f, direction.x * rotationSpeed * Time.deltaTime, 0f);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -39,7 +41,7 @@ public class ElectricGun : BoardItem
     {
         GetComponent<VisualEffect>().Play();
         yield return new WaitForSecondsRealtime(5f);
-        controller.ChangeState(controller.idleState);
+        controller.RequestChangeState(NewBoardGameController.NetworkState.Idle);
         ItemDatabase.instance.ReturnItemPosition(this);
     }
 }

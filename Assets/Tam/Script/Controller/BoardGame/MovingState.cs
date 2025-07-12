@@ -10,6 +10,7 @@ public class MovingState : BoardState
 
     public override void Enter()
     {
+        controller.RequestChangeAnimation("Run");
     }
 
     public override void Exit()
@@ -20,7 +21,7 @@ public class MovingState : BoardState
     {
         if (!controller.MoveStep())
         {
-            controller.ChangeState(controller.nodeState);
+            controller.RequestChangeState(NewBoardGameController.NetworkState.Node);
         }
     }
 
