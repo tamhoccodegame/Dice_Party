@@ -3963,6 +3963,7 @@ GameObject:
   - component: {fileID: 8355820250530106322}
   - component: {fileID: 2364766849608134301}
   - component: {fileID: 9088320632722768333}
+  - component: {fileID: 5588281625366019359}
   m_Layer: 3
   m_Name: ChayTruongCharacter
   m_TagString: Player
@@ -4035,6 +4036,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 2364766849608134301}
   - {fileID: 9088320632722768333}
+  - {fileID: 5588281625366019359}
   ForceRemoteRenderTimeframe: 0
 --- !u!143 &8355820250530106322
 CharacterController:
@@ -4093,10 +4095,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f2748b53e24a1a4b8ab8e9534933a6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cam: {fileID: 0}
   coinMask:
     serializedVersion: 2
     m_Bits: 2048
   currentAnim: 
+--- !u!114 &5588281625366019359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1737a1ed7962da344af34f684a0a9c75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 0}
+  invincibleDuration: 2
+  blinkInterval: 0.15
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0

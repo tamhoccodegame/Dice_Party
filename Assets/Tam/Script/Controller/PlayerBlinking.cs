@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
-public class PlayerBlinking : MonoBehaviour
+public class PlayerBlinking : NetworkBehaviour
 {
     [Header("Animation & Invincibility")]
     public Animator animator;
     public float invincibleDuration = 2f;
     public float blinkInterval = 0.15f;
 
-    private bool isInvincible = false;
-    private bool isBlinking = false;
+    [Networked] private NetworkBool isInvincible { get; set; }
+    [Networked] private NetworkBool isBlinking { get; set; }
 
     private List<SkinnedMeshRenderer> skinnedMeshes = new List<SkinnedMeshRenderer>();
 
@@ -19,26 +20,34 @@ public class PlayerBlinking : MonoBehaviour
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
 
-        // Lấy toàn bộ SkinnedMeshRenderer trong con cháu
         skinnedMeshes.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>());
     }
 
     public void OnHitByObstacle(Vector3 hitPoint)
     {
+        if (!HasStateAuthority) return; // Host xử lý
+
         if (isInvincible)
         {
             Debug.Log("[⚡ IMMUNE] Player is invincible");
             return;
         }
 
-        animator.SetTrigger("isHurt");
+        RPC_PlayHurtAnim();
         Debug.Log("[😵 HIT] Player took damage at " + hitPoint);
         Audio_Manager.Instance.Play2D("Hurt");
 
         Coin_Manager.Instance.DropCoins(hitPoint);
 
+        RPC_StartInvisibly();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_StartInvisibly()
+    {
         StartCoroutine(InvincibilityRoutine());
     }
+
 
     private IEnumerator InvincibilityRoutine()
     {
@@ -51,13 +60,13 @@ public class PlayerBlinking : MonoBehaviour
         while (elapsed < invincibleDuration)
         {
             visible = !visible;
-            SetAllMeshesVisible(visible);
+            RPC_SetVisible(visible); // Gửi cho toàn bộ client
 
             yield return new WaitForSeconds(blinkInterval);
             elapsed += blinkInterval;
         }
 
-        SetAllMeshesVisible(true);
+        RPC_SetVisible(true); // Đảm bảo hiện lại
         isInvincible = false;
         isBlinking = false;
 
@@ -74,4 +83,16 @@ public class PlayerBlinking : MonoBehaviour
     }
 
     public bool IsInvincible() => isInvincible;
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_PlayHurtAnim()
+    {
+        animator.SetTrigger("isHurt");
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_SetVisible(bool visible)
+    {
+        SetAllMeshesVisible(visible);
+    }
 }

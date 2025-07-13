@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using Fusion;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class Tire_Movement : MonoBehaviour
+public class Tire_Movement : NetworkBehaviour
 {
     public enum Axis
     {
@@ -38,7 +40,12 @@ public class Tire_Movement : MonoBehaviour
 
     private Vector3 moveDirection;
     private Vector3 lastPos;
-    private Quaternion initialRotation;
+    private Quaternion initialRotation; private Rigidbody _rb;
+
+    void Awake()
+    {
+        _rb = GetComponent<Rigidbody>();
+    }
 
     void Start()
     {
@@ -63,8 +70,9 @@ public class Tire_Movement : MonoBehaviour
         }
     }
 
-    void Update()
+    public override void FixedUpdateNetwork()
     {
+        if (!HasStateAuthority) return;
         CheckWallAndReflect();
         Move();
         RotateMesh();
@@ -90,7 +98,8 @@ public class Tire_Movement : MonoBehaviour
 
     void Move()
     {
-        transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        Vector3 newPos = _rb.position + moveDirection * moveSpeed * Runner.DeltaTime;
+        _rb.MovePosition(newPos);
     }
 
     void RotateMesh()
@@ -152,8 +161,8 @@ public class Tire_Movement : MonoBehaviour
     {
         if (collision.collider.CompareTag("Player"))
         {
-            var player = collision.collider.GetComponent<PlayerController_N>() ??
-                         collision.collider.GetComponentInParent<PlayerController_N>();
+            var player = collision.collider.GetComponent<PlayerBlinking>() ??
+                         collision.collider.GetComponentInParent<PlayerBlinking>();
 
             if (player != null)
             {

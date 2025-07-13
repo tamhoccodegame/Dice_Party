@@ -1,3 +1,4 @@
+using Fusion;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "ProjectileData", menuName = "Gameplay/Projectile Data")]
@@ -8,6 +9,6 @@ public class ProjectileData : ScriptableObject
     public float lifeTime = 4f;       // s
 
     [Header("FX")]
-    public GameObject impactVFX;
-    public GameObject shootVFX;
+    public NetworkObject impactVFX;
+    public NetworkObject shootVFX;
 }
