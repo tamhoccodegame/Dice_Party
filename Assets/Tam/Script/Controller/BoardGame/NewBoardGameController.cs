@@ -11,6 +11,7 @@ public class NewBoardGameController : NetworkBehaviour
     private NetworkCharacterController _controller;
 
     private BoardState currentState;
+    [Networked] public string currentAnim { get; set; }
 
     public IdleState idleState;
     public MovingState movingState;
@@ -91,6 +92,8 @@ public class NewBoardGameController : NetworkBehaviour
 
     public void RequestChangeState(NetworkState newState)
     {
+        if (newState == networkState) return;
+
         if (HasStateAuthority)
         {
             networkState = newState;
@@ -137,6 +140,8 @@ public class NewBoardGameController : NetworkBehaviour
 
     public void RequestChangeAnimation(string animName)
     {
+        if (animName == currentAnim) return;
+
         if (HasStateAuthority)
         {
             RPC_ChangeAnimation(animName);
@@ -156,6 +161,7 @@ public class NewBoardGameController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_ChangeAnimation(string animName)
     {
+        currentAnim = animName;
         animator.Play(animName);
     }
 
@@ -401,6 +407,18 @@ public class NewBoardGameController : NetworkBehaviour
         itemTransform.SetParent(gunSpawnPoint);
         itemTransform.transform.localPosition = Vector3.zero;
         itemTransform.localRotation = Quaternion.identity;
+    }
+
+    public void RequestTriggerItem()
+    {
+        if(HasStateAuthority)
+        {
+            RPC_TriggerItem();
+        }
+        else
+        {
+            RPC_RequestTriggerItem();
+        }
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]

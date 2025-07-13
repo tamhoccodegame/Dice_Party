@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class CameraFollow : NetworkBehaviour
     private float cameraLerpSpeed = 4f; // Tốc độ Lerp (tùy chỉnh)
 
     private bool isCameraMoving; // Không dùng Networked nữa
+    private NetworkId? currentTargetId = null;
 
     private void Awake()
     {
@@ -32,6 +34,9 @@ public class CameraFollow : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_StartFollowTarget(NetworkId targetId)
     {
+        if (targetCam != null && currentTargetId == targetId) return;
+        currentTargetId = targetId;
+
         StartCoroutine(ChangeFollowTarget(targetId));
     }
 

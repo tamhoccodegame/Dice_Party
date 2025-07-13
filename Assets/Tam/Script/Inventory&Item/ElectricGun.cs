@@ -19,21 +19,21 @@ public class ElectricGun : BoardItem
 
         controller.GetComponent<CharacterController>().enabled = false;
 
-        if(GetInput(out NetworkInputData inputData))
+        float rotationSpeed = 90f; // độ/giây, quay 90 độ mỗi giây nếu giữ A hoặc D
+
+        if(controller.GetInput(out NetworkInputData input))
         {
-            float rotationSpeed = 90f; // độ/giây, quay 90 độ mỗi giây nếu giữ A hoặc D
+            float h = input.direction.x;
 
-            Vector2 direction = inputData.direction;
-
-            if (direction.x != 0)
+            if (Mathf.Abs(h) > 0.01f)
             {
-                controller.transform.Rotate(0f, direction.x * rotationSpeed * Time.deltaTime, 0f);
+                controller.transform.Rotate(0f, h * rotationSpeed * controller.Runner.DeltaTime, 0f);
             }
-        }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            controller.RPC_RequestTriggerItem();
+            if(input.buttons.IsSet(NetworkInputData.JUMPBUTTON))
+            {
+                controller.RequestTriggerItem();
+            }
         }
     }
 
