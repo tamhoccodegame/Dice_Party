@@ -5,6 +5,13 @@ using UnityEngine.VFX;
 
 public class ElectricGun : BoardItem
 {
+    private LaserBeam laserBeam;
+
+    private void Start()
+    {
+        laserBeam = GetComponent<LaserBeam>();
+    }
+
     public override void Use(NewBoardGameController controller)
     {
         controller.RequestChangeAnimation("GunAim");
@@ -40,7 +47,18 @@ public class ElectricGun : BoardItem
     public override IEnumerator ProcessCoroutine(NewBoardGameController controller)
     {
         GetComponent<VisualEffect>().Play();
-        yield return new WaitForSecondsRealtime(5f);
+
+        float elapsedTime = 0;
+        while(Mathf.FloorToInt(elapsedTime) <= 5f)
+        {
+            if (controller.HasInputAuthority && laserBeam.hitTarget != null)
+            {
+                laserBeam.ApplyDamage();
+            }
+            elapsedTime += 1.5f;
+            yield return new WaitForSecondsRealtime(1.5f);
+        }
+        
         controller.RequestChangeState(NewBoardGameController.NetworkState.Idle);
         ItemDatabase.instance.ReturnItemPosition(this);
     }

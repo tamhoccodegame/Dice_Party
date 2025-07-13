@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 [RequireComponent(typeof(NetworkCharacterController))]
 public class NewBoardGameController : NetworkBehaviour
@@ -12,6 +14,9 @@ public class NewBoardGameController : NetworkBehaviour
 
     private BoardState currentState;
     [Networked] public string currentAnim { get; set; }
+
+    [Networked] public Vector3 NetworkPosition { get; set; }
+    private Vector3 _smoothPos;
 
     public IdleState idleState;
     public MovingState movingState;
@@ -59,6 +64,8 @@ public class NewBoardGameController : NetworkBehaviour
     {
         animator = GetComponent<Animator>();
         _controller = GetComponent<NetworkCharacterController>();
+
+        _smoothPos = transform.position;
 
         idleState = new IdleState(this);
         movingState = new MovingState(this);
@@ -173,12 +180,87 @@ public class NewBoardGameController : NetworkBehaviour
         }
     }
 
+    public void RequestHurt(PlayerRef player, int ammount)
+    {
+        if (HasStateAuthority)
+            RPC_Hurt(player, ammount);
+        else
+            RPC_RequestHurt(player, ammount);
+    }
+
+    public void RequestHealth(PlayerRef player, int ammount)
+    {
+        if (HasStateAuthority)
+            RPC_Health(player, ammount);
+        else
+            RPC_RequestHealth(player, ammount);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestHurt(PlayerRef player, int ammount)
+    {
+        RPC_Hurt(player, ammount);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestHealth(PlayerRef player, int ammount)
+    {
+        RPC_Health(player, ammount);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_Hurt(PlayerRef player, int ammount)
+    {
+        StartCoroutine(HurtCoroutine(player, ammount));
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_Health(PlayerRef player, int ammount)
+    {
+        StartCoroutine(HealthCoroutine(player, ammount));
+    }
+
+    private IEnumerator HurtCoroutine(PlayerRef player, int ammount)
+    {
+        string previousAnim = currentAnim;
+        Debug.Log("💢 Bị đau!");
+        RequestChangeAnimation("Hurt");
+        TurnManager.instance.RequestUpdateHealth(player, -ammount);
+        // hiệu ứng bị thương
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        RequestChangeAnimation(previousAnim);
+    }
+
+    private IEnumerator HealthCoroutine(PlayerRef player, int ammount)
+    {
+        string previousAnim = currentAnim;
+        Debug.Log("❤️ Hồi máu!");
+        RequestChangeAnimation("Heal");
+        TurnManager.instance.RequestUpdateHealth(player, ammount);
+        // hiệu ứng hồi máu
+        yield return new WaitForSecondsRealtime(1f);
+
+        RequestChangeAnimation(previousAnim);
+    }
+
     public override void FixedUpdateNetwork()
     {
+        if (HasStateAuthority)
+        {
+            NetworkPosition = transform.position;
+        }
+        else
+        {
+            _smoothPos = Vector3.Lerp(_smoothPos, NetworkPosition, 0.15f);
+            transform.position = _smoothPos;
+        }
+
         if (!HasStateAuthority) return;
         currentState?.FixedUpdateNetwork();
     }
 
+    #region Move
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_RequestRollDice()
     {
@@ -201,7 +283,7 @@ public class NewBoardGameController : NetworkBehaviour
                 RPC_ChangeNetworkState(NetworkState.ChooseDirection);
                 yield break;
             }
-            StepsLeft = 3;
+            StepsLeft = 2;
         }
 
         RPC_ChangeAnimation("RollDice");
@@ -241,6 +323,8 @@ public class NewBoardGameController : NetworkBehaviour
         }
         return true;
     }
+
+    #endregion
 
     // Item (tạm bỏ qua inventory)
     public void UseSelectedItem()

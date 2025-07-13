@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
@@ -26,6 +28,9 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     private void Awake()
     {
         instance = this;
+
+        QualitySettings.vSyncCount = 0; // Tắt VSync
+        Application.targetFrameRate = 60; // Lock FPS ở mức vừa phải
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
