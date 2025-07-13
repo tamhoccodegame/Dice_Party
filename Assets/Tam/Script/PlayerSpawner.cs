@@ -27,7 +27,8 @@ public class PlayerSpawner : NetworkBehaviour
     public override void Spawned()
     {
         //Test Scene Only
-        //Runner.Spawn(playerPrefab, spawnPosition.position, Quaternion.identity, Runner.LocalPlayer);
+        var go = Runner.Spawn(playerPrefab, spawnPosition[0].position, Quaternion.identity, Runner.LocalPlayer);
+        spawnedCharacters.Add(Runner.LocalPlayer, go);
     }
 
     public void SpawnPlayer()
@@ -65,6 +66,7 @@ public class PlayerSpawner : NetworkBehaviour
                 spawnedCharacters.Add(playerList[i], go);
             }
         }
+
     }
 
     public Dictionary<PlayerRef, NetworkId> GetSpawnedCharacters()

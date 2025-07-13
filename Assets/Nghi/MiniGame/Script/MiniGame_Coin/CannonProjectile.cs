@@ -33,9 +33,9 @@ public class CannonProjectile : MonoBehaviour
 
         if (collision.collider.CompareTag("Player"))
         {
-            PlayerController_N player = collision.collider.GetComponent<PlayerController_N>();
+            PlayerBlinking player = collision.collider.GetComponent<PlayerBlinking>();
             if (player == null)
-                player = collision.collider.GetComponentInParent<PlayerController_N>();
+                player = collision.collider.GetComponentInParent<PlayerBlinking>();
 
             if (player != null)
             {

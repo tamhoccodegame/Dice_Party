@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Fusion;
 
-public class Coins : MonoBehaviour
+public class Coins : NetworkBehaviour
 {
     [Header("Rotation Settings")]
     [Tooltip("Speed at which the coin rotates around the Y-axis.")]
@@ -30,21 +31,27 @@ public class Coins : MonoBehaviour
     private bool isCollected = false;
     private bool canBeCollected = false;
 
-    private void Start()
+    public override void Spawned()
     {
         if (lifetime > 2)
             Destroy(gameObject, lifetime);
 
         StartCoroutine(EnablePickupAfterDelay(0.8f));
-    }
-
+    }  
     private void OnCollisionEnter(Collision collision)
     {
-        if (!collision.collider.CompareTag("Player") || isCollected || !canBeCollected) return;
+        if (!HasStateAuthority) return;
+
+        
+    }
+
+    public void EatCoin(NetworkId eater)
+    {
+        if(isCollected || !canBeCollected) return;  
 
         isCollected = true;
 
-        Coin_Manager.Instance.AddCoins(value);
+        Coin_Manager.Instance.RequestUpdateCoin(Runner.FindObject(eater).GetComponent<NetworkObject>().InputAuthority, value);
 
         if (pickupVFX != null)
             Instantiate(pickupVFX, transform.position, Quaternion.identity);
