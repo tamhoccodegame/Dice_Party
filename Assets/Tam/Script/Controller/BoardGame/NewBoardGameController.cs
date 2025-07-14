@@ -153,7 +153,7 @@ public class NewBoardGameController : NetworkBehaviour
         {
             RPC_ChangeAnimation(animName);
         }
-        else
+        else if(HasInputAuthority)
         {
             RPC_RequestChangeAnimation(animName);
         }

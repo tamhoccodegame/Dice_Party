@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using Fusion;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrapActivationManager : MonoBehaviour
+public class TrapActivationManager : NetworkBehaviour
 {
     public Transform player;
     public float scanInterval = 0.2f;
@@ -10,8 +11,10 @@ public class TrapActivationManager : MonoBehaviour
     private float timer = 0f;
     private List<TrapActivator> traps = new List<TrapActivator>();
 
-    void Start()
+    public override void Spawned()
     {
+        if (!HasStateAuthority) return;
+        player = FindFirstObjectByType<MNGChayTruongController>().transform;
         // Tìm tất cả trap trong scene (có thể tối ưu nếu có nhiều)
         TrapActivator[] foundTraps = FindObjectsOfType<TrapActivator>(true); // true để tìm cả những trap bị tắt
 
@@ -24,9 +27,11 @@ public class TrapActivationManager : MonoBehaviour
         Debug.Log($"[🧠 TrapActivationManager] Tìm thấy {traps.Count} traps");
     }
 
-    void Update()
+
+    public override void FixedUpdateNetwork()
     {
-        timer += Time.deltaTime;
+        if (!HasStateAuthority) return;
+        timer += Runner.SimulationTime;
         if (timer >= scanInterval)
         {
             timer = 0f;

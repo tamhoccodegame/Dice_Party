@@ -5,11 +5,18 @@ using UnityEngine.VFX;
 
 public class ElectricGun : BoardItem
 {
-    private LaserBeam laserBeam;
+    public LaserBeam laserBeam;
+    public VisualEffect laserEffect;
 
     private void Start()
     {
-        laserBeam = GetComponent<LaserBeam>();
+        
+    }
+
+    public override void Spawned()
+    {
+        laserEffect.Stop();
+        laserEffect.playRate = 3.5f;
     }
 
     public override void Use(NewBoardGameController controller)
@@ -18,7 +25,6 @@ public class ElectricGun : BoardItem
 
         controller.RequestSetItemPosition(0);
 
-        GetComponent<VisualEffect>().Stop();
     }
 
     public override void Tick(NewBoardGameController controller)
@@ -28,7 +34,7 @@ public class ElectricGun : BoardItem
 
         float rotationSpeed = 90f; // độ/giây, quay 90 độ mỗi giây nếu giữ A hoặc D
 
-        if(controller.GetInput(out NetworkInputData input))
+        if (controller.GetInput(out NetworkInputData input))
         {
             float h = input.direction.x;
 
@@ -37,7 +43,7 @@ public class ElectricGun : BoardItem
                 controller.transform.Rotate(0f, h * rotationSpeed * controller.Runner.DeltaTime, 0f);
             }
 
-            if(input.buttons.IsSet(NetworkInputData.JUMPBUTTON))
+            if (input.buttons.IsSet(NetworkInputData.JUMPBUTTON))
             {
                 controller.RequestTriggerItem();
             }
@@ -46,19 +52,15 @@ public class ElectricGun : BoardItem
 
     public override IEnumerator ProcessCoroutine(NewBoardGameController controller)
     {
-        GetComponent<VisualEffect>().Play();
+        laserEffect.Play();
 
-        float elapsedTime = 0;
-        while(Mathf.FloorToInt(elapsedTime) <= 5f)
-        {
-            if (controller.HasInputAuthority && laserBeam.hitTarget != null)
-            {
-                laserBeam.ApplyDamage();
-            }
-            elapsedTime += 1.5f;
-            yield return new WaitForSecondsRealtime(1.5f);
-        }
-        
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        if (controller.HasInputAuthority && laserBeam.hitTarget != null)
+            laserBeam.ApplyDamage();
+
+        yield return new WaitForSecondsRealtime(1.5f);
+
         controller.RequestChangeState(NewBoardGameController.NetworkState.Idle);
         ItemDatabase.instance.ReturnItemPosition(this);
     }

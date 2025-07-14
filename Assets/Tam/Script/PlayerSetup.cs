@@ -24,7 +24,6 @@ public class PlayerSetup : NetworkBehaviour
         if (!Object.HasInputAuthority) return;
 
         CustomData data = NetworkManager.customData;
-        if(data != null) 
         RPC_RequestUpdateCustom(data.hairIndex, data.colorIndex, data.bodyPartIndex);
     }
 

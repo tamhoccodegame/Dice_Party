@@ -33,6 +33,6 @@ public class LaserBeam : MonoBehaviour
 
     public void ApplyDamage()
     {
-        hitTarget.RequestHurt(hitTarget.Object.InputAuthority, 2);
+        hitTarget.RequestHurt(hitTarget.Object.InputAuthority, 15);
     }
 }

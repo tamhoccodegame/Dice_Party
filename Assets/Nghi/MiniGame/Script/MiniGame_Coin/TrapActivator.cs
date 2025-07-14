@@ -1,15 +1,25 @@
-﻿using System.Collections;
+﻿using Fusion;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrapActivator : MonoBehaviour
+public class TrapActivator : NetworkBehaviour
 {
     public float activationDistance = 20f;
     private Transform player;
 
-    private void Awake()
+    public override void Spawned()
     {
-        gameObject.SetActive(false); // Ban đầu luôn tắt
+        if (HasStateAuthority)
+        {
+            RPC_SetActive(false);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_SetActive(bool active)
+    {
+        gameObject.SetActive(active);
     }
 
     public void Init(Transform playerRef)
@@ -19,14 +29,16 @@ public class TrapActivator : MonoBehaviour
 
     public void CheckActivation()
     {
+        if (!HasStateAuthority) return;
+
         if (player == null) return;
 
         float distance = Vector3.Distance(player.position, transform.position);
         bool shouldBeActive = distance <= activationDistance;
 
         if (shouldBeActive && !gameObject.activeSelf)
-            gameObject.SetActive(true);
+            RPC_SetActive(true);
         else if (!shouldBeActive && gameObject.activeSelf)
-            gameObject.SetActive(false);
+            RPC_SetActive(false);
     }
 }

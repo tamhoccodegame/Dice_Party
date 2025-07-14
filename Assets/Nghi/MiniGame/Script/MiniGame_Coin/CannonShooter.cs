@@ -20,14 +20,14 @@ public class CannonShooter : NetworkBehaviour
     {
     }
 
-    public void Update()
+    public override void FixedUpdateNetwork()
     {
         if (!HasStateAuthority) return;
 
-        if (Time.time < _nextFireTime) return;
+        if (Runner.SimulationTime < _nextFireTime) return;
 
         Shoot();
-        _nextFireTime = Time.time + fireInterval;
+        _nextFireTime = Runner.SimulationTime + fireInterval;
     }
 
     private void Shoot()

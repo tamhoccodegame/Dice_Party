@@ -1,14 +1,16 @@
-﻿using System.Collections;
+﻿using Fusion;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
-public class CannonProjectile : MonoBehaviour
+public class CannonProjectile : NetworkBehaviour
 {
     private Rigidbody _rb;
     private ProjectileData _data;
 
-    private void Awake()
+    public override void Spawned()
     {
+        if (!HasStateAuthority) return;
         _rb = GetComponent<Rigidbody>();
         _rb.interpolation = RigidbodyInterpolation.Interpolate;
         _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -27,9 +29,10 @@ public class CannonProjectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if(!HasStateAuthority) return;
         // Spawn VFX nếu có
         if (_data.impactVFX)
-            Instantiate(_data.impactVFX, transform.position, Quaternion.identity);
+            Runner.Spawn(_data.impactVFX, transform.position, Quaternion.identity);
 
         if (collision.collider.CompareTag("Player"))
         {
@@ -52,6 +55,7 @@ public class CannonProjectile : MonoBehaviour
 
     private void Despawn()
     {
+        if (!HasStateAuthority) return;
         // Nếu sau này xài Object Pool thì đổi thành pool.Despawn(this);
         Destroy(gameObject);
     }

@@ -1,4 +1,5 @@
-﻿using Fusion;
+﻿using Dreamteck.Splines;
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,17 +53,18 @@ public class Coin_Manager : NetworkBehaviour
     public float coinLifetime = 5f;
     public float spawnForce = 2.5f;
 
-    private void Awake()
-    {
-        if (Instance != null) Destroy(gameObject);
-        Instance = this;
-    }
-
     public override void Spawned()
     {
+        Instance = this;
         foreach(var charr in PlayerSpawner.instance.spawnedCharacters)
         {
             playersCoin.Add(charr.Key, 0);
+        }
+        FindFirstObjectByType<PlayerSpawner>().SpawnPlayer();
+
+        foreach(var s in FindObjectsByType<SplineFollower>(FindObjectsSortMode.None))
+        {
+            s.follow = true;
         }
     }
 

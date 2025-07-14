@@ -27,8 +27,8 @@ public class PlayerSpawner : NetworkBehaviour
     public override void Spawned()
     {
         //Test Scene Only
-        var go = Runner.Spawn(playerPrefab, spawnPosition[0].position, Quaternion.identity, Runner.LocalPlayer);
-        spawnedCharacters.Add(Runner.LocalPlayer, go);
+        //var go = Runner.Spawn(playerPrefab, spawnPosition[0].position, Quaternion.identity, Runner.LocalPlayer);
+        //spawnedCharacters.Add(Runner.LocalPlayer, go);
     }
 
     public void SpawnPlayer()

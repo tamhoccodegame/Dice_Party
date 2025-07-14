@@ -44,11 +44,13 @@ public class Tire_Movement : NetworkBehaviour
 
     void Awake()
     {
-        _rb = GetComponent<Rigidbody>();
+       
     }
 
-    void Start()
+    public override void Spawned()
     {
+        if (!HasStateAuthority) return;
+        _rb = GetComponent<Rigidbody>();
         if (wheelMesh == null)
         {
             Debug.LogError("❌ Wheel mesh not assigned.");
@@ -98,8 +100,7 @@ public class Tire_Movement : NetworkBehaviour
 
     void Move()
     {
-        Vector3 newPos = _rb.position + moveDirection * moveSpeed * Runner.DeltaTime;
-        _rb.MovePosition(newPos);
+        _rb.velocity = moveDirection * moveSpeed;
     }
 
     void RotateMesh()
@@ -157,19 +158,24 @@ public class Tire_Movement : NetworkBehaviour
         };
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.collider.CompareTag("Player"))
+        if (!HasStateAuthority) return;
+        if (other.CompareTag("Player"))
         {
-            var player = collision.collider.GetComponent<PlayerBlinking>() ??
-                         collision.collider.GetComponentInParent<PlayerBlinking>();
+            var player = other.GetComponent<PlayerBlinking>() ??
+                         other.GetComponentInParent<PlayerBlinking>();
 
             if (player != null)
             {
-                Vector3 hitPoint = collision.contacts[0].point;
-                player.OnHitByObstacle(hitPoint);
+                player.OnHitByObstacle(other.transform.position);
             }
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        
     }
 
 

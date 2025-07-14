@@ -1,9 +1,10 @@
 ﻿using Dreamteck.Splines;
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tire_Movement_Spline : MonoBehaviour
+public class Tire_Movement_Spline : NetworkBehaviour
 {
     public enum TireMode
     {
@@ -26,23 +27,9 @@ public class Tire_Movement_Spline : MonoBehaviour
     private Vector3 lastPos;
     private bool goingBack = false;
 
-    //void Start()
-    //{
-    //    if (wheelMesh == null || follower == null)
-    //    {
-    //        Debug.LogError("Missing wheel mesh or spline follower.");
-    //        enabled = false;
-    //        return;
-    //    }
-
-    //    lastPos = transform.position;
-
-    //    // Event khi tới cuối
-    //    follower.onEndReached += OnEndReached;
-    //}
-
-    void Start()
+    public override void Spawned()
     {
+        if(!HasStateAuthority) return;
         if (wheelMesh == null || follower == null)
         {
             Debug.LogError("Missing wheel mesh or spline follower.");
@@ -75,9 +62,7 @@ public class Tire_Movement_Spline : MonoBehaviour
         follower.direction = goingBack ? Spline.Direction.Backward : Spline.Direction.Forward;
     }
 
-
-
-    void Update()
+    public override void FixedUpdateNetwork()
     {
         RotateMesh();
     }
@@ -112,10 +97,11 @@ public class Tire_Movement_Spline : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if(!HasStateAuthority) return;
         if (collision.collider.CompareTag("Player"))
         {
-            var player = collision.collider.GetComponent<PlayerController_N>() ??
-                         collision.collider.GetComponentInParent<PlayerController_N>();
+            var player = collision.collider.GetComponent<PlayerBlinking>() ??
+                         collision.collider.GetComponentInParent<PlayerBlinking>();
 
             if (player != null)
             {

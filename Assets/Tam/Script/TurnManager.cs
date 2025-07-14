@@ -324,7 +324,7 @@ public class TurnManager : NetworkBehaviour
             currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
             if (currentPlayerIndex == 0)
             {
-                RPC_LoadScene(isFirstTry ? "MNG3" : "MNG1");
+                RPC_LoadScene(isFirstTry ? "MNG_ChayDuongTruong" : "MNG1");
             }
             CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
         }

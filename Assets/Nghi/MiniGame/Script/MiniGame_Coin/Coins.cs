@@ -10,7 +10,7 @@ public class Coins : NetworkBehaviour
     [Tooltip("Speed at which the coin rotates around the Y-axis.")]
     public float rotationSpeed = 90f;
 
-    void Update()
+    public override void FixedUpdateNetwork()
     {
         // Rotate the coin around its Y axis
         transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime, Space.World);
@@ -28,22 +28,16 @@ public class Coins : NetworkBehaviour
     [Tooltip("Auto destroy delay after pickup (for VFX to play).")]
     public float destroyDelay = 0.1f;
 
-    private bool isCollected = false;
-    private bool canBeCollected = false;
+    [Networked, UnitySerializeField] private bool isCollected { get; set; } = false;
+    [Networked, UnitySerializeField] private bool canBeCollected { get; set; } = true;
 
     public override void Spawned()
     {
-        if (lifetime > 2)
-            Destroy(gameObject, lifetime);
-
-        StartCoroutine(EnablePickupAfterDelay(0.8f));
-    }  
-    private void OnCollisionEnter(Collision collision)
-    {
         if (!HasStateAuthority) return;
 
-        
-    }
+        if (lifetime > 2)
+            Destroy(gameObject, lifetime);
+    }  
 
     public void EatCoin(NetworkId eater)
     {
@@ -74,7 +68,7 @@ public class Coins : NetworkBehaviour
 
     private IEnumerator EnablePickupAfterDelay(float delay)
     {
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSecondsRealtime(delay);
         canBeCollected = true;
     }
 }
