@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -63,6 +65,12 @@ public class Lobby : MonoBehaviour
 
     }
 
+    void OnPlayerJoined(PlayerInput playerInput)
+    {
+        var uiModule = playerInput.GetComponent<InputSystemUIInputModule>();
+        playerInput.uiInputModule = uiModule;
+    }
+
     void UpdatePlayerList()
     {
         //players.Sort((a, b) => a.PlayerId.CompareTo(b.PlayerId));
@@ -75,7 +83,7 @@ public class Lobby : MonoBehaviour
 
         //foreach (PlayerRef player in players)
         //{
-           
+
         //        //Spawn Avatar (model 3D)
         //        if (!spawnedAvatars.ContainsKey(player))
         //        {
@@ -112,14 +120,14 @@ public class Lobby : MonoBehaviour
         //        playerSlotUI.AddBodypartName(bodypart.name);
         //    }
 
-        //    //if (Runner.LocalPlayer != player)
-        //    //{
-        //    //    playerSlotUI.unreadyButton.SetActive(false);
-        //    //    playerSlotUI.unreadyPanel.SetActive(!isReady);
-        //    //    playerSlotUI.adjustAppearancePanel.SetActive(false);
-        //    //    playerSlotUI.afterJoinPanel.SetActive(false);
-        //    //    playerSlotUI.customizePanel.SetActive(false);
-        //    //}
+        //if (Runner.LocalPlayer != player)
+        //{
+        //    playerSlotUI.unreadyButton.SetActive(false);
+        //    playerSlotUI.unreadyPanel.SetActive(!isReady);
+        //    playerSlotUI.adjustAppearancePanel.SetActive(false);
+        //    playerSlotUI.afterJoinPanel.SetActive(false);
+        //    playerSlotUI.customizePanel.SetActive(false);
+        //}
         //}
     }
     #endregion
