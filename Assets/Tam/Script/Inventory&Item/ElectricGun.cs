@@ -54,7 +54,7 @@ public class ElectricGun : BoardItem
     {
         laserEffect.Play();
 
-        yield return new WaitForSecondsRealtime(0.5f);
+        yield return new WaitForSecondsRealtime(2f);
 
         if (controller.HasInputAuthority && laserBeam.hitTarget != null)
             laserBeam.ApplyDamage();

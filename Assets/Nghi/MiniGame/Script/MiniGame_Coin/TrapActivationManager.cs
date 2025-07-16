@@ -14,19 +14,22 @@ public class TrapActivationManager : NetworkBehaviour
     public override void Spawned()
     {
         if (!HasStateAuthority) return;
-        player = FindFirstObjectByType<MNGChayTruongController>().transform;
         // Tìm tất cả trap trong scene (có thể tối ưu nếu có nhiều)
-        TrapActivator[] foundTraps = FindObjectsOfType<TrapActivator>(true); // true để tìm cả những trap bị tắt
 
+
+        Debug.Log($"[🧠 TrapActivationManager] Tìm thấy {traps.Count} traps");
+    }
+
+    public void SetPlayer()
+    {
+        player = FindFirstObjectByType<MNGChayTruongController>().transform;
+        TrapActivator[] foundTraps = FindObjectsOfType<TrapActivator>(true); // true để tìm cả những trap bị tắt
         foreach (var trap in foundTraps)
         {
             trap.Init(player);
             traps.Add(trap);
         }
-
-        Debug.Log($"[🧠 TrapActivationManager] Tìm thấy {traps.Count} traps");
     }
-
 
     public override void FixedUpdateNetwork()
     {

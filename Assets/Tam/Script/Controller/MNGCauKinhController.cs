@@ -139,6 +139,7 @@ public class MNGCauKinhController : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     void RPC_RequestSetGoal()
     {
+        if (isGoal) return;
         isGoal = true;
     }
 }

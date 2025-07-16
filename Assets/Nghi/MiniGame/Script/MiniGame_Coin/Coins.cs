@@ -19,7 +19,7 @@ public class Coins : NetworkBehaviour
     public int value = 1;
     private float lifetime = 2f;
     [Tooltip("Optional pickup effect.")]
-    public GameObject pickupVFX;
+    public NetworkObject pickupVFX;
 
     //[Header("SFX")]
     //public AudioClip pickupSFX;
@@ -48,7 +48,7 @@ public class Coins : NetworkBehaviour
         Coin_Manager.Instance.RequestUpdateCoin(Runner.FindObject(eater).GetComponent<NetworkObject>().InputAuthority, value);
 
         if (pickupVFX != null)
-            Instantiate(pickupVFX, transform.position, Quaternion.identity);
+            Runner.Spawn(pickupVFX, transform.position, Quaternion.identity);
 
         Audio_Manager.Instance.Play("Coin_PickUp", transform.position);
 
@@ -57,13 +57,21 @@ public class Coins : NetworkBehaviour
         GetComponent<MeshRenderer>().enabled = false;
         GetComponent<Collider>().enabled = false;
 
+        RPC_Destroy();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_Destroy()
+    {
         Destroy(gameObject, destroyDelay);
     }
 
-
     public void SetLifetime(float time)
     {
+        if (HasStateAuthority) return;
         lifetime = time;
+        canBeCollected = false;
+        StartCoroutine(EnablePickupAfterDelay(0.9f));
     }
 
     private IEnumerator EnablePickupAfterDelay(float delay)

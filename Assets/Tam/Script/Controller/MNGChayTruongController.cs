@@ -15,6 +15,8 @@ public class MNGChayTruongController : NetworkBehaviour
 
     public string currentAnim;
 
+    public bool isGoal = false;
+
     public override void Spawned()
     {
         controller = GetComponent<NetworkCharacterController>();
@@ -135,5 +137,25 @@ public class MNGChayTruongController : NetworkBehaviour
     void RPC_EnableRagdoll()
     {
         GetComponent<Ragdoll>().EnableRagdoll();
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "Goal")
+        {
+            if (Object.HasInputAuthority)
+                RPC_RequestSetGoal();
+        }
+    }
+
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    void RPC_RequestSetGoal()
+    {
+        if (isGoal) return;
+        isGoal = true;
+
+        if(HasStateAuthority)
+        Coin_Manager.Instance.UpdateGameState();
     }
 }

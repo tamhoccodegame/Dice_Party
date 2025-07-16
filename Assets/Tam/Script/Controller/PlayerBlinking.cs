@@ -37,7 +37,7 @@ public class PlayerBlinking : NetworkBehaviour
         Debug.Log("[😵 HIT] Player took damage at " + hitPoint);
         Audio_Manager.Instance.Play2D("Hurt");
 
-        Coin_Manager.Instance.DropCoins(hitPoint);
+        Coin_Manager.Instance.DropCoins(Object.InputAuthority, hitPoint);
 
         RPC_StartInvisibly();
     }

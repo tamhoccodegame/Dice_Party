@@ -20,7 +20,7 @@ public class Coin_Manager : NetworkBehaviour
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
 
-    public TextMeshProUGUI[] playerLiveTextUI;
+    public TextMeshProUGUI[] playerScoreTextUI;
 
     [Header("Tutorial Panel")]
     public GameObject tutorialPanel;
@@ -44,8 +44,8 @@ public class Coin_Manager : NetworkBehaviour
     public static Coin_Manager Instance { get; private set; }
 
     public int TotalCoins { get; private set; } = 0;
-    public GameObject coinPrefab;
-    public GameObject pickupVFX;
+    public NetworkObject coinPrefab;
+    public NetworkObject pickupVFX;
 
     [Header("Drop Settings")]
     public int coinsToDropOnHit = 3;
@@ -56,15 +56,18 @@ public class Coin_Manager : NetworkBehaviour
     public override void Spawned()
     {
         Instance = this;
-        foreach(var charr in PlayerSpawner.instance.spawnedCharacters)
-        {
-            playersCoin.Add(charr.Key, 0);
-        }
-        FindFirstObjectByType<PlayerSpawner>().SpawnPlayer();
+        MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
+        tutorialPanel.SetActive(true);
 
-        foreach(var s in FindObjectsByType<SplineFollower>(FindObjectsSortMode.None))
+        if (Object.HasStateAuthority)
         {
-            s.follow = true;
+            RPC_HideTutorial();
+            foreach (var charr in NetworkManager.instance.GetAllPlayers())
+            {
+                playersCoin.Add(charr, 0);
+            }
+
+            RPC_UpdateScoreUI();
         }
     }
 
@@ -117,24 +120,51 @@ public class Coin_Manager : NetworkBehaviour
         {
             playersCoin.Add(player, 1);
         }
+        UpdateScoreUI();
     }
 
-    public void DropCoins(Vector3 origin)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_UpdateScoreUI()
     {
-        int dropCount = Mathf.Min(TotalCoins, coinsToDropOnHit);
+        UpdateScoreUI();
+    }
+
+    void UpdateScoreUI()
+    {
+        int index = 0;
+        foreach(var playerText in NetworkManager.instance.GetAllPlayers())
+        {
+            if (!playerScoreTextUI[index].transform.parent.gameObject.activeSelf)
+            {
+                playerScoreTextUI[index].transform.parent.gameObject.SetActive(true);
+            }
+            index++;
+        }
+
+        index = 0;
+        foreach(var player in NetworkManager.instance.GetAllPlayers())
+        {
+            playerScoreTextUI[index].text = playersCoin[player].ToString();
+            index++;
+        }
+    }
+
+    public void DropCoins(PlayerRef player, Vector3 origin)
+    {
+        int dropCount = Mathf.Min(playersCoin[player], coinsToDropOnHit);
         if (dropCount <= 0)
         {
             Debug.Log("[⚠️ DROP] Not enough coins to drop.");
             return;
         }
 
-        RequestUpdateCoin(Runner.LocalPlayer, 3);
+        RequestUpdateCoin(player, -3);
 
         for (int i = 0; i < dropCount; i++)
         {
             // 👉 spawn tại player, thêm chút chiều cao để không dính sàn
             Vector3 spawnPos = origin + Vector3.up * coinSpawnHeight;
-            GameObject coin = Instantiate(coinPrefab, spawnPos, Quaternion.identity);
+            NetworkObject coin = Runner.Spawn(coinPrefab, spawnPos, Quaternion.identity);
 
             Coins coinScript = coin.GetComponent<Coins>();
             if (coinScript != null)
@@ -167,6 +197,7 @@ public class Coin_Manager : NetworkBehaviour
         }
 
         Debug.Log($"[💥 COINS DROPPED] {dropCount} coins dropped at {origin}");
+        UpdateScoreUI();
     }
 
     private IEnumerator FadeBlackScreen(float from, float to)
@@ -206,11 +237,28 @@ public class Coin_Manager : NetworkBehaviour
 
         yield return new WaitForSecondsRealtime(5f);
         GetComponent<PlayerSpawner>().SpawnPlayer();
-        introCutscene.Play();
-        introCutscene.stopped += StartGame;
-        yield return new WaitForSecondsRealtime(1f);
-        yield return StartCoroutine(FadeBlackScreen(1, 0));
 
+        if(introCutscene != null)
+        {
+            introCutscene.Play();
+            introCutscene.stopped += StartGame;
+            yield return new WaitForSecondsRealtime(1f);
+            yield return StartCoroutine(FadeBlackScreen(1, 0));
+        }
+        else
+        {
+            yield return new WaitForSecondsRealtime(1f);
+            yield return StartCoroutine(FadeBlackScreen(1, 0));
+            yield return new WaitForSecondsRealtime(1f);
+            isGameStarted = true;
+            foreach (var s in FindObjectsByType<SplineFollower>(FindObjectsSortMode.None))
+            {
+                s.follow = true;
+            }
+            if(HasStateAuthority)
+            FindFirstObjectByType<TrapActivationManager>().SetPlayer();
+        }
+           
     }
 
     private void StartGame(PlayableDirector obj)
@@ -243,8 +291,19 @@ public class Coin_Manager : NetworkBehaviour
 
     bool CheckGameOver()
     {
-        //return playerLives.All(kvp => kvp.Value <= 0); 
-        return true;
+        var players = FindObjectsByType<MNGChayTruongController>(FindObjectsSortMode.None);
+        return players.All(p => p.isGoal);
+    }
+
+    public void UpdateGameState()
+    {
+        if (isGameOver) return;
+
+        if (CheckGameOver())
+        {
+            isGameOver = true;
+            RPC_ShowGameOverPanel();
+        }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

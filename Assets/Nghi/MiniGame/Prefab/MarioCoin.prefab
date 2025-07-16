@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 9063804537496275994}
     m_Modifications:
+    - target: {fileID: -3253145927826154124, guid: aa122f157eac1c8428ae5db8a315ccd8, type: 3}
+      propertyPath: SortKey
+      value: 1061509028
+      objectReference: {fileID: 0}
     - target: {fileID: 1544217392820158188, guid: aa122f157eac1c8428ae5db8a315ccd8, type: 3}
       propertyPath: playOnAwake
       value: 0
@@ -133,6 +137,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aa122f157eac1c8428ae5db8a315ccd8, type: 3}
+--- !u!114 &1425072746049549702 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -3253145927826154124, guid: aa122f157eac1c8428ae5db8a315ccd8, type: 3}
+  m_PrefabInstance: {fileID: 4691731697823541490}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8727424062605911587 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4035903591278710481, guid: aa122f157eac1c8428ae5db8a315ccd8, type: 3}
@@ -160,7 +175,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e2535a0bfcbe3940b754dadd5aa4a4f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -7.5700073
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e2535a0bfcbe3940b754dadd5aa4a4f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -168,7 +183,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e2535a0bfcbe3940b754dadd5aa4a4f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 2.9004822
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e2535a0bfcbe3940b754dadd5aa4a4f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -252,7 +267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 90
   value: 1
-  pickupVFX: {fileID: 4035903591278710484, guid: aa122f157eac1c8428ae5db8a315ccd8, type: 3}
+  pickupVFX: {fileID: -3253145927826154124, guid: aa122f157eac1c8428ae5db8a315ccd8, type: 3}
   destroyDelay: 0.1
   _isCollected: 0
   _canBeCollected: 1
@@ -321,7 +336,8 @@ MonoBehaviour:
   SortKey: 2048697145
   ObjectInterest: 1
   Flags: 262145
-  NestedObjects: []
+  NestedObjects:
+  - {fileID: 1425072746049549702}
   NetworkedBehaviours:
   - {fileID: 6090071595791463556}
   - {fileID: 5790983908408946659}
