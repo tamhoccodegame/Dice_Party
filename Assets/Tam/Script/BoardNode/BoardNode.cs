@@ -24,7 +24,7 @@ public class BoardNode : NetworkBehaviour
 
     public virtual void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
     {
-
+        EndTurn(playerRef);
     }
 
     protected void EndTurn(PlayerRef player)
