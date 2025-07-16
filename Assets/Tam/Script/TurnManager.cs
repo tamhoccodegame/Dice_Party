@@ -298,7 +298,7 @@ public class TurnManager : NetworkBehaviour
 
     public void RequestNextTurn()
     {
-        if (Object.HasStateAuthority)
+        if (HasStateAuthority)
             if (CheckWin())
             {
                 RPC_LoadScene("Win");
@@ -306,13 +306,13 @@ public class TurnManager : NetworkBehaviour
             }
 
         if (Object.HasStateAuthority)
-        {
-            RPC_NextTurn();
-        }
-        else
-        {
-            RPC_RequestNextTurn();
-        }
+            {
+                RPC_NextTurn();
+            }
+            else
+            {
+                RPC_RequestNextTurn();
+            }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
