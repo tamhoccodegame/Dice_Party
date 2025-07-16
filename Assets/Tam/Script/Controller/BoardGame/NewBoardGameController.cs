@@ -283,13 +283,37 @@ public class NewBoardGameController : NetworkBehaviour
                 RPC_ChangeNetworkState(NetworkState.ChooseDirection);
                 yield break;
             }
-            StepsLeft = 2;
+            StepsLeft = 5;
         }
 
         RPC_ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
 
         RequestChangeState(NetworkState.Moving);
+    }
+
+    public void RequestSetStepLeft(int step)
+    {
+        if (HasStateAuthority)
+        {
+            RPC_SetStepLeft(step);
+        }
+        else
+        {
+            RPC_RequestSetStepLeft(step);
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestSetStepLeft(int step)
+    {
+        RPC_SetStepLeft(step);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_SetStepLeft(int step)
+    {
+        StepsLeft = step;
     }
 
     // Di chuyển từng bước
@@ -423,6 +447,24 @@ public class NewBoardGameController : NetworkBehaviour
         rollDiceEffect.Play();
         dice.SetActive(false);
         yield return new WaitForSeconds(0.5f);
+    }
+
+    public void RequestSetCurrentNode(NetworkId nodeId)
+    {
+        if (HasStateAuthority)
+        {
+            RPC_SetCurrentNode(nodeId);
+        }
+        else
+        {
+            RPC_RequestSetCurrentNode(nodeId);
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_RequestSetCurrentNode(NetworkId nodeId)
+    {
+        RPC_SetCurrentNode(nodeId);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
