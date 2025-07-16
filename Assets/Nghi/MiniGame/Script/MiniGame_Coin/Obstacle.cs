@@ -1,14 +1,12 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Obstacle : NetworkBehaviour
+public class Obstacle : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (!HasStateAuthority) return;
         if (other.CompareTag("Player"))
         {
             var player = other.GetComponent<PlayerBlinking>() ??

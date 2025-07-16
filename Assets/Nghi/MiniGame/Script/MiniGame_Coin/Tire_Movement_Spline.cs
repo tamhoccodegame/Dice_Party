@@ -1,10 +1,9 @@
 ﻿using Dreamteck.Splines;
-using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tire_Movement_Spline : NetworkBehaviour
+public class Tire_Movement_Spline : MonoBehaviour
 {
     public enum TireMode
     {
@@ -27,9 +26,8 @@ public class Tire_Movement_Spline : NetworkBehaviour
     private Vector3 lastPos;
     private bool goingBack = false;
 
-    public override void Spawned()
+    public void Awake()
     {
-        if(!HasStateAuthority) return;
         if (wheelMesh == null || follower == null)
         {
             Debug.LogError("Missing wheel mesh or spline follower.");
@@ -62,9 +60,10 @@ public class Tire_Movement_Spline : NetworkBehaviour
         follower.direction = goingBack ? Spline.Direction.Backward : Spline.Direction.Forward;
     }
 
-    public override void FixedUpdateNetwork()
+    private void Update()
     {
         RotateMesh();
+
     }
 
     void RotateMesh()
@@ -97,7 +96,6 @@ public class Tire_Movement_Spline : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(!HasStateAuthority) return;
         if (collision.collider.CompareTag("Player"))
         {
             var player = collision.collider.GetComponent<PlayerBlinking>() ??

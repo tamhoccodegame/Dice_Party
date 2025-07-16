@@ -10,7 +10,7 @@ public class PlayerSetup : MonoBehaviour
 
     public void Awake()
     {
-        CustomData data = NetworkManager.customData;
+        CustomData data = SystemManager.customData;
         UpdateCustom(data.hairIndex, data.colorIndex, data.bodyPartIndex);
     }
 

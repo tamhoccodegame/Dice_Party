@@ -89,10 +89,7 @@ public class GlassBreakManager : MonoBehaviour
 
     void InitPlayersScore()
     {
-        for(int i = 0; i < NetworkManager.instance.GetAllPlayers().Count; i++)
-        {
-            playerTextUI[i].transform.parent.gameObject.SetActive(true);
-        }
+       
     }
 
     void CountDown()
@@ -111,7 +108,6 @@ public class GlassBreakManager : MonoBehaviour
         {
             foreach (var p in PlayerSpawner.instance.GetSpawnedCharacters())
             {
-                UpdateRank(p.Key, p.Value);
             }
         }
 

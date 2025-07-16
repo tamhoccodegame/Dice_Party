@@ -1,9 +1,8 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrapActivationManager : NetworkBehaviour
+public class TrapActivationManager : MonoBehaviour
 {
     public Transform player;
     public float scanInterval = 0.2f;
@@ -11,9 +10,8 @@ public class TrapActivationManager : NetworkBehaviour
     private float timer = 0f;
     private List<TrapActivator> traps = new List<TrapActivator>();
 
-    public override void Spawned()
+    public void Awake()
     {
-        if (!HasStateAuthority) return;
         // Tìm tất cả trap trong scene (có thể tối ưu nếu có nhiều)
 
 
@@ -31,10 +29,9 @@ public class TrapActivationManager : NetworkBehaviour
         }
     }
 
-    public override void FixedUpdateNetwork()
+    public void Update()
     {
-        if (!HasStateAuthority) return;
-        timer += Runner.SimulationTime;
+        timer += Time.deltaTime;
         if (timer >= scanInterval)
         {
             timer = 0f;

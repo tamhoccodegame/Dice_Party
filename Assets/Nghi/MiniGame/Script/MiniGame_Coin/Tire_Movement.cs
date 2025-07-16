@@ -1,10 +1,9 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Tire_Movement : NetworkBehaviour
+public class Tire_Movement : MonoBehaviour
 {
     public enum Axis
     {
@@ -42,14 +41,8 @@ public class Tire_Movement : NetworkBehaviour
     private Vector3 lastPos;
     private Quaternion initialRotation; private Rigidbody _rb;
 
-    void Awake()
+    public void Awake()
     {
-       
-    }
-
-    public override void Spawned()
-    {
-        if (!HasStateAuthority) return;
         _rb = GetComponent<Rigidbody>();
         if (wheelMesh == null)
         {
@@ -72,9 +65,8 @@ public class Tire_Movement : NetworkBehaviour
         }
     }
 
-    public override void FixedUpdateNetwork()
+    public void Update()
     {
-        if (!HasStateAuthority) return;
         CheckWallAndReflect();
         Move();
         RotateMesh();
@@ -160,7 +152,6 @@ public class Tire_Movement : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!HasStateAuthority) return;
         if (other.CompareTag("Player"))
         {
             var player = other.GetComponent<PlayerBlinking>() ??

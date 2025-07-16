@@ -78,10 +78,7 @@ public class VongXoayManager : MonoBehaviour
 
     void InitPlayerLivesUI()
     {
-        for(int i = 0; i < NetworkManager.instance.GetAllPlayers().Count; i++)
-        {
-            playerLiveTextUI[i].transform.parent.gameObject.SetActive(true);
-        }
+        
     }
 
     void HideTutorial()

@@ -16,22 +16,6 @@ public class WinManager : MonoBehaviour
 
     public void Awake()
     {
-        int index = 1;
-        foreach (var player in NetworkManager.instance.GetAllPlayers())
-        {
-            BoardGameData data = BoardGameData.instance;
-
-            if (player == data.winner)
-            {
-                //Runner.Spawn(playerPrefab, spawnPositions[0].position, Quaternion.Euler(0, -180, 0), player);
-            }
-            else
-            {
-                //Runner.Spawn(playerPrefab, spawnPositions[index].position, Quaternion.Euler(0, -180, 0), player);
-                index++;
-            }
-        }
-
         PlayCutscene();
     }
 

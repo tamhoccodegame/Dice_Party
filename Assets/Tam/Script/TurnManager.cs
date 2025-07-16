@@ -39,7 +39,6 @@ public class TurnManager : MonoBehaviour
 
         if (isFirstTry)
         {
-            BoardGameData.instance.EnsurePlayerStatAndInventory(NetworkManager.instance.GetAllPlayers());
             if (introCutscene.gameObject.activeSelf) StartCoroutine(DelayPlayIntroCutscene());
             else
             {
@@ -49,10 +48,7 @@ public class TurnManager : MonoBehaviour
                     {
                         StartCoroutine(DelayUpdatePlayerUI());
 
-                        foreach (var player in NetworkManager.instance.GetAllPlayers())
-                        {
-                            BoardGameData.instance.UpdateItem(player, new ElectricGun());
-                        }
+                        
                     }
 
                     UpdatePlayerDataUI();
@@ -99,11 +95,6 @@ public class TurnManager : MonoBehaviour
             if (isFirstTry)
             {
                 StartCoroutine(DelayUpdatePlayerUI());
-
-                foreach (var player in NetworkManager.instance.GetAllPlayers())
-                {
-                    BoardGameData.instance.UpdateItem(player, new ElectricGun());
-                }
             }
 
             UpdatePlayerDataUI();
@@ -175,7 +166,6 @@ public class TurnManager : MonoBehaviour
     void StartFirstTurn()
     {
             currentPlayerIndex = 0;
-            CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
 
         playerController[currentPlayerIndex].StartTurn();
         UpdateTurnUI();
@@ -184,14 +174,7 @@ public class TurnManager : MonoBehaviour
     public bool CheckWin()
     {
         BoardGameData data = BoardGameData.instance;
-        foreach (var player in NetworkManager.instance.GetAllPlayers())
-        {
-            if (data.playersBoardStat[player].cupQty >= 1)
-            {
-                data.winner = player;
-                return true;
-            }
-        }
+        
         return false;
     }
   

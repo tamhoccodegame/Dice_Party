@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using PlayFab.ClientModels;
 using PlayFab;
-using PlayFab.CloudScriptModels;
 using UnityEngine;
 using TMPro;
-using WebSocketSharp;
 using UnityEngine.UI;
 
 public class PlayFabRegister : MonoBehaviour

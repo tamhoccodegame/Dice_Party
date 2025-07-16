@@ -31,11 +31,7 @@ public class IdleState : BoardState
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            controller.RPC_RequestRollDice();
-        }
-        else if(Input.GetKeyDown(KeyCode.Q))
-        {
-            controller.RequestChangeState(NewBoardGameController.NetworkState.Item);
+            controller.RollDice();
         }
     }
 

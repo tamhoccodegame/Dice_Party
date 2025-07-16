@@ -1,14 +1,13 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CannonShooter : NetworkBehaviour
+public class CannonShooter : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform firePoint;                // Gán đầu nòng
     [SerializeField] private ProjectileData projectileData;
-    [SerializeField] private NetworkObject projectilePrefab;
+    [SerializeField] private GameObject projectilePrefab;
 
     [Header("Fire Control")]
     [SerializeField, Tooltip("Seconds per shot")]
@@ -16,18 +15,12 @@ public class CannonShooter : NetworkBehaviour
 
     private float _nextFireTime;
 
-    public override void Spawned()
+    public void Update()
     {
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-        if (!HasStateAuthority) return;
-
-        if (Runner.SimulationTime < _nextFireTime) return;
+        if (Time.time < _nextFireTime) return;
 
         Shoot();
-        _nextFireTime = Runner.SimulationTime + fireInterval;
+        _nextFireTime = Time.time + fireInterval;
     }
 
     private void Shoot()
@@ -41,11 +34,11 @@ public class CannonShooter : NetworkBehaviour
         // 1. VFX tại nòng đại bác khi bắn
         if (projectileData.shootVFX != null)
         {
-            NetworkObject flash = Runner.Spawn(projectileData.shootVFX, firePoint.position, firePoint.rotation);
+            GameObject flash = Instantiate(projectileData.shootVFX, firePoint.position, firePoint.rotation);
         }
 
         // Spawn đạn tại firePoint
-        NetworkObject projGO = Runner.Spawn(projectilePrefab, firePoint.position, firePoint.rotation);
+        GameObject projGO = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
 
         // Khởi tạo đạn
         if (projGO.TryGetComponent(out CannonProjectile proj))

@@ -1,5 +1,4 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,7 +20,7 @@ public class ItemState : BoardState
 
     public override void FixedUpdateNetwork()
     {
-        controller.currentItem.Tick(controller);
+        //controller.currentItem.Tick(controller);
     }
 
     public override void HandleInput()
