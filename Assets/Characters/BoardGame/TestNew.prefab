@@ -3965,7 +3965,7 @@ MonoBehaviour:
   gravity: -1000
   jumpImpulse: 8
   acceleration: 30
-  braking: 50
+  braking: 2000
   maxSpeed: 6
   rotationSpeed: 15
 --- !u!114 &2771086323349013419
@@ -3980,6 +3980,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ceeb4bb4840e1843aedd96c22c5e8e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _currentAnim: 
+  _NetworkPosition: {x: 0, y: 0, z: 0}
+  _networkState: 0
   _StepsLeft: 0
   feet: {fileID: 5339602891216914746}
   currentNode: {fileID: 0}
@@ -3991,6 +3994,7 @@ MonoBehaviour:
   arrowDirectionPrefab: {fileID: 9035063740964656231, guid: e788408d93fc4df4c869f756e543deab, type: 3}
   spawnedArrows: []
   rollDiceEffect: {fileID: 5714308519246576880}
+  currentItem: {fileID: 0}
   gunSpawnPoint: {fileID: 2852378781093316953}
 --- !u!1 &2713937601389622726
 GameObject:

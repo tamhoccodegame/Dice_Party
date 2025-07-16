@@ -283,7 +283,7 @@ public class NewBoardGameController : NetworkBehaviour
                 RPC_ChangeNetworkState(NetworkState.ChooseDirection);
                 yield break;
             }
-            StepsLeft = 5;
+            StepsLeft = 2;
         }
 
         RPC_ChangeAnimation("RollDice");

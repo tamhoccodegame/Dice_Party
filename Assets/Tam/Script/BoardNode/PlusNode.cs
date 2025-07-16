@@ -25,9 +25,10 @@ public class PlusNode : BoardNode
 
         NewBoardGameController player = Runner.FindObject(playerObject).GetComponent<NewBoardGameController>();
 
-        player.RequestSetStepLeft(3);
-
         player.RequestSetCurrentNode(Object.Id);
+
+        player.RequestSetStepLeft(4);
+
 
         yield return new WaitForSecondsRealtime(0.5f);
 

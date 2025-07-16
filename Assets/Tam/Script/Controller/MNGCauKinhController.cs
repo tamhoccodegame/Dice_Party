@@ -71,6 +71,7 @@ public class MNGCauKinhController : NetworkBehaviour
             if(data.buttons.IsSet(NetworkInputData.JUMPBUTTON))
             {
                 controller.Jump();
+                if(HasStateAuthority)
                 RPC_ChangeAnim("Jump");
             }
             
@@ -90,9 +91,11 @@ public class MNGCauKinhController : NetworkBehaviour
             if (controller.Grounded)
             {
                 if (moveDir.magnitude > 0)
-                    RPC_ChangeAnim("Run");
+                    if (HasStateAuthority)
+                        RPC_ChangeAnim("Run");
                 else
-                    RPC_ChangeAnim("Idle");
+                    if (HasStateAuthority)
+                        RPC_ChangeAnim("Idle");
             }
         }
     }
