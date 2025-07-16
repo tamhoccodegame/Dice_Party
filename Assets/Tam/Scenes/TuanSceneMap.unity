@@ -10629,10 +10629,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2272361821866055856, guid: c10d4bf43e839734c9ceabf0c5580d4f, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1413405897}
+      addedObject: {fileID: 1413405898}
     - targetCorrespondingSourceObject: {fileID: 2272361821866055856, guid: c10d4bf43e839734c9ceabf0c5580d4f, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1413405898}
+      addedObject: {fileID: 1413405899}
   m_SourcePrefab: {fileID: 100100000, guid: c10d4bf43e839734c9ceabf0c5580d4f, type: 3}
 --- !u!1 &246863579 stripped
 GameObject:
@@ -56318,22 +56318,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1496001727043469834, guid: c10d4bf43e839734c9ceabf0c5580d4f, type: 3}
   m_PrefabInstance: {fileID: 246863578}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1413405897
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 246863579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bff48069aeb074940b8f3b089fa4bb6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isStartNode: 0
-  nextNodes:
-  - {fileID: 630345182}
-  nodeEffect: {fileID: 0}
 --- !u!114 &1413405898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56351,8 +56335,25 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 1413405897}
+  - {fileID: 1413405899}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &1413405899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246863579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fd74004b9d351c428a24e5a621758d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isStartNode: 0
+  nextNodes:
+  - {fileID: 630345182}
+  nodeEffect: {fileID: 0}
+  keyPrefab: {fileID: 8877908127993203680, guid: a51c5fb30fdf682498a07183c5f28aff, type: 3}
 --- !u!1001 &1418044874
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -77642,7 +77643,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isStartNode: 0
   nextNodes:
-  - {fileID: 1413405897}
+  - {fileID: 1413405899}
   nodeEffect: {fileID: 0}
   keyPrefab: {fileID: 8877908127993203680, guid: a51c5fb30fdf682498a07183c5f28aff, type: 3}
 --- !u!1001 &1832650083
