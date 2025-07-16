@@ -26,22 +26,7 @@ public class Tire_Movement_Spline : MonoBehaviour
     private Vector3 lastPos;
     private bool goingBack = false;
 
-    //void Start()
-    //{
-    //    if (wheelMesh == null || follower == null)
-    //    {
-    //        Debug.LogError("Missing wheel mesh or spline follower.");
-    //        enabled = false;
-    //        return;
-    //    }
-
-    //    lastPos = transform.position;
-
-    //    // Event khi tới cuối
-    //    follower.onEndReached += OnEndReached;
-    //}
-
-    void Start()
+    public void Awake()
     {
         if (wheelMesh == null || follower == null)
         {
@@ -75,11 +60,10 @@ public class Tire_Movement_Spline : MonoBehaviour
         follower.direction = goingBack ? Spline.Direction.Backward : Spline.Direction.Forward;
     }
 
-
-
-    void Update()
+    private void Update()
     {
         RotateMesh();
+
     }
 
     void RotateMesh()
@@ -114,8 +98,8 @@ public class Tire_Movement_Spline : MonoBehaviour
     {
         if (collision.collider.CompareTag("Player"))
         {
-            var player = collision.collider.GetComponent<PlayerController_N>() ??
-                         collision.collider.GetComponentInParent<PlayerController_N>();
+            var player = collision.collider.GetComponent<PlayerBlinking>() ??
+                         collision.collider.GetComponentInParent<PlayerBlinking>();
 
             if (player != null)
             {

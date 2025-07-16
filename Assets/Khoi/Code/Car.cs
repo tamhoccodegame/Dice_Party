@@ -105,7 +105,7 @@ public class Car : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Pi"))
         {
             // Va chạm mặt đất, reset lực nếu cần
             rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z); // Chặn rớt xuống

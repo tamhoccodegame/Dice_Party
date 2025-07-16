@@ -1,5 +1,4 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +9,7 @@ public class FramerateMilestone
     public float speed;
 }
 
-public class CircleTrap : NetworkBehaviour
+public class CircleTrap : MonoBehaviour
 {
     public List<FramerateMilestone> framerateMilestones;
 
@@ -25,7 +24,7 @@ public class CircleTrap : NetworkBehaviour
         else if (soundName == "Blade") bladeSound.Play();
     }
 
-    [Networked] public float time { get; set; } = 0;
+    public float time { get; set; } = 0;
 
     public enum State
     {
@@ -36,14 +35,13 @@ public class CircleTrap : NetworkBehaviour
     }
 
     public State cachedState;
-    [Networked] public State state { get; set; }
+    public State state { get; set; }
 
     public Animator animator;
 
-    public override void Spawned()
+    public void Awake()
     {
         state = State.Null;
-        cachedState = state;
         InvokeRepeating(nameof(CountDown), 1f, 1f);
     }
 
@@ -57,8 +55,7 @@ public class CircleTrap : NetworkBehaviour
             animator.speed = framerateMilestones[currentMilestoneIndex].speed;
         }
     }
-
-    public override void FixedUpdateNetwork()
+    private void Update()
     {
         if (!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
 
@@ -67,17 +64,14 @@ public class CircleTrap : NetworkBehaviour
         if (cachedState != state)
         {
             cachedState = state;
-            RPC_ChangeAnimation();
+            ChangeAnimation();
         }
     }
 
     public void TryChangeState()
     {
         animator.CrossFade("PhaseTransition", 0.1f);
-        if (HasStateAuthority)
-        {
-            StartCoroutine(ChangeStateCoroutine());
-        }
+        StartCoroutine(ChangeStateCoroutine());
     }
 
     IEnumerator ChangeStateCoroutine()
@@ -87,12 +81,11 @@ public class CircleTrap : NetworkBehaviour
         state = (State)Random.Range(0, 3);
         if(state == cachedState)
         {
-            RPC_ChangeAnimation();
+            ChangeAnimation();
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_ChangeAnimation()
+    void ChangeAnimation()
     {
         switch (state)
         {

@@ -1,13 +1,10 @@
-using Fusion;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BoardItem
+public abstract class BoardItem : MonoBehaviour
 {
-    public string itemName;
-    public GameObject itemPrefab;
+    //public abstract void Use(NewBoardGameController controller);
+    //public abstract void Tick(NewBoardGameController controller);
 
-    public abstract void Use(BoardGameController controller);
-    public abstract void Tick(BoardGameController controller);
+    //public abstract IEnumerator ProcessCoroutine(NewBoardGameController controller);
 }

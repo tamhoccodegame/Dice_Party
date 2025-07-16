@@ -486,7 +486,7 @@ namespace Dreamteck.Splines {
             getSamples = false;
         }
 
-        private void Update()
+        public void Update()
         {
             if (updateMethod == UpdateMethod.Update)
             {

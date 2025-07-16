@@ -15,7 +15,7 @@ public class CannonShooter : MonoBehaviour
 
     private float _nextFireTime;
 
-    private void Update()
+    public void Update()
     {
         if (Time.time < _nextFireTime) return;
 
@@ -35,14 +35,10 @@ public class CannonShooter : MonoBehaviour
         if (projectileData.shootVFX != null)
         {
             GameObject flash = Instantiate(projectileData.shootVFX, firePoint.position, firePoint.rotation);
-            Destroy(flash, 2f); // auto cleanup
         }
 
         // Spawn đạn tại firePoint
-        GameObject projGO = Instantiate(
-            projectilePrefab,
-            firePoint.position,
-            firePoint.rotation);  // hướng theo nòng
+        GameObject projGO = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
 
         // Khởi tạo đạn
         if (projGO.TryGetComponent(out CannonProjectile proj))
