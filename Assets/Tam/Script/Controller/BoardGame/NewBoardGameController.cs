@@ -278,18 +278,17 @@ public class NewBoardGameController : NetworkBehaviour
     {
         if(HasStateAuthority)
         {
-            if(currentNode.nextNodes.Count > 1)
-            {
-                RPC_ChangeNetworkState(NetworkState.ChooseDirection);
-                yield break;
-            }
-            StepsLeft = 2;
+            StepsLeft = Random.Range(1, 10);
         }
 
         RPC_ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
-
-        RequestChangeState(NetworkState.Moving);
+        if (currentNode.nextNodes.Count > 1)
+        {
+            RPC_ChangeNetworkState(NetworkState.ChooseDirection);
+        }
+        else
+            RequestChangeState(NetworkState.Moving);
     }
 
     public void RequestSetStepLeft(int step)
