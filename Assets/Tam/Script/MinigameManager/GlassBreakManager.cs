@@ -1,11 +1,11 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -15,7 +15,7 @@ public class GlassCouple
     public BreakGlass glass2;
 }
 
-public class GlassBreakManager : NetworkBehaviour
+public class GlassBreakManager : MonoBehaviour
 {
     public static GlassBreakManager instance;
     public GlassCouple[] glassCouples;
@@ -31,17 +31,10 @@ public class GlassBreakManager : NetworkBehaviour
 
     public TextMeshProUGUI countDownText;
 
-    [Networked] public int time { get; set; }
+    public int time { get; set; }
 
-    [Networked]
-    [Capacity(4)]
-    [UnitySerializeField]
-    public NetworkDictionary<NetworkId, int> playerScores => default;
-
-    [Networked]
-    [Capacity(4)]
-    [UnitySerializeField]
-    public NetworkDictionary<PlayerRef, NetworkId> playerRanks => default;
+    public Dictionary<int, int> playerScores = new();
+    public Dictionary<int, GameObject> playerRanks => default;
 
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
@@ -56,10 +49,8 @@ public class GlassBreakManager : NetworkBehaviour
 
     public Transform spawnPosition;
 
-    [Networked]
     public bool isGameOver { get; set; } = false;
 
-    [Networked]
     public bool isGameStarted { get; set; } = false;
 
     public float fadeDuration = 1f;
@@ -67,11 +58,9 @@ public class GlassBreakManager : NetworkBehaviour
     public void FadeIn() => StartCoroutine(FadeBlackScreen(0, 1));
     public void FadeOut() => StartCoroutine(FadeBlackScreen(1, 0));
 
-    public override void Spawned()
+    public void Awake()
     {
         cam.enabled = false; 
-        if (Object.HasStateAuthority)
-        {
             foreach (var glassCouple in glassCouples)
             {
                 if (Random.value < 0.5f)
@@ -85,7 +74,6 @@ public class GlassBreakManager : NetworkBehaviour
                     glassCouple.glass2.SetBreakable(true);
                 }
             }
-        }
 
         countDownText.text = time.ToString();
         InvokeRepeating(nameof(CountDown), 0f, 1f);
@@ -94,15 +82,12 @@ public class GlassBreakManager : NetworkBehaviour
         instance = this;
         tutorialPanel.SetActive(true);
 
-        if (Object.HasStateAuthority)
-        {
-            RPC_HideTutorial();
-            RPC_InitPlayerScore();
-        }
+      
+            HideTutorial();
+            InitPlayersScore();
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_InitPlayerScore()
+    void InitPlayersScore()
     {
         for(int i = 0; i < NetworkManager.instance.GetAllPlayers().Count; i++)
         {
@@ -114,12 +99,9 @@ public class GlassBreakManager : NetworkBehaviour
     {
         if (!isGameStarted || isGameOver) return;
 
-        if (HasStateAuthority)
-        {
             time -= 1;
 
             CheckTimeOut();
-        }
         countDownText.text = time.ToString();
     }
 
@@ -134,61 +116,39 @@ public class GlassBreakManager : NetworkBehaviour
         }
 
     }
-
-    //Khi mà đến đích thì sẽ gọi hàm này
-    public void RequestAddRank(PlayerRef playerRef, NetworkId playerObject)
-    {
-        if (Object.HasStateAuthority)
-        {
-            UpdateRank(playerRef, playerObject);
-        }
-        else
-        {
-            RPC_RequestUpdateRank(playerRef, playerObject);
-        }
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-
-    public void RPC_RequestUpdateRank(PlayerRef playerRef, NetworkId playerObject)
-    {
-        UpdateRank(playerRef, playerObject);
-    }
-
-    public void UpdateRank(PlayerRef playerRef, NetworkId playerObject)
+    public void UpdateRank()
     {
         if (isGameOver) return;
 
-        if (!playerRanks.ContainsKey(playerRef))
-        {
-            playerRanks.Add(playerRef, playerObject);
-        }
+        //if (!playerRanks.ContainsKey(playerRef))
+        //{
+        //    playerRanks.Add(playerRef, playerObject);
+        //}
 
-        if (Object.HasStateAuthority)
-        {
-            RPC_UpdateUILive(playerObject);
-        }
+        //if (Object.HasStateAuthority)
+        //{
+        //    RPC_UpdateUILive(playerObject);
+        //}
 
-        if (CheckGameOver())
-        {
-            isGameOver = true;
-            RPC_ShowGameOverPanel();
+        //if (CheckGameOver())
+        //{
+        //    isGameOver = true;
+        //    RPC_ShowGameOverPanel();
 
-            //if (playerRanks.Count >= 2)
-            {
-                RPC_SpawnRewardAvatar();
-            }
-        }
+        //    //if (playerRanks.Count >= 2)
+        //    {
+        //        RPC_SpawnRewardAvatar();
+        //    }
+        //}
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateUILive(NetworkId playerId)
+    void UpdateUILive()
     {
         for(int i = 0; i < playerScores.Count; i++)
         {
-            if (playerScores.ElementAt(i).Key == playerId)
-                playerTextUI[i].text = playerScores.ElementAt(i).Value.ToString();
-            else continue;
+            //if (playerScores.ElementAt(i).Key == playerId)
+            //    playerTextUI[i].text = playerScores.ElementAt(i).Value.ToString();
+            //else continue;
         }
     }
 
@@ -213,8 +173,7 @@ public class GlassBreakManager : NetworkBehaviour
         blackScreen.color = newColor;
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_HideTutorial()
+    void HideTutorial()
     {
         StartCoroutine(HideTutorialCouroutine());
     }
@@ -239,10 +198,7 @@ public class GlassBreakManager : NetworkBehaviour
     {
         Destroy(obj.gameObject);
         FindFirstObjectByType<GlobalVolume>().StartFadeOut();
-        if (Object.HasStateAuthority)
-        {
             isGameStarted = true;
-        }
     }
 
     IEnumerator ReturnToBoard()
@@ -257,23 +213,21 @@ public class GlassBreakManager : NetworkBehaviour
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         yield return new WaitForSecondsRealtime(3f);
 
-        if (HasStateAuthority)
-            Runner.LoadScene("TuanSceneMap");
+            SceneManager.LoadScene("TuanSceneMap");
     }
 
     bool CheckGameOver()
     {
-        return playerRanks.Count >= Runner.ActivePlayers.Count();
+        return false;
+        //return playerRanks.Count >= Runner.ActivePlayers.Count();
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     void RPC_ShowGameOverPanel()
     {
         StartCoroutine(ReturnToBoard());
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SpawnRewardAvatar()
+    public void SpawnRewardAvatar()
     {
         StartCoroutine(SpawnRewardAvatarDelayed());
     }
@@ -286,41 +240,41 @@ public class GlassBreakManager : NetworkBehaviour
         GameObject.Find("FreeLook Camera").SetActive(false);
         for (int i = 0; i < playerRanks.Count; i++)
         {
-            NetworkObject iRankObject = Runner.FindObject(playerRanks.ElementAt(i).Value);
-            NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
-            iCc.gravity = 0;
-            iCc.jumpImpulse = 0;
-            iCc.acceleration = 0;
-            iCc.maxSpeed = 0;
+            //NetworkObject iRankObject = Runner.FindObject(playerRanks.ElementAt(i).Value);
+            //NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
+            //iCc.gravity = 0;
+            //iCc.jumpImpulse = 0;
+            //iCc.acceleration = 0;
+            //iCc.maxSpeed = 0;
 
-            if (HasStateAuthority)
-            {
-                iCc.Teleport(rankPositions[i].position, Quaternion.Euler(0, -90, 0));
-            }
+            //if (HasStateAuthority)
+            //{
+            //    iCc.Teleport(rankPositions[i].position, Quaternion.Euler(0, -90, 0));
+            //}
 
-            MNGCauKinhController iCk = iRankObject.GetComponent<MNGCauKinhController>();
-            iCk.enabled = false;
-            Animator iAnimator = iRankObject.GetComponent<Animator>();
+            //MNGCauKinhController iCk = iRankObject.GetComponent<MNGCauKinhController>();
+            //iCk.enabled = false;
+            //Animator iAnimator = iRankObject.GetComponent<Animator>();
 
-            if (iCk.isGoal)
-            {
-                Debug.Log(i);
-                if (i == 0) iAnimator.Play("Win");
-                else iAnimator.Play("Lose");
-            }
-            else
-            {
-                iAnimator.Play("Lose");
-            }
+            //if (iCk.isGoal)
+            //{
+            //    Debug.Log(i);
+            //    if (i == 0) iAnimator.Play("Win");
+            //    else iAnimator.Play("Lose");
+            //}
+            //else
+            //{
+            //    iAnimator.Play("Lose");
+            //}
             #endregion
 
             #region UISlot
-            gameOverSlots[i].gameObject.SetActive(true);
-            gameOverSlots[i].keyQtyText.text = "10";
-            gameOverSlots[i].rankText.text = $"{i + 1}";
+            //gameOverSlots[i].gameObject.SetActive(true);
+            //gameOverSlots[i].keyQtyText.text = "10";
+            //gameOverSlots[i].rankText.text = $"{i + 1}";
 
-            string playerName = BoardGameData.instance.GetName(playerRanks.ElementAt(i).Key);
-            gameOverSlots[i].nameText.text = playerName;
+            //string playerName = BoardGameData.instance.GetName(playerRanks.ElementAt(i).Key);
+            //gameOverSlots[i].nameText.text = playerName;
             #endregion
         }
 

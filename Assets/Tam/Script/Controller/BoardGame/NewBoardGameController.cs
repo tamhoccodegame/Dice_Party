@@ -241,7 +241,7 @@ public class NewBoardGameController : MonoBehaviour
     }
 
 
-    void ChooseDirection(int index)
+    public void ChooseDirection(int index)
     {
         toMoveNode = currentNode.nextNodes[index];
         ChangeState(movingState);
