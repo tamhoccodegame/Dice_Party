@@ -1,41 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
-using Fusion;
 using UnityEngine;
 
-public class PlayerSetup : NetworkBehaviour
+public class PlayerSetup : MonoBehaviour
 {
     public GameObject[] hairs;
     public GameObject[] colors;
     public GameObject[] bodyparts;
 
-
-    private void Start()
+    public void Awake()
     {
-        if (!Object.HasInputAuthority) return;
-
-        CustomData data = NetworkManager.customData;
-        if (data != null)
-            RPC_RequestUpdateCustom(data.hairIndex, data.colorIndex, data.bodyPartIndex);
+        CustomData data = SystemManager.customData;
+        UpdateCustom(data.hairIndex, data.colorIndex, data.bodyPartIndex);
     }
 
-    public override void Spawned()
-    {
-        if (!Object.HasInputAuthority) return;
 
-        CustomData data = NetworkManager.customData;
-        if(data != null) 
-        RPC_RequestUpdateCustom(data.hairIndex, data.colorIndex, data.bodyPartIndex);
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestUpdateCustom(int hairIndex, int colorIndex, int bodyPartIndex)
-    {
-        RPC_UpdateCustom(hairIndex, colorIndex, bodyPartIndex);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_UpdateCustom(int hairIndex, int colorIndex, int bodyPartIndex)
+    public void UpdateCustom(int hairIndex, int colorIndex, int bodyPartIndex)
     {
         for (int i = 0; i < hairs.Length; i++)
         {

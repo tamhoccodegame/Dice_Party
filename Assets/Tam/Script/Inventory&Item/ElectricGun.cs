@@ -1,39 +1,65 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.VFX;
 
 public class ElectricGun : BoardItem
 {
-    private GameObject spawnedGun;
-    public override void Use(BoardGameController controller)
-    {
-        if (!controller.HasInputAuthority) return;
+    public LaserBeam laserBeam;
+    public VisualEffect laserEffect;
 
-        itemPrefab = ItemDatabase.instance.GetItemPrefab("ElectricGun");
+    //private void Start()
+    //{
+        
+    //}
 
-        spawnedGun = Object.Instantiate(itemPrefab,
-            controller.gunSpawnPoint.position,
-            controller.gunSpawnPoint.rotation,
-            controller.gunSpawnPoint);
+    //public override void Spawned()
+    //{
+    //    laserEffect.Stop();
+    //    laserEffect.playRate = 3.5f;
+    //}
 
-        controller.SetUsingItem(this);
-    }
+    //public override void Use(NewBoardGameController controller)
+    //{
+    //    controller.RequestChangeAnimation("GunAim");
 
-    public override void Tick(BoardGameController controller)
-    {
-        controller.GetComponent<CharacterController>().enabled = false;
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
-        Vector3 inputDir = new Vector3(h, 0, v);
+    //    controller.RequestSetItemPosition(0);
 
-        if (inputDir.sqrMagnitude > 0.1f)
-        {
-            controller.transform.forward = inputDir;
-        }
+    //}
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            controller.RPC_FireGun();
-            Object.Destroy(spawnedGun);
-            controller.ClearUsingItem();
-        }
-    }
+    //public override void Tick(NewBoardGameController controller)
+    //{
+
+    //    controller.GetComponent<CharacterController>().enabled = false;
+
+    //    float rotationSpeed = 90f; // độ/giây, quay 90 độ mỗi giây nếu giữ A hoặc D
+
+    //    if (controller.GetInput(out NetworkInputData input))
+    //    {
+    //        float h = input.direction.x;
+
+    //        if (Mathf.Abs(h) > 0.01f)
+    //        {
+    //            controller.transform.Rotate(0f, h * rotationSpeed * controller.Runner.DeltaTime, 0f);
+    //        }
+
+    //        if (input.buttons.IsSet(NetworkInputData.JUMPBUTTON))
+    //        {
+    //            controller.RequestTriggerItem();
+    //        }
+    //    }
+    //}
+
+    //public override IEnumerator ProcessCoroutine(NewBoardGameController controller)
+    //{
+    //    laserEffect.Play();
+
+    //    yield return new WaitForSecondsRealtime(2f);
+
+    //    if (controller.HasInputAuthority && laserBeam.hitTarget != null)
+    //        laserBeam.ApplyDamage();
+
+    //    yield return new WaitForSecondsRealtime(1.5f);
+
+    //    controller.RequestChangeState(NewBoardGameController.NetworkState.Idle);
+    //    ItemDatabase.instance.ReturnItemPosition(this);
+    //}
 }

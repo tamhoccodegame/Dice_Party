@@ -1,9 +1,9 @@
-using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class LevelLoader : NetworkBehaviour
+public class LevelLoader : MonoBehaviour
 {
     public static LevelLoader instance;
 
@@ -22,13 +22,13 @@ public class LevelLoader : NetworkBehaviour
     public void LoadScene(string sceneName)
     {
         animator.Play("StartLoad");
-        if(HasStateAuthority) StartCoroutine(WaitToLoad(sceneName));
+        StartCoroutine(WaitToLoad(sceneName));
     }
 
     IEnumerator WaitToLoad(string sceneName)
     {
         yield return new WaitForSeconds(3f);
-        Runner.LoadScene(sceneName);
+        SceneManager.LoadScene(sceneName);
     }
 
 

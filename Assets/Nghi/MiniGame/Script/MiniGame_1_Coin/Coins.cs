@@ -9,7 +9,7 @@ public class Coins : MonoBehaviour
     [Tooltip("Speed at which the coin rotates around the Y-axis.")]
     public float rotationSpeed = 90f;
 
-    void Update()
+    public void Update()
     {
         // Rotate the coin around its Y axis
         transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime, Space.World);
@@ -27,24 +27,22 @@ public class Coins : MonoBehaviour
     [Tooltip("Auto destroy delay after pickup (for VFX to play).")]
     public float destroyDelay = 0.1f;
 
-    private bool isCollected = false;
-    private bool canBeCollected = false;
+    private bool isCollected { get; set; } = false;
+    private bool canBeCollected { get; set; } = true;
 
-    private void Start()
+    public void Awake()
     {
         if (lifetime > 2)
             Destroy(gameObject, lifetime);
+    }  
 
-        StartCoroutine(EnablePickupAfterDelay(0.8f));
-    }
-
-    private void OnCollisionEnter(Collision collision)
+    public void EatCoin()
     {
-        if (!collision.collider.CompareTag("Player") || isCollected || !canBeCollected) return;
+        if(isCollected || !canBeCollected) return;  
 
         isCollected = true;
 
-        Coin_Manager.Instance.AddCoins(value);
+        //Coin_Manager.Instance.RequestUpdateCoin(Runner.FindObject(eater).GetComponent<NetworkObject>().InputAuthority, value);
 
         if (pickupVFX != null)
             Instantiate(pickupVFX, transform.position, Quaternion.identity);
@@ -59,15 +57,16 @@ public class Coins : MonoBehaviour
         Destroy(gameObject, destroyDelay);
     }
 
-
     public void SetLifetime(float time)
     {
         lifetime = time;
+        canBeCollected = false;
+        StartCoroutine(EnablePickupAfterDelay(0.9f));
     }
 
     private IEnumerator EnablePickupAfterDelay(float delay)
     {
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSecondsRealtime(delay);
         canBeCollected = true;
     }
 }

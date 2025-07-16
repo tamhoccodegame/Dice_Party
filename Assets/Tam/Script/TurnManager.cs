@@ -1,5 +1,4 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -7,14 +6,12 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 
-public class TurnManager : NetworkBehaviour
+public class TurnManager : MonoBehaviour
 {
     public static TurnManager instance;
-    public List<BoardGameController> playerController;
-    [Networked] public int currentPlayerIndex { get; set; }
-    [Networked] public PlayerRef currentPlayerRef { get; set; }
-
-    [Networked] public bool isFirstTry { get; set; } = true;
+    public List<NewBoardGameController> playerController;
+    public int currentPlayerIndex { get; set; }
+     public bool isFirstTry { get; set; } = true;
 
     [Header("BXH")]
     public Transform slotTemplate;
@@ -24,56 +21,55 @@ public class TurnManager : NetworkBehaviour
 
     public PlayableDirector introCutscene;
 
-    public enum GameState
-    {
-        BoardGame,
-        MiniGame
-    }
-
-    public GameState currentState;
-
     public Image blackScreen;
     public float fadeDuration = 1f;
 
     [Header("Demo")]
     public Transform chestGold;
 
-    private void Awake()
+    public void Awake()
     {
         instance = this;
-    }
 
-    public override void Spawned()
-    {
         GetComponent<PlayerSpawner>().SpawnPlayer();
         MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
         StartCoroutine(FadeBlackScreen(1, 0));
 
-        playerController = FindObjectsByType<BoardGameController>(FindObjectsSortMode.InstanceID).ToList();
+        playerController = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.InstanceID).ToList();
 
         if (isFirstTry)
         {
-            BoardGameData.instance.EnsurePlayerStat(NetworkManager.instance.GetAllPlayers());
-            if (HasStateAuthority) StartCoroutine(DelayPlayIntroCutscene());
+            if (introCutscene.gameObject.activeSelf) StartCoroutine(DelayPlayIntroCutscene());
+            else
+            {
+                
+                    //ShowChestGoldAndStartFirstTurn();
+                    if (isFirstTry)
+                    {
+                        StartCoroutine(DelayUpdatePlayerUI());
+
+                        
+                    }
+
+                    UpdatePlayerDataUI();
+            }
         }
         else
         {
-            if (Object.HasStateAuthority)
-            {
-                RPC_StartFirstTurn();
+           
+                StartFirstTurn();
 
                 if (isFirstTry)
                 {
                     StartCoroutine(DelayUpdatePlayerUI());
 
-                    foreach (var player in NetworkManager.instance.GetAllPlayers())
-                    {
-                        BoardGameData.instance.UpdateItem(player, new ElectricGun());
-                    }
+                    //foreach (var player in NetworkManager.instance.GetAllPlayers())
+                    //{
+                    //    BoardGameData.instance.UpdateItem(player, new ElectricGun());
+                    //}
                 }
 
-                RPC_UpdatePlayerDataUI();
-            }
+                UpdatePlayerDataUI();
         }
 
     }
@@ -81,11 +77,10 @@ public class TurnManager : NetworkBehaviour
     IEnumerator DelayPlayIntroCutscene()
     {
         yield return new WaitForSecondsRealtime(1f);
-        RPC_PlayIntroCutscene();
+        PlayIntroCutscene();
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_PlayIntroCutscene()
+    void PlayIntroCutscene()
     {
         introCutscene.Play();
         introCutscene.stopped += IntroCutscene_stopped;
@@ -95,115 +90,39 @@ public class TurnManager : NetworkBehaviour
     {
         Destroy(obj.gameObject);
         FindFirstObjectByType<GlobalVolume>().StartFadeOut();
-        if (Object.HasStateAuthority)
-        {
-            RPC_ShowChestGoldAndStartFirstTurn();
+        
+            ShowChestGoldAndStartFirstTurn();
             if (isFirstTry)
             {
                 StartCoroutine(DelayUpdatePlayerUI());
-
-                foreach (var player in NetworkManager.instance.GetAllPlayers())
-                {
-                    BoardGameData.instance.UpdateItem(player, new ElectricGun());
-                }
             }
 
-            RPC_UpdatePlayerDataUI();
-        }
-
+            UpdatePlayerDataUI();
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_ShowChestGoldAndStartFirstTurn()
+    void ShowChestGoldAndStartFirstTurn()
     {
         StartCoroutine(ShowChestGoldAndStartFirstTurnCoroutine());
     }
 
     IEnumerator ShowChestGoldAndStartFirstTurnCoroutine()
     {
-        if(HasStateAuthority)
-        CameraFollow.instance.RPC_StartFollowTarget(chestGold.GetComponent<NetworkObject>().Id);
+        //CameraFollow.instance.RPC_StartFollowTarget(chestGold.GetComponent<NetworkObject>().Id);
         yield return new WaitForSecondsRealtime(3f);
         chestGold.GetComponent<ChestGoldNode>().chest.Play("FlyDown");
         yield return new WaitForSecondsRealtime(3f);
-        if(HasStateAuthority)
-        RPC_StartFirstTurn();
+        StartFirstTurn();
     }
 
     IEnumerator DelayUpdatePlayerUI()
     {
-        foreach (var player in NetworkManager.instance.GetAllPlayers())
-        {
-            RPC_UpdateKey(player, 0);
-            RPC_UpdateCup(player, 0);
-            RPC_UpdateHealth(player, 30);
-        }
         yield return new WaitForSecondsRealtime(0.5f);
 
-        RPC_UpdatePlayerDataUI();
-    }
-
-    #region PlayerBoardData
-    public void RequestUpdateKey(PlayerRef player, int ammount)
-    {
-        if (HasStateAuthority)
-        {
-            RPC_UpdateKey(player, ammount);
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateKey(PlayerRef player, int ammount)
-    {
-        BoardGameData.instance.UpdateKey(player, ammount);
-        if (HasStateAuthority)
-        {
-            RPC_UpdatePlayerDataUI();
-        }
-    }
-
-    public void RequestUpdateCup(PlayerRef player, int ammount)
-    {
-        if (HasStateAuthority)
-        {
-            RPC_UpdateCup(player, ammount);
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateCup(PlayerRef player, int ammount)
-    {
-        BoardGameData.instance.UpdateCup(player, ammount);
-        if (HasStateAuthority)
-        {
-            RPC_UpdatePlayerDataUI();
-        }
-    }
-
-    public void RequestUpdateHealth(PlayerRef player, int ammount)
-    {
-        if (HasStateAuthority)
-        {
-            RPC_UpdateHealth(player, ammount);
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateHealth(PlayerRef player, int ammount)
-    {
-        BoardGameData.instance.UpdateHealth(player, ammount);
-        if (HasStateAuthority)
-        {
-            RPC_UpdatePlayerDataUI();
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_UpdatePlayerDataUI()
-    {
         UpdatePlayerDataUI();
     }
 
+    #region PlayerBoardData
+    
     public void UpdatePlayerDataUI()
     {
         foreach (Transform child in slotContainer)
@@ -213,29 +132,29 @@ public class TurnManager : NetworkBehaviour
         }
 
         #region UpdatePlayerBoardStatUI
-        Debug.Log("playersBoardStat count: " + BoardGameData.instance.playersBoardStat.Count);
+        //Debug.Log("playersBoardStat count: " + BoardGameData.instance.playersBoardStat.Count);
 
-        Dictionary<PlayerRef, BoardGameStat> dictCopy = BoardGameData.instance.playersBoardStat;
-        dictCopy.OrderByDescending(d => d.Value.cupQty);
+        //Dictionary<PlayerRef, BoardGameStat> dictCopy = BoardGameData.instance.playersBoardStat;
+        //dictCopy.OrderByDescending(d => d.Value.cupQty);
 
-        foreach (var kvp in dictCopy)
-        {
-            RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
-            slotRect.gameObject.SetActive(true);
+        //foreach (var kvp in dictCopy)
+        //{
+        //    RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
+        //    slotRect.gameObject.SetActive(true);
 
-            BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
+        //    BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
 
-            boardSlotRect.UpdateCup(kvp.Value.cupQty);
-            boardSlotRect.UpdateKey(kvp.Value.keyQty);
-            boardSlotRect.UpdateHealth(kvp.Value.health);
+        //    boardSlotRect.UpdateCup(kvp.Value.cupQty);
+        //    boardSlotRect.UpdateKey(kvp.Value.keyQty);
+        //    boardSlotRect.UpdateHealth(kvp.Value.health);
 
-            string playerName = BoardGameData.instance.GetName(kvp.Key);
+        //    string playerName = BoardGameData.instance.GetName(kvp.Key);
 
-            if (string.IsNullOrEmpty(playerName))
-                boardSlotRect.UpdateName(kvp.Key.PlayerId.ToString());
-            else
-                boardSlotRect.UpdateName(playerName);
-        }
+        //    if (string.IsNullOrEmpty(playerName))
+        //        boardSlotRect.UpdateName(kvp.Key.PlayerId.ToString());
+        //    else
+        //        boardSlotRect.UpdateName(playerName);
+        //}
         #endregion
     }
 
@@ -244,15 +163,9 @@ public class TurnManager : NetworkBehaviour
 
     #region Turn
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_StartFirstTurn()
+    void StartFirstTurn()
     {
-        if (Object.HasStateAuthority)
-        {
             currentPlayerIndex = 0;
-            currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
-            CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
-        }
 
         playerController[currentPlayerIndex].StartTurn();
         UpdateTurnUI();
@@ -261,56 +174,19 @@ public class TurnManager : NetworkBehaviour
     public bool CheckWin()
     {
         BoardGameData data = BoardGameData.instance;
-        foreach (var player in NetworkManager.instance.GetAllPlayers())
-        {
-            if (data.playersBoardStat[player].cupQty >= 1)
-            {
-                data.winner = player;
-                return true;
-            }
-        }
+        
         return false;
     }
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_RequestNextTurn()
+  
+    public void NextTurn()
     {
-        RPC_NextTurn();
-    }
-
-    public void RequestNextTurn()
-    {
-        if (Object.HasStateAuthority)
-            if (CheckWin())
-            {
-                RPC_LoadScene("Win");
-                return;
-            }
-
-        if (Object.HasStateAuthority)
-        {
-            RPC_NextTurn();
-        }
-        else
-        {
-            RPC_RequestNextTurn();
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_NextTurn()
-    {
-        if (Object.HasStateAuthority)
-        {
             currentPlayerIndex = (currentPlayerIndex + 1) % playerController.Count;
-            currentPlayerRef = playerController[currentPlayerIndex].Object.InputAuthority;
             if (currentPlayerIndex == 0)
             {
-                RPC_LoadScene(isFirstTry ? "MNG3" : "MNG1");
+                LoadScene(isFirstTry ? "MNG3" : "MNG3");
             }
-            CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
-        }
-
+            //CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
+        
         if (currentPlayerIndex != 0)
         {
             playerController[currentPlayerIndex].StartTurn();
@@ -320,14 +196,14 @@ public class TurnManager : NetworkBehaviour
 
     void UpdateTurnUI()
     {
-        if (currentPlayerRef == Runner.LocalPlayer)
-        {
-            turnNotifyText.text = "Your Turn";
-        }
-        else
-        {
-            turnNotifyText.text = $"{playerController[currentPlayerIndex].name}'s Turn";
-        }
+        //if (currentPlayerRef == Runner.LocalPlayer)
+        //{
+        //    turnNotifyText.text = "Your Turn";
+        //}
+        //else
+        //{
+        //    turnNotifyText.text = $"{playerController[currentPlayerIndex].name}'s Turn";
+        //}
 
         turnNotifyText.gameObject.SetActive(true);
     }
@@ -357,8 +233,7 @@ public class TurnManager : NetworkBehaviour
         blackScreen.color = newColor;
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_LoadScene(string sceneName)
+    void LoadScene(string sceneName)
     {
         StartCoroutine(LoadSceneCoroutine(sceneName));
     }

@@ -1,31 +1,22 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class VongXoayManager : NetworkBehaviour
+public class VongXoayManager : MonoBehaviour
 {
     public static VongXoayManager instance;
 
-    [Networked]
-    [Capacity(4)]
-    [UnitySerializeField]
-    public NetworkDictionary<NetworkId, int> playerLives => default;
+    public Dictionary<int, int> playerLives = new Dictionary<int, int>();
 
-    [Networked]
-    [Capacity(4)]
-    [UnitySerializeField]
-    public NetworkDictionary<PlayerRef, NetworkId> playerRanks => default;
+    public Dictionary<int, GameObject> playerRanks = new Dictionary<int, GameObject>();
 
-    [Networked]
     public bool isGameOver { get; set; } = false;
 
-
-    [Networked]
     public bool isGameStarted { get; set; } = false;
 
     public PlayableDirector introCutscene;
@@ -54,17 +45,14 @@ public class VongXoayManager : NetworkBehaviour
     public void FadeIn() => StartCoroutine(FadeBlackScreen(0, 1));
     public void FadeOut() => StartCoroutine(FadeBlackScreen(1, 0));
 
-    public override void Spawned()
+    public void Awake()
     {
         MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
         instance = this;
         tutorialPanel.SetActive(true);
 
-        if (Object.HasStateAuthority)
-        {
-            RPC_HideTutorial();
-            RPC_InitPlayerLivesUI();
-        }
+            HideTutorial();
+            InitPlayerLivesUI();
     }
 
     private IEnumerator FadeBlackScreen(float from, float to)
@@ -88,17 +76,12 @@ public class VongXoayManager : NetworkBehaviour
         blackScreen.color = newColor;
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_InitPlayerLivesUI()
+    void InitPlayerLivesUI()
     {
-        for(int i = 0; i < NetworkManager.instance.GetAllPlayers().Count; i++)
-        {
-            playerLiveTextUI[i].transform.parent.gameObject.SetActive(true);
-        }
+        
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_HideTutorial()
+    void HideTutorial()
     {
         StartCoroutine(HideTutorialCouroutine());
     }
@@ -123,63 +106,40 @@ public class VongXoayManager : NetworkBehaviour
     {
         Destroy(obj.gameObject);
         //FindFirstObjectByType<GlobalVolume>().StartFadeOut();
-        if (Object.HasStateAuthority)
-        {
+        
             isGameStarted = true;
-        }
     }
-
-    public void RequestUpdateLive(PlayerRef playerRef, NetworkId playerObject)
+    private void UpdateLive()
     {
         if (isGameOver) return;
 
-        if (Object.HasStateAuthority)
-        {
-            UpdateLive(playerRef, playerObject);
-        }
-        else
-        {
-            RPC_RequestUpdateLive(playerRef, playerObject);
-        }
-    }
+        //if (playerLives.TryGet(playerObject, out int value))
+        //{
+        //    playerLives.Set(playerObject, value - 1);
+        //}
+        //else
+        //{
+        //    playerLives.Add(playerObject, 3);
+        //}
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_RequestUpdateLive(PlayerRef playerRef, NetworkId playerObject)
-    {
-        UpdateLive(playerRef, playerObject);
-    }
+        //if (playerLives[playerObject] <= 0 && !playerRanks.ContainsKey(playerRef))
+        //{
+        //    playerRanks.Add(playerRef, playerObject);
+        //}
 
-    private void UpdateLive(PlayerRef playerRef, NetworkId playerObject)
-    {
-        if (isGameOver) return;
+        //if (Object.HasStateAuthority)
+        //{
+        //    RPC_UpdateUILive();
+        //}
 
-        if (playerLives.TryGet(playerObject, out int value))
-        {
-            playerLives.Set(playerObject, value - 1);
-        }
-        else
-        {
-            playerLives.Add(playerObject, 3);
-        }
+        //if (CheckGameOver())
+        //{
+        //    isGameOver = true;
+        //    RPC_ShowGameOverPanel();
 
-        if (playerLives[playerObject] <= 0 && !playerRanks.ContainsKey(playerRef))
-        {
-            playerRanks.Add(playerRef, playerObject);
-        }
-
-        if (Object.HasStateAuthority)
-        {
-            RPC_UpdateUILive();
-        }
-
-        if (CheckGameOver())
-        {
-            isGameOver = true;
-            RPC_ShowGameOverPanel();
-
-            //if (playerRanks.Count >= 2)
-            playerRanks.Reverse();
-        }
+        //    //if (playerRanks.Count >= 2)
+        //    playerRanks.Reverse();
+        //}
     }
 
     IEnumerator ReturnToBoard()
@@ -187,8 +147,7 @@ public class VongXoayManager : NetworkBehaviour
         //Volume active
         gameOverVolume.SetActive(true); 
         yield return new WaitForSecondsRealtime(1.5f);
-        if(HasStateAuthority) 
-        RPC_SpawnRewardAvatar();
+        SpawnRewardAvatar();
         yield return null;
         gameOverPanel.SetActive(true);
         gameOverVolume.SetActive(false);
@@ -196,8 +155,7 @@ public class VongXoayManager : NetworkBehaviour
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         yield return new WaitForSecondsRealtime(3f);
 
-        if(HasStateAuthority)
-        Runner.LoadScene("TuanSceneMap");
+        SceneManager.LoadScene("TuanSceneMap");
     }
 
     bool CheckGameOver()
@@ -205,60 +163,57 @@ public class VongXoayManager : NetworkBehaviour
         return playerLives.All(kvp => kvp.Value <= 0);
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_ShowGameOverPanel()
+    void ShowGameOverPanel()
     {
         StartCoroutine(ReturnToBoard());
     }
 
-    [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
-    public void RPC_SpawnRewardAvatar()
+    public void SpawnRewardAvatar()
     {
-        whoWinsText.text = BoardGameData.instance.GetName(playerRanks.ElementAt(0).Key) + " Wins";
+        //whoWinsText.text = BoardGameData.instance.GetName(playerRanks.ElementAt(0).Key) + " Wins";
         for (int i = 0; i < playerRanks.Count; i++)
         {
             #region Player
-            NetworkObject iRankObject = Runner.FindObject(playerRanks.ElementAt(i).Value);
-            NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
-            iCc.gravity = 0;
-            iCc.jumpImpulse = 0;
+            //NetworkObject iRankObject = Runner.FindObject(playerRanks.ElementAt(i).Value);
+            //NetworkCharacterController iCc = iRankObject.GetComponent<NetworkCharacterController>();
+            //iCc.gravity = 0;
+            //iCc.jumpImpulse = 0;
 
-            if (HasStateAuthority)
-            {
-                iCc.Teleport(rankPositions[i].position, Quaternion.Euler(0, -90, 0));
-            }
+            //if (HasStateAuthority)
+            //{
+            //    iCc.Teleport(rankPositions[i].position, Quaternion.Euler(0, -90, 0));
+            //}
 
-            Animator iAnimator = iRankObject.GetComponent<Animator>();
+            //Animator iAnimator = iRankObject.GetComponent<Animator>();
 
-            if (i == 0) iAnimator.Play("Win");
-            else iAnimator.Play("Lose");
+            //if (i == 0) iAnimator.Play("Win");
+            //else iAnimator.Play("Lose");
             #endregion
 
             #region UISlot
-            gameOverSlots[i].gameObject.SetActive(true);
-            gameOverSlots[i].keyQtyText.text = "10";
-            gameOverSlots[i].rankText.text = $"{i + 1}";
+            //gameOverSlots[i].gameObject.SetActive(true);
+            //gameOverSlots[i].keyQtyText.text = "10";
+            //gameOverSlots[i].rankText.text = $"{i + 1}";
 
-            string playerName = BoardGameData.instance.GetName(playerRanks.ElementAt(i).Key);
-            gameOverSlots[i].nameText.text = playerName;
-            #endregion
+            //string playerName = BoardGameData.instance.GetName(playerRanks.ElementAt(i).Key);
+            //gameOverSlots[i].nameText.text = playerName;
+            //#endregion
 
-            #region Reward
-            BoardGameData data = BoardGameData.instance;
-            if(data != null)
-            {
-                int rewardKeyQty = i == 0 ? 8 : 4;
-                data.UpdateKey(iRankObject.InputAuthority, rewardKeyQty);
+            //#region Reward
+            //BoardGameData data = BoardGameData.instance;
+            //if(data != null)
+            //{
+            //    int rewardKeyQty = i == 0 ? 8 : 4;
+            //    data.UpdateKey(iRankObject.InputAuthority, rewardKeyQty);
 
-                //BoardItem boardItem = new ElectricGun();
-                //data.UpdateItem(iRankObject.InputAuthority, boardItem);
-            }
+            //    //BoardItem boardItem = new ElectricGun();
+            //    //data.UpdateItem(iRankObject.InputAuthority, boardItem);
+            //}
             #endregion
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_UpdateUILive()
+    void UpdateUILive()
     {
         int index = 0;
         foreach (var kvp in playerLives)

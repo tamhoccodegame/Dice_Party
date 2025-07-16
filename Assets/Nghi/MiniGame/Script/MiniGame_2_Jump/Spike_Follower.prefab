@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 135368774023477672}
   - component: {fileID: 7647370906960776956}
   - component: {fileID: 108872191882589967}
+  - component: {fileID: 2664671266709837788}
   m_Layer: 0
   m_Name: DamageTrigger
   m_TagString: Untagged
@@ -66,6 +67,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbedafb15d598e645bcd9095e93b8855, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2664671266709837788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1249275560765487106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 4268448614
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 108872191882589967}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &2888219245825478715
 GameObject:
   m_ObjectHideFlags: 0
@@ -156,6 +176,7 @@ GameObject:
   - component: {fileID: 5352602440608417668}
   - component: {fileID: 5528817366676893623}
   - component: {fileID: 2328726795363186847}
+  - component: {fileID: 8414642454000909849}
   m_Layer: 10
   m_Name: Spike_Follower
   m_TagString: Untagged
@@ -303,7 +324,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   follower: {fileID: 5352602440608417668}
   loopBack: 1
-  mode: 0
+  mode: 1
   wheelRadius: 0.35
   wheelMesh: {fileID: 1912767760951473173}
   destroyOnFinish: 0
@@ -320,11 +341,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   follower: {fileID: 5352602440608417668}
-  detectionDistance: 1
-  trapLayer:
-    serializedVersion: 2
-    m_Bits: 1024
-  raycastOrigin: {fileID: 3855128041796099853}
+  raycastDistance: 1.5
+--- !u!114 &8414642454000909849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6618318361414174015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 1732068048
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects:
+  - {fileID: 2664671266709837788}
+  NetworkedBehaviours:
+  - {fileID: 5528817366676893623}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &7119157441005598333
 GameObject:
   m_ObjectHideFlags: 0

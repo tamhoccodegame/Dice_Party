@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5846781541135780088}
   - component: {fileID: 520481348538315294}
   - component: {fileID: 8240607393004587693}
+  - component: {fileID: 7809356903588280846}
   m_Layer: 10
   m_Name: Tire_Follower
   m_TagString: Untagged
@@ -176,11 +177,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   follower: {fileID: 5846781541135780088}
-  detectionDistance: 1
-  trapLayer:
-    serializedVersion: 2
-    m_Bits: 1024
-  raycastOrigin: {fileID: 5014919417141981145}
+  raycastDistance: 1.5
+--- !u!114 &7809356903588280846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211541626403222442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 953193739
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects:
+  - {fileID: 3476618403363114148}
+  NetworkedBehaviours:
+  - {fileID: 520481348538315294}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &2868155263389317473
 GameObject:
   m_ObjectHideFlags: 0
@@ -412,6 +429,7 @@ GameObject:
   - component: {fileID: 3758002684323368508}
   - component: {fileID: 3738780537270549314}
   - component: {fileID: 8453393676822831802}
+  - component: {fileID: 3476618403363114148}
   m_Layer: 0
   m_Name: DamageTrigger
   m_TagString: Untagged
@@ -467,3 +485,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbedafb15d598e645bcd9095e93b8855, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3476618403363114148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7444884394027072331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 1257947858
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 8453393676822831802}
+  ForceRemoteRenderTimeframe: 0

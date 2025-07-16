@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Tire_Movement : MonoBehaviour
@@ -38,10 +39,11 @@ public class Tire_Movement : MonoBehaviour
 
     private Vector3 moveDirection;
     private Vector3 lastPos;
-    private Quaternion initialRotation;
+    private Quaternion initialRotation; private Rigidbody _rb;
 
-    void Start()
+    public void Awake()
     {
+        _rb = GetComponent<Rigidbody>();
         if (wheelMesh == null)
         {
             Debug.LogError("❌ Wheel mesh not assigned.");
@@ -63,7 +65,7 @@ public class Tire_Movement : MonoBehaviour
         }
     }
 
-    void Update()
+    public void Update()
     {
         CheckWallAndReflect();
         Move();
@@ -90,7 +92,7 @@ public class Tire_Movement : MonoBehaviour
 
     void Move()
     {
-        transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        _rb.velocity = moveDirection * moveSpeed;
     }
 
     void RotateMesh()
@@ -148,19 +150,23 @@ public class Tire_Movement : MonoBehaviour
         };
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.collider.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            var player = collision.collider.GetComponent<PlayerController_N>() ??
-                         collision.collider.GetComponentInParent<PlayerController_N>();
+            var player = other.GetComponent<PlayerBlinking>() ??
+                         other.GetComponentInParent<PlayerBlinking>();
 
             if (player != null)
             {
-                Vector3 hitPoint = collision.contacts[0].point;
-                player.OnHitByObstacle(hitPoint);
+                player.OnHitByObstacle(other.transform.position);
             }
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        
     }
 
 
