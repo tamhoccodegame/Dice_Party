@@ -1,5 +1,4 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -7,14 +6,12 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 
-public class TurnManager : NetworkBehaviour
+public class TurnManager : MonoBehaviour
 {
     public static TurnManager instance;
     public List<NewBoardGameController> playerController;
-    [Networked] public int currentPlayerIndex { get; set; }
-    [Networked] public PlayerRef currentPlayerRef { get; set; }
-
-    [Networked] public bool isFirstTry { get; set; } = true;
+    public int currentPlayerIndex { get; set; }
+     public bool isFirstTry { get; set; } = true;
 
     [Header("BXH")]
     public Transform slotTemplate;
@@ -43,7 +40,7 @@ public class TurnManager : NetworkBehaviour
         instance = this;
     }
 
-    public override void Spawned()
+    public void Awake()
     {
         GetComponent<PlayerSpawner>().SpawnPlayer();
         MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);

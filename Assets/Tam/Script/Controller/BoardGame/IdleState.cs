@@ -10,7 +10,7 @@ public class IdleState : BoardState
 
     public override void Enter()
     {
-        controller.RequestChangeAnimation("Idle");
+        controller.ChangeAnimation("Idle");
     }
 
     public override void Exit()

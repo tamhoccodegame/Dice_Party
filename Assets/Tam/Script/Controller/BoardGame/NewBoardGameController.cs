@@ -1,22 +1,15 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 
-[RequireComponent(typeof(NetworkCharacterController))]
-public class NewBoardGameController : NetworkBehaviour
+[RequireComponent(typeof(CharacterController))]
+public class NewBoardGameController : MonoBehaviour
 {
     private Animator animator;
-    private NetworkCharacterController _controller;
+    private CharacterController _controller;
 
     private BoardState currentState;
-    [Networked] public string currentAnim { get; set; }
-
-    [Networked] public Vector3 NetworkPosition { get; set; }
-    private Vector3 _smoothPos;
+    public string currentAnim { get; set; }
 
     public IdleState idleState;
     public MovingState movingState;
@@ -33,15 +26,13 @@ public class NewBoardGameController : NetworkBehaviour
         Node,
     }
 
-    [Networked, UnitySerializeField] public NetworkState networkState { get; set; }
-
-    [Networked] public int StepsLeft { get; set; }
-    public bool isMyTurn => Runner.LocalPlayer == TurnManager.instance.currentPlayerRef;
+    public int StepsLeft { get; set; }
+    public bool isMyTurn => true;//asdsa;
 
     public Transform feet;
     public BoardNode currentNode;
     public int currentNodeId;             //Chỉ dùng được local scene
-    [Networked, UnitySerializeField] public string currentNodeName { get; set; }
+    public string currentNodeName { get; set; }
     public BoardNode toMoveNode;
 
     // --- Quản lý xúc xắc và UI hiển thị bước ---
@@ -60,84 +51,37 @@ public class NewBoardGameController : NetworkBehaviour
     public BoardItem currentItem;
     public Transform gunSpawnPoint;
 
-    public override void Spawned()
+    public void Awake()
     {
         animator = GetComponent<Animator>();
-        _controller = GetComponent<NetworkCharacterController>();
-
-        _smoothPos = transform.position;
+        _controller = GetComponent<CharacterController>();
 
         idleState = new IdleState(this);
         movingState = new MovingState(this);
         chooseDirectionState = new ChooseDirectionState(this);
         itemState = new ItemState(this);
         nodeState = new NodeState(this);
-
-        string currentNodeName1 = null;
-        BoardGameData gameData = BoardGameData.instance;
-
-        if (gameData != null && gameData.playersCurrentNode.Count > 0)
-        {
-            currentNodeName1 = gameData.GetNode(Object.InputAuthority);
-        }
-
-        // Nếu không có dữ liệu từ BoardGameData thì lấy node mặc định
-        if (currentNodeName1 != null)
-        {
-            currentNode = GameObject.Find(currentNodeName1).GetComponent<BoardNode>();
-        }
-        else
-        {
-            currentNode = FindFirstObjectByType<PlayerSpawner>().spawnPosition[0].GetComponent<BoardNode>();
-        }
-
-        toMoveNode = currentNode.nextNodes[0];
-
-        if(HasStateAuthority)
-        RPC_ChangeNetworkState(NetworkState.Idle);
     }
 
-    public void RequestChangeState(NetworkState newState)
-    {
-        if (newState == networkState) return;
 
-        if (HasStateAuthority)
-        {
-            networkState = newState;
-            RPC_ChangeNetworkState(newState);
-        }
-        else
-        {
-            RPC_RequestChangeNetworkState(newState);
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    void RPC_RequestChangeNetworkState(NetworkState newState)
-    {
-        networkState = newState;
-        RPC_ChangeNetworkState(networkState);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    void RPC_ChangeNetworkState(NetworkState newState)
+    public void ChangeState(BoardState newState)
     {
         currentState?.Exit();
         switch (newState)
         {
-            case NetworkState.Idle:
+            case IdleState:
                 currentState = idleState;
                 break;
-            case NetworkState.Moving:
+            case MovingState:
                 currentState = movingState;
                 break;
-            case NetworkState.ChooseDirection:
+            case ChooseDirectionState:
                 currentState = chooseDirectionState;
                 break;
-            case NetworkState.Item:
+            case ItemState:
                 currentState = itemState;
                 break;
-            case NetworkState.Node:
+            case NodeState:
                 currentState = nodeState;
                 break;
         }
@@ -145,28 +89,7 @@ public class NewBoardGameController : NetworkBehaviour
         currentState.Enter();
     }
 
-    public void RequestChangeAnimation(string animName)
-    {
-        if (animName == currentAnim) return;
-
-        if (HasStateAuthority)
-        {
-            RPC_ChangeAnimation(animName);
-        }
-        else if(HasInputAuthority)
-        {
-            RPC_RequestChangeAnimation(animName);
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestChangeAnimation(string animName)
-    {
-        RPC_ChangeAnimation(animName);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_ChangeAnimation(string animName)
+    public void ChangeAnimation(string animName)
     {
         currentAnim = animName;
         animator.Play(animName);
@@ -174,143 +97,65 @@ public class NewBoardGameController : NetworkBehaviour
 
     private void Update()
     {
-        if (Object.HasInputAuthority)
-        {
-            currentState?.Update();
-        }
+        currentState?.Update();
     }
 
-    public void RequestHurt(PlayerRef player, int ammount)
-    {
-        if (HasStateAuthority)
-            RPC_Hurt(player, ammount);
-        else
-            RPC_RequestHurt(player, ammount);
-    }
+    //public void Hurt(PlayerRef player, int ammount)
+    //{
+    //    StartCoroutine(HurtCoroutine(player, ammount));
+    //}
 
-    public void RequestHealth(PlayerRef player, int ammount)
-    {
-        if (HasStateAuthority)
-            RPC_Health(player, ammount);
-        else
-            RPC_RequestHealth(player, ammount);
-    }
+    //public void Heal(PlayerRef player, int ammount)
+    //{
+    //    StartCoroutine(HealthCoroutine(player, ammount));
+    //}
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestHurt(PlayerRef player, int ammount)
-    {
-        RPC_Hurt(player, ammount);
-    }
+    //private IEnumerator HurtCoroutine(PlayerRef player, int ammount)
+    //{
+    //    string previousAnim = currentAnim;
+    //    Debug.Log("💢 Bị đau!");
+    //    RequestChangeAnimation("Hurt");
+    //    TurnManager.instance.RequestUpdateHealth(player, -ammount);
+    //    // hiệu ứng bị thương
+    //    yield return new WaitForSecondsRealtime(0.5f);
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestHealth(PlayerRef player, int ammount)
-    {
-        RPC_Health(player, ammount);
-    }
+    //    RequestChangeAnimation(previousAnim);
+    //}
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_Hurt(PlayerRef player, int ammount)
-    {
-        StartCoroutine(HurtCoroutine(player, ammount));
-    }
+    //private IEnumerator HealthCoroutine(PlayerRef player, int ammount)
+    //{
+    //    string previousAnim = currentAnim;
+    //    Debug.Log("❤️ Hồi máu!");
+    //    RequestChangeAnimation("Heal");
+    //    TurnManager.instance.RequestUpdateHealth(player, ammount);
+    //    // hiệu ứng hồi máu
+    //    yield return new WaitForSecondsRealtime(1f);
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_Health(PlayerRef player, int ammount)
-    {
-        StartCoroutine(HealthCoroutine(player, ammount));
-    }
+    //    RequestChangeAnimation(previousAnim);
+    //}
 
-    private IEnumerator HurtCoroutine(PlayerRef player, int ammount)
-    {
-        string previousAnim = currentAnim;
-        Debug.Log("💢 Bị đau!");
-        RequestChangeAnimation("Hurt");
-        TurnManager.instance.RequestUpdateHealth(player, -ammount);
-        // hiệu ứng bị thương
-        yield return new WaitForSecondsRealtime(0.5f);
-
-        RequestChangeAnimation(previousAnim);
-    }
-
-    private IEnumerator HealthCoroutine(PlayerRef player, int ammount)
-    {
-        string previousAnim = currentAnim;
-        Debug.Log("❤️ Hồi máu!");
-        RequestChangeAnimation("Heal");
-        TurnManager.instance.RequestUpdateHealth(player, ammount);
-        // hiệu ứng hồi máu
-        yield return new WaitForSecondsRealtime(1f);
-
-        RequestChangeAnimation(previousAnim);
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-        if (HasStateAuthority)
-        {
-            NetworkPosition = transform.position;
-        }
-        else
-        {
-            _smoothPos = Vector3.Lerp(_smoothPos, NetworkPosition, 0.15f);
-            transform.position = _smoothPos;
-        }
-
-        if (!HasStateAuthority) return;
-        currentState?.FixedUpdateNetwork();
-    }
 
     #region Move
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestRollDice()
-    {
-        RPC_RollDice();
-        RPC_HideDice();
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_RollDice()
+    public void RollDice()
     {
         StartCoroutine(RollDiceCoroutine());
     }
 
     IEnumerator RollDiceCoroutine()
     {
-        if(HasStateAuthority)
-        {
             StepsLeft = Random.Range(1, 10);
-        }
 
-        RPC_ChangeAnimation("RollDice");
+        ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
         if (currentNode.nextNodes.Count > 1)
         {
-            RPC_ChangeNetworkState(NetworkState.ChooseDirection);
+            ChangeState(chooseDirectionState);
         }
         else
-            RequestChangeState(NetworkState.Moving);
+            ChangeState(movingState);
     }
 
-    public void RequestSetStepLeft(int step)
-    {
-        if (HasStateAuthority)
-        {
-            RPC_SetStepLeft(step);
-        }
-        else
-        {
-            RPC_RequestSetStepLeft(step);
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestSetStepLeft(int step)
-    {
-        RPC_SetStepLeft(step);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SetStepLeft(int step)
+    public void SetStepLeft(int step)
     {
         StepsLeft = step;
     }
@@ -328,19 +173,19 @@ public class NewBoardGameController : NetworkBehaviour
         if (Vector3.Distance(feet.position, toMoveNode.transform.position) < 0.3f)
         {
             currentNode = toMoveNode;
-            RPC_SetCurrentNode(currentNode.Object.Id);
+            //RPC_SetCurrentNode(currentNode.Object.Id);
             StepsLeft--;
 
             if (StepsLeft > 0)
             {
-                if(currentNode.nextNodes.Count > 1)
+                if (currentNode.nextNodes.Count > 1)
                 {
-                    RequestChangeState(NetworkState.ChooseDirection);
+                    ChangeState(chooseDirectionState);
                     return true;
                 }
                 else
                 {
-                    toMoveNode = currentNode.nextNodes[0]; 
+                    toMoveNode = currentNode.nextNodes[0];
                 }
             }
         }
@@ -364,28 +209,13 @@ public class NewBoardGameController : NetworkBehaviour
     // --- Hàm kết thúc lượt ---
     public void EndTurn()
     {
-        BoardGameData boardGameData = BoardGameData.instance;
-        NewBoardGameController[] players = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.None);
-
-        // Lưu trạng thái node hiện tại vào data để đồng bộ map
-        foreach (var player in players)
-        {
-            PlayerRef playerRef = player.GetComponent<NetworkObject>().InputAuthority;
-            string currentNodeName = player.currentNodeName;
-            boardGameData.UpdateNode(playerRef, currentNodeName);
-        }
-
-        if (HasInputAuthority)
-            TurnManager.instance.RequestNextTurn();
+        
     }
 
 
     // --- Spawn các mũi tên chọn hướng khi tới ngã ba ---
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_ShowDirectionChoices()
+    public void ShowDirectionChoices()
     {
-        if (!isMyTurn) return;
-
         ClearArrow();
         for (int i = 0; i < currentNode.nextNodes.Count; i++)
         {
@@ -410,19 +240,11 @@ public class NewBoardGameController : NetworkBehaviour
         spawnedArrows.Clear();
     }
 
-    // --- Hàm khi client chọn hướng ---
-    public void ChooseDirection(int index)
-    {
-        if (!isMyTurn) return;
-        ClearArrow();
-        RPC_ChooseDirection(index);
-    }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    void RPC_ChooseDirection(int index)
+    void ChooseDirection(int index)
     {
         toMoveNode = currentNode.nextNodes[index];
-        RequestChangeState(NetworkState.Moving);
+        ChangeState(movingState);
     }
 
     private void ShowDice()
@@ -431,8 +253,7 @@ public class NewBoardGameController : NetworkBehaviour
     }
 
     #region RPC
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_HideDice()
+    private void HideDice()
     {
         StartCoroutine(HideDiceCoroutine());
     }
@@ -448,116 +269,11 @@ public class NewBoardGameController : NetworkBehaviour
         yield return new WaitForSeconds(0.5f);
     }
 
-    public void RequestSetCurrentNode(NetworkId nodeId)
-    {
-        if (HasStateAuthority)
-        {
-            RPC_SetCurrentNode(nodeId);
-        }
-        else
-        {
-            RPC_RequestSetCurrentNode(nodeId);
-        }
-    }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestSetCurrentNode(NetworkId nodeId)
+    public void SetCurrentNode()
     {
-        RPC_SetCurrentNode(nodeId);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SetCurrentNode(NetworkId nodeId)
-    {
-        currentNode = Runner.FindObject(nodeId).GetComponent<BoardNode>();
-        currentNodeName = currentNode.name;
+   
     }
     #endregion
 
-    #region ItemRef
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestUsingItem(int itemId)
-    {
-        RPC_SetUsingItem(itemId);
-    }
-
-    public void RequestSetUsingItem(int itemId)
-    {
-        if (HasStateAuthority)
-        {
-            RPC_SetUsingItem(itemId);
-        }
-        else
-        {
-            RPC_RequestUsingItem(itemId);
-        }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SetUsingItem(int itemId)
-    {
-        BoardItem item = ItemDatabase.instance.GetItemByItemId(itemId);
-        //if (item != null)
-        {
-            currentItem = item;
-            currentItem.Use(this);
-        }
-    }
-
-    public void RequestSetItemPosition(int itemId)
-    {
-        if (HasStateAuthority)
-        {
-            RPC_SetItemPosition(itemId);
-        }
-        else
-        {
-            RPC_RequestSetItemPosition(itemId);
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestSetItemPosition(int itemId)
-    {
-        RPC_SetItemPosition(itemId);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SetItemPosition(int itemId)
-    {
-        Debug.Log("Alo em");
-        var itemTransform = ItemDatabase.instance.GetItemByItemId(itemId).transform;
-
-        itemTransform.SetParent(gunSpawnPoint);
-        itemTransform.transform.localPosition = Vector3.zero;
-        itemTransform.localRotation = Quaternion.identity;
-    }
-
-    public void RequestTriggerItem()
-    {
-        if(HasStateAuthority)
-        {
-            RPC_TriggerItem();
-        }
-        else
-        {
-            RPC_RequestTriggerItem();
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestTriggerItem()
-    {
-        RPC_TriggerItem();
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-
-    public void RPC_TriggerItem()
-    {
-        StartCoroutine(currentItem.ProcessCoroutine(this));
-    }
-
-    #endregion
 }

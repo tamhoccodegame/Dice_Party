@@ -1,8 +1,6 @@
-﻿using Fusion;
-using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class VongXoay : NetworkBehaviour
+public class VongXoay : MonoBehavior
 {
     [Header("Cài đặt vòng xoay")]
     public float startSpeed = 50f;

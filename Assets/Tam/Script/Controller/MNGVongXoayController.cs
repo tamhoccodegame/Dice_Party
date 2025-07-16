@@ -1,29 +1,28 @@
-﻿using Fusion;
-using System.Collections;
+﻿using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 
-[RequireComponent(typeof(NetworkCharacterController))]
 [RequireComponent(typeof(CharacterController))]
-public class MNGVongXoayController : NetworkBehaviour
+[RequireComponent(typeof(CharacterController))]
+public class MNGVongXoayController : MonoBehaviour
 {
-    private NetworkCharacterController controller;
+    private CharacterController controller;
     private Animator animator;
 
     public VisualEffect bloodEffect;
 
     public string currentAnim;
 
-    public override void Spawned()
+    public void Awake()
     {
         bloodEffect.Stop();
-        controller = GetComponent<NetworkCharacterController>();
+        controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
 
         if (VongXoayManager.instance != null)
-            VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
+            //VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
 
         Invoke(nameof(ResetGravity), 2f);
     }
@@ -38,38 +37,7 @@ public class MNGVongXoayController : NetworkBehaviour
 
     }
 
-    public override void FixedUpdateNetwork()
-    {
-        if (!Object.HasStateAuthority) return;
-
-        if (GetInput(out NetworkInputData data))
-        {
-            Vector3 direction = data.direction;
-
-            if (data.buttons.IsSet(NetworkInputData.JUMPBUTTON) && controller.Grounded)
-            {
-                controller.Jump();
-
-                RPC_ChangeAnim("Jump");
-            }
-
-            // Luôn chạy Move
-            controller.Move(direction);
-
-            // Anim xử lý tách biệt
-            if (controller.Grounded)
-            {
-                if (direction.sqrMagnitude > 0.001f)
-                    RPC_ChangeAnim("Run");
-                else
-                    RPC_ChangeAnim("Idle");
-            }
-        }
-
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_ChangeAnim(string animName, float blendTime = 0.25f)
+    public void ChangeAnim(string animName, float blendTime = 0.25f)
     {
         if (animName == currentAnim) return;
         currentAnim = animName;
@@ -77,16 +45,7 @@ public class MNGVongXoayController : NetworkBehaviour
         animator.CrossFade(animName, blendTime);
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestChangeAnim(string animName, float blendTime = 0.25f)
-    {
-        RPC_ChangeAnim(animName, blendTime);
-    }
-
-
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    public void RPC_BloodEffect()
+    public void BloodEffect()
     {
         bloodEffect.Play();
     }
@@ -96,36 +55,22 @@ public class MNGVongXoayController : NetworkBehaviour
     {
         if (VongXoayManager.instance.isGameOver) return;
 
-        if (Object.HasInputAuthority)
-        {
             Debug.Log("DIEE");
-            RPC_BloodEffect();
+            BloodEffect();
 
-            int currentLive = VongXoayManager.instance.playerLives.Get(Object.Id);
-            VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
+            //int currentLive = VongXoayManager.instance.playerLives.Get(Object.Id);
+            //VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
 
-            StartCoroutine(DelayCheckDie());
-        }
+        ChangeAnim("Die");
+        DisableInput();
     }
 
-    IEnumerator DelayCheckDie()
-    {
-        yield return new WaitForSecondsRealtime(0.1f);
-        if (VongXoayManager.instance.playerLives.Get(Object.Id) <= 0)
-        {
-            RPC_RequestChangeAnim("Die");
-            RPC_DisableInput();
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    void RPC_DisableInput()
+    void DisableInput()
     {
         Destroy(this);
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    void RPC_EnableRagdoll()
+    void EnableRagdoll()
     {
         GetComponent<Ragdoll>().EnableRagdoll();
     }

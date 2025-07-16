@@ -11,8 +11,8 @@ public class ItemState : BoardState
 
     public override void Enter()
     {
-        controller.RequestChangeAnimation("GunAim");
-        controller.RequestSetUsingItem(0);
+        //controller.RequestChangeAnimation("GunAim");
+        //controller.RequestSetUsingItem(0);
     }
 
     public override void Exit()

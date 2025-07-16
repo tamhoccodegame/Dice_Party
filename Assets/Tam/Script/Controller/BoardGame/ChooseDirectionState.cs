@@ -10,8 +10,8 @@ public class ChooseDirectionState : BoardState
 
     public override void Enter()
     {
-        controller.RequestChangeAnimation("Idle");
-        controller.RPC_ShowDirectionChoices();
+        controller.ChangeAnimation("Idle");
+        controller.ShowDirectionChoices();
     }
 
     public override void Exit()

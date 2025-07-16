@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Fusion;
 using UnityEngine;
 
-public class BoardNode : NetworkBehaviour
+public class BoardNode : MonoBehaviour
 {
     public bool isStartNode = false;
     public List<BoardNode> nextNodes;
@@ -22,22 +21,22 @@ public class BoardNode : NetworkBehaviour
 
     }
 
-    public virtual void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
-    {
-        EndTurn(playerRef);
-    }
+    //public virtual void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
+    //{
+    //    EndTurn(playerRef);
+    //}
 
-    protected void EndTurn(PlayerRef player)
-    {
-        NewBoardGameController[] players = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.None);
+    //protected void EndTurn(PlayerRef player)
+    //{
+    //    NewBoardGameController[] players = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.None);
 
-        foreach (var p in players)
-        {
-            if (p.Object.InputAuthority == player)
-            {
-                p.EndTurn();
-            }
-            else continue;
-        }
-    }
+    //    foreach (var p in players)
+    //    {
+    //        if (p.Object.InputAuthority == player)
+    //        {
+    //            p.EndTurn();
+    //        }
+    //        else continue;
+    //    }
+    //}
 }

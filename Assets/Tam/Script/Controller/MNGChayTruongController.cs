@@ -1,14 +1,10 @@
-﻿using Fusion;
-using System.Collections;
-using System.Runtime.InteropServices;
-using Unity.Cinemachine;
+﻿using System.Collections;
 using UnityEngine;
-using static UnityEngine.UI.Image;
 
-public class MNGChayTruongController : NetworkBehaviour
+public class MNGChayTruongController : MonoBehaviour
 {
     public Camera cam;
-    private NetworkCharacterController controller;
+    private CharacterController controller;
     private Animator animator;
 
     public LayerMask coinMask;
@@ -17,17 +13,17 @@ public class MNGChayTruongController : NetworkBehaviour
 
     public bool isGoal = false;
 
-    public override void Spawned()
+    public void Awake()
     {
-        controller = GetComponent<NetworkCharacterController>();
+        controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
         cam = Camera.main;
 
         if (VongXoayManager.instance != null)
-            VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
+            //VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
 
-        Invoke(nameof(ResetGravity), 2f);
+            Invoke(nameof(ResetGravity), 2f);
     }
 
     void ResetGravity()
@@ -40,101 +36,27 @@ public class MNGChayTruongController : NetworkBehaviour
 
     }
 
-    public override void FixedUpdateNetwork()
-    {
-        if (HasStateAuthority)
-        {
-            // origin: tâm, radius: bán kính
-            RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1.5f, Vector3.up, 0f, coinMask);
-            foreach (var hit in hits)
-            {
-                hit.collider.gameObject.GetComponent<Coins>().EatCoin(Object.Id);
-            }
-        }
-
-
-        Vector3 moveDir = Vector3.zero;
-
-        if (GetInput(out NetworkInputData data))
-        {
-            if (data.buttons.IsSet(NetworkInputData.JUMPBUTTON))
-            {
-                controller.Jump();
-                RPC_ChangeAnim("Jump");
-            }
-
-            // Movement
-            data.direction.Normalize();
-            Vector3 camForward = cam.transform.forward;
-            Vector3 camRight = cam.transform.right;
-
-            camForward.y = 0;
-            camRight.y = 0;
-
-            moveDir = camRight * data.direction.x + camForward * data.direction.z;
-
-            controller.Move(moveDir);
-
-            // Animation
-            if (controller.Grounded)
-            {
-                if (moveDir.magnitude > 0)
-                    RPC_ChangeAnim("Run");
-                else
-                    RPC_ChangeAnim("Idle");
-            }
-        }
-
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_ChangeAnim(string animName, float blendTime = 0.25f)
+    public void ChangeAnim(string animName, float blendTime = 0.25f)
     {
         if (animName == currentAnim) return;
         currentAnim = animName;
 
         animator.CrossFade(animName, blendTime);
     }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_RequestChangeAnim(string animName, float blendTime = 0.25f)
-    {
-        RPC_ChangeAnim(animName, blendTime);
-    }
-
     public void Die()
     {
         if (VongXoayManager.instance.isGameOver) return;
 
-        if (Object.HasInputAuthority)
-        {
-            Debug.Log("DIEE");
-
-            int currentLive = VongXoayManager.instance.playerLives.Get(Object.Id);
-            VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
-
-            StartCoroutine(DelayCheckDie());
-        }
+        ChangeAnim("Die");
+        DisableInput();
     }
 
-    IEnumerator DelayCheckDie()
-    {
-        yield return new WaitForSecondsRealtime(0.1f);
-        if (VongXoayManager.instance.playerLives.Get(Object.Id) <= 0)
-        {
-            RPC_RequestChangeAnim("Die");
-            RPC_DisableInput();
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    void RPC_DisableInput()
+    void DisableInput()
     {
         Destroy(this);
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    void RPC_EnableRagdoll()
+    void EnableRagdoll()
     {
         GetComponent<Ragdoll>().EnableRagdoll();
     }
@@ -143,19 +65,16 @@ public class MNGChayTruongController : NetworkBehaviour
     {
         if (other.name == "Goal")
         {
-            if (Object.HasInputAuthority)
-                RPC_RequestSetGoal();
+            SetGoal();
         }
     }
 
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    void RPC_RequestSetGoal()
+    void SetGoal()
     {
         if (isGoal) return;
         isGoal = true;
 
-        if(HasStateAuthority)
         Coin_Manager.Instance.UpdateGameState();
     }
 }
