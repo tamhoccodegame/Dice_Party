@@ -16,8 +16,8 @@ public class PlayerSlotUI : MonoBehaviour
 
     private void Awake()
     {
-        hairSelector.textOptions.Clear();
-        bodyPartSelector.textOptions.Clear();
+        //hairSelector.textOptions.Clear();
+        //bodyPartSelector.textOptions.Clear();
     }
 
     public void AddHairName(string hairName)
