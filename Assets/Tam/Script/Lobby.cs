@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -14,7 +13,6 @@ public class Lobby : MonoBehaviour
     public Transform[] avatarStandingPosition;
     public GameObject playerPrefab;
 
-    public Transform playerSlotTemplate;
     public Transform playerSlotContainer;
 
     public GameObject[] hostOwnObjects;
@@ -28,7 +26,6 @@ public class Lobby : MonoBehaviour
     private void Awake()
     {
         EnsureReadyStatusInit();
-        UpdatePlayerList();
 
         foreach (var go in hostOwnObjects)
         {
@@ -58,8 +55,6 @@ public class Lobby : MonoBehaviour
         //ApplyCustom();
 
         EnsureReadyStatusInit();
-        UpdatePlayerList();
-        UpdatePlayerList();
     }
     public void OnClickSetReady(bool ready)
     {
@@ -73,60 +68,23 @@ public class Lobby : MonoBehaviour
 
     private void OnPlayerJoined(PlayerInput playerInput)
     {
-        // Gán UI module nếu cần
-        //playerInput.uiInputModule = 
-        // Add vào PlayerManager
         PlayerManager.instance.AddPlayer(playerInput);
+        playerInput.transform.SetParent(playerSlotContainer);
+
+        playerInput.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = $"Player {playerCount + 1}";
 
         //Spawn Avatar (model 3D)
         if (!spawnedAvatars.ContainsKey(playerInput))
         {
-            playerInput.transform.position = avatarStandingPosition[playerCount].position;
-            playerInput.transform.rotation = Quaternion.Euler(0, 180, 0);
-            spawnedAvatars.Add(playerInput, playerInput.gameObject);
+            var model = Instantiate(playerPrefab, 
+                                    avatarStandingPosition[playerCount].position, 
+                                    Quaternion.Euler(0, 180, 0));
+            spawnedAvatars.Add(playerInput, model);
             playerCount++;
+            playerInput.GetComponent<PlayerSlotUI>().InitSelector(model.GetComponent<PlayerCustom>());
         }
 
         // Cập nhật UI NOTE: Sửa lại cho nó liên quan giữa char và slot ui. hiện tại nó chưa liên quan?
-        UpdatePlayerList();
-    }
-
-    void UpdatePlayerList()
-    {
-        foreach (Transform child in playerSlotContainer)
-        {
-            if (child == playerSlotTemplate) continue;
-            Destroy(child.gameObject);
-        }
-
-        List<PlayerInput> list = PlayerManager.instance.players;
-
-        for (int i = 0; i < list.Count; i++)
-        {
-
-            var p = Instantiate(playerSlotTemplate, playerSlotContainer);
-            p.gameObject.SetActive(true);
-
-            TextMeshProUGUI playerNameText = p.transform.Find("Name").GetComponent<TextMeshProUGUI>();
-            playerNameText.text = $"Player {i + 1}";
-
-            PlayerSlotUI playerSlotUI = p.GetComponent<PlayerSlotUI>();
-            readyStatus.TryGetValue(list[i], out bool isReady);
-            var readyPanel = playerSlotUI.readyPanel;
-            readyPanel.SetActive(isReady);
-
-            PlayerCustom playerCustom = playerPrefab.GetComponent<PlayerCustom>();
-
-            foreach (var hair in playerCustom.hairs)
-            {
-                playerSlotUI.AddHairName(hair.name);
-            }
-
-            foreach (var bodypart in playerCustom.bodyparts)
-            {
-                playerSlotUI.AddBodypartName(bodypart.name);
-            }
-        }
     }
         #endregion
 

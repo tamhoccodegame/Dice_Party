@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 
 public class PanelSwitcher : MonoBehaviour
 {
+    public MultiplayerEventSystem eventSystem;
+
     public SmoothPanelToggle mainPanel;
     public SmoothPanelToggle customizePanel;
     public SmoothPanelToggle readyPanel;
@@ -25,8 +28,8 @@ public class PanelSwitcher : MonoBehaviour
         readyPanel.HideInstant();
         customizePanel.ToggleVisibility(true);
 
-        EventSystem.current.SetSelectedGameObject(null);
-        EventSystem.current.SetSelectedGameObject(defaultCustomizeButton);
+        eventSystem.SetSelectedGameObject(null);
+        eventSystem.SetSelectedGameObject(defaultCustomizeButton);
     }
 
     public void OpenMainPanel()
@@ -35,8 +38,8 @@ public class PanelSwitcher : MonoBehaviour
         readyPanel.HideInstant();
         customizePanel.HideInstant();
 
-        EventSystem.current.SetSelectedGameObject(null);
-        EventSystem.current.SetSelectedGameObject(defaultMainButton);
+        eventSystem.SetSelectedGameObject(null);
+        eventSystem.SetSelectedGameObject(defaultMainButton);
     }
 
     public void OpenReadyPanel()
@@ -45,7 +48,7 @@ public class PanelSwitcher : MonoBehaviour
         readyPanel.ToggleVisibility(true);
         customizePanel.HideInstant();
 
-        EventSystem.current.SetSelectedGameObject(null);
-        EventSystem.current.SetSelectedGameObject(defaultReadyButton);
+        eventSystem.SetSelectedGameObject(null);
+        eventSystem.SetSelectedGameObject(defaultReadyButton);
     }
 }
