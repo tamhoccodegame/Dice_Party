@@ -225,7 +225,7 @@ public class NewBoardGameController : MonoBehaviour
 
             ArrowPointer arrow = Instantiate(arrowDirectionPrefab, midPoint, Quaternion.identity).GetComponent<ArrowPointer>();
             arrow.transform.rotation = Quaternion.LookRotation((next.transform.position - currentNode.transform.position), Vector3.up);
-            arrow.Setup(this, i);
+            //arrow.Setup(this, i);
             spawnedArrows.Add(arrow.gameObject);
         }
     }

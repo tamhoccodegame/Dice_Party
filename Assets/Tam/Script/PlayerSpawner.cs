@@ -9,6 +9,7 @@ public class PlayerSpawner : MonoBehaviour
     public static PlayerSpawner instance;
     private PlayerManager playerManager;
 
+    public GameObject boardCarPrefab;
     public GameObject playerPrefab;
     public Transform[] spawnPosition;
 
@@ -40,7 +41,19 @@ public class PlayerSpawner : MonoBehaviour
 
         //if (isBoardScene)
         {
-            var player = Instantiate(playerPrefab, spawnPosition[0].position, Quaternion.identity);
+            BoardCar car = Instantiate(boardCarPrefab, spawnPosition[0].position, Quaternion.identity)
+                              .GetComponent<BoardCar>();
+            int index = 0;
+            foreach(var playerInput in playerManager.players)
+            {
+                var player = Instantiate(playerPrefab, car.playerSitPositions[index].position, Quaternion.identity);
+                player.transform.SetParent(car.playerSitPositions[index]);
+                player.transform.localPosition = Vector3.zero;
+                player.transform.localRotation = Quaternion.Euler(0,0,0);
+                car.animators.Add(player.GetComponent<Animator>());
+                if (index <= 1) player.GetComponent<Animator>().Play("Sit");
+            }
+
         }
 
         //if (boardGameData != null && boardGameData.playersCurrentNode.Count > 0 && isBoardScene)

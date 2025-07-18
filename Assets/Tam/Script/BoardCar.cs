@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Windows;
@@ -17,17 +19,31 @@ public class BoardCar : MonoBehaviour
 
     public int stepLeft = 0;
 
+    public Transform[] playerSitPositions;
+
     [Header("Players Animator")]
-    public Animator[] animators;
+    public List<Animator> animators;
 
     [Header("Car Animator")]
     public Animator carAnim;
+
+    public GameObject arrowPrefab;
+    public List<GameObject> spawnedArrows;
+
+    public bool isWaitingForChoice = false;
+    Coroutine moveCoroutine = null; 
 
     // Start is called before the first frame update
     void Start()
     {
         inputs = PlayerManager.instance.players;
         UpdatePlayerInput();
+        currentNode = PlayerSpawner.instance.spawnPosition[0].GetComponent<BoardNode>();
+        toMoveNode = currentNode.nextNodes[0];
+        controller = GetComponent<CharacterController>();
+
+        FindFirstObjectByType<CinemachineCamera>().Follow = transform;
+        FindFirstObjectByType<CinemachineCamera>().LookAt = transform;
     }
 
     void UpdatePlayerInput()
@@ -39,8 +55,107 @@ public class BoardCar : MonoBehaviour
     private void OnTrigger(InputAction.CallbackContext obj)
     {
         stepLeft = 10;
-        Debug.Log(stepLeft);
-        currentPlayerInputIndex++;
+        if(currentNode.nextNodes.Count > 1)
+        {
+            ShowDirection();
+        }
+        else
+        {
+            StopAllCoroutines();
+            moveCoroutine = StartCoroutine(MoveToNextNode());
+        }
+    }
+
+    private void Update()
+    {
+        if (toMoveNode != null)
+        {
+            Vector3 direction = toMoveNode.transform.position - transform.position;
+            direction.y = 0;
+            Quaternion newRotation = Quaternion.LookRotation(direction);
+            if(Quaternion.Angle(transform.rotation, newRotation) > 0.1f)
+            transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 5 *  Time.deltaTime);
+        }
+    }
+
+    private void SetCurrentNode(BoardNode node)
+    {
+        currentNode = node;
+        toMoveNode = currentNode.nextNodes[0];
+    }
+
+    IEnumerator MoveToNextNode()
+    {
+        carAnim.CrossFade("StartMove", 0.25f);
+        yield return new WaitForSeconds(0.5f);
+        carAnim.CrossFade("Move", 0.25f);
+
+        while (stepLeft > 0)
+        {
+            while(isWaitingForChoice) yield return null;
+
+            while(Vector3.Distance(transform.position, toMoveNode.transform.position) > 0.4f)
+            {
+                Vector3 moveDirection = (toMoveNode.transform.position - transform.position).normalized;
+                controller.Move(moveDirection * 10f * Time.deltaTime);
+                yield return null;
+            }
+
+            stepLeft--;
+             
+            currentNode = toMoveNode;
+
+            if(currentNode.nextNodes.Count > 1)
+            {
+                carAnim.CrossFade("EndMove", 0.25f);
+                yield return new WaitForSeconds(0.5f);
+                carAnim.CrossFade("Idle", 0.25f);
+                isWaitingForChoice = true;
+                ShowDirection();
+                yield break;
+            }
+            else
+            {
+                toMoveNode = currentNode.nextNodes[0];
+            }
+
+                yield return null;
+        }
+        yield return null;
+        currentPlayerInputIndex = (currentPlayerInputIndex + 1) % inputs.Count;
         UpdatePlayerInput();
+    }
+
+    void ClearArrow()
+    {
+        foreach(var arrow in spawnedArrows)
+        {
+            Destroy(arrow);
+        }
+        spawnedArrows.Clear();
+    }
+
+    void ShowDirection()
+    {
+        ClearArrow();
+        for(int i = 0; i < currentNode.nextNodes.Count; i++)
+        {
+            Vector3 midPoint = (currentNode.nextNodes[i].transform.position + transform.position) / 2f;
+            Vector3 spawnPosition = new Vector3(midPoint.x, arrowPrefab.transform.position.y, midPoint.z);
+
+            ArrowPointer arrow = Instantiate(arrowPrefab, spawnPosition, Quaternion.identity).GetComponent<ArrowPointer>();
+            arrow.transform.rotation = Quaternion.LookRotation((currentNode.nextNodes[i].transform.position - currentNode.transform.position), Vector3.up);
+            arrow.Setup(this, i);
+
+            spawnedArrows.Add(arrow.gameObject);
+        }
+    }
+
+    public void ChooseDirection(int index)
+    {
+        toMoveNode = currentNode.nextNodes[index];
+        isWaitingForChoice = false;
+        StopAllCoroutines();
+        moveCoroutine = StartCoroutine(MoveToNextNode());
     }
 }

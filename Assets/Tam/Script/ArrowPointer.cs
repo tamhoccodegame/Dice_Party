@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class ArrowPointer : MonoBehaviour
 {
-    private NewBoardGameController playerController;
+    private BoardCar playerController;
     private int index;
     
-    public void Setup(NewBoardGameController _playerController, int _index)
+    public void Setup(BoardCar _playerController, int _index)
     {
         playerController = _playerController;
         index = _index;
