@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 
 public class PlayerSlotUI : MonoBehaviour
 {
@@ -15,26 +17,47 @@ public class PlayerSlotUI : MonoBehaviour
     public OptionSelector hairSelector;
     public OptionSelector bodyPartSelector;
 
+    private bool isReady = false;
+
+    private PlayerCustom playerCustom;
+
+    public InputSystemUIInputModule inputSystemUIInputModule;
+
     private void Awake()
     {
-        //hairSelector.textOptions.Clear();
-        //bodyPartSelector.textOptions.Clear();
+        inputSystemUIInputModule = GetComponentInChildren<InputSystemUIInputModule>();
     }
 
     public void InitSelector(PlayerCustom playerCustom)
     {
-        colorSelector.playerCustom = playerCustom;
-        hairSelector.playerCustom = playerCustom;
-        bodyPartSelector.playerCustom = playerCustom;
+        this.playerCustom = playerCustom;
+        List<string> hairNames = new List<string>();
+        List<string> bodyPartNames = new List<string>();
+
+        foreach(var hair in playerCustom.hairs)
+        {
+            hairNames.Add(hair.name);
+        }
+
+        foreach(var bodyPart in playerCustom.bodyparts)
+        {
+            bodyPartNames.Add(bodyPart.name);
+        }
+
+        colorSelector.Init(playerCustom);
+        hairSelector.Init(playerCustom, hairNames);
+        bodyPartSelector.Init(playerCustom, bodyPartNames);
     }
 
-    public void AddHairName(string hairName)
+    public void SetReady(bool isReady)
     {
-        hairSelector.textOptions.Add(hairName);
+        this.isReady = isReady;
+        Lobby.instance.SetReady(GetComponent<PlayerInput>(), isReady);
     }
 
-    public void AddBodypartName(string bodypartName)
+    public void ApplyCustom()
     {
-        bodyPartSelector.textOptions.Add(bodypartName);
+        playerCustom.ApplyCustoms();
     }
+
 }

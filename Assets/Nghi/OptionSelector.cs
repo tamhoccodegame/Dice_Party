@@ -49,6 +49,15 @@ public class OptionSelector : MonoBehaviour
         UpdateDisplay();
     }
 
+    public void Init(PlayerCustom playerCustom, List<string> _textOptions = null)
+    {
+        textOptions.Clear();
+
+        textOptions = _textOptions;
+
+        this.playerCustom = playerCustom;
+    }
+
     private void Update()
     {
         isActive = eventSystem.currentSelectedGameObject == gameObject;
@@ -59,7 +68,6 @@ public class OptionSelector : MonoBehaviour
             InputActionReference navigateAction = inputModule.move;
             // Nếu muốn đọc raw value:
             navigateValue = navigateAction.action.ReadValue<Vector2>();
-            Debug.Log("Navigate vector: " + navigateValue);
         }
 
         if (!isActive) return;

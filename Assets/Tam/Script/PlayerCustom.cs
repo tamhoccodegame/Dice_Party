@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerCustom : MonoBehaviour
 {
@@ -12,30 +13,29 @@ public class PlayerCustom : MonoBehaviour
     public int currentColorIndex = 0;
     public int currentBodypartIndex = 0;
 
+    private PlayerInput playerInput;
+
     public void Awake()
     {
-        RequestApplyCustom(currentHairIndex, currentColorIndex, currentBodypartIndex);
     }
 
-    public void RequestApplyCustom(int hairIndex, int colorIndex, int bodypartIndex)
+    public void Init(PlayerInput playerInput)
     {
-        CustomData customData = SystemManager.customData;
+        this.playerInput = playerInput;
+    }
+
+    public void ApplyCustoms()
+    {
+        CustomData customData = PlayerManager.instance.GetComponentInChildren<CustomData>();
         if (customData != null)
         {
-            customData.hairIndex = currentHairIndex;
-            customData.colorIndex = currentColorIndex;
-            customData.bodyPartIndex = currentBodypartIndex;
-        }
-        ApplyCustoms(hairIndex, colorIndex, bodypartIndex);       
-    }
-  
+            Custom custom = new Custom { hairIndex = currentHairIndex, colorIndex = currentColorIndex, bodyPartIndex = currentBodypartIndex };
+            customData.SaveCustom(playerInput, custom);
 
-    public void ApplyCustoms(int hairIndex, int colorIndex, int bodypartIndex)
-    {
-        Debug.Log($"Host nhận thông tin: hairIndex:{hairIndex} colorIndex:{colorIndex} bodypartIndex:{bodypartIndex}");
-        ApplyHair(hairIndex);
-        ApplyColor(colorIndex);
-        ApplyBodypart(bodypartIndex);
+        }
+        ApplyHair(currentHairIndex);
+        ApplyColor(currentColorIndex);
+        ApplyBodypart(currentBodypartIndex);
     }
 
     public void NextHair()

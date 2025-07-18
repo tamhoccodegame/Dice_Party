@@ -1,22 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class Lobby : MonoBehaviour
 {
+    public static Lobby instance;
+
     public Transform[] avatarStandingPosition;
     public GameObject playerPrefab;
 
     public Transform playerSlotContainer;
-
-    public GameObject[] hostOwnObjects;
-    public Button hostStartButton;
+    public Transform[] playerSlots;
 
     private Dictionary<PlayerInput, GameObject> spawnedAvatars = new Dictionary<PlayerInput, GameObject>();
     private Dictionary<PlayerInput, bool> readyStatus = new Dictionary<PlayerInput, bool>();
@@ -25,45 +24,40 @@ public class Lobby : MonoBehaviour
 
     private void Awake()
     {
-        EnsureReadyStatusInit();
-
-        foreach (var go in hostOwnObjects)
-        {
-            go.SetActive(true);
-        }
-
+        instance = this;
     }
-
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    public async void StartGame()
+    IEnumerator StartGame()
     {
-        //ApplyCustom();
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadScene("TestSpawnPlayerAfterLobby");
+        //SceneManager.LoadScene("TuanSceneMap");
 
-        await Task.Delay(1000);
-
-        SceneManager.LoadScene("TuanSceneMap");
     }
 
-    #region UpdatePlayerListUI
-    private void NetworkManager_onPlayerListChange()
+    public void SetReady(PlayerInput playerInput, bool ready)
     {
-        //ApplyCustom();
+        readyStatus[playerInput] = ready;
+        Debug.Log($"Dictionary Count: {readyStatus.Count} {playerInput} status: {ready}");
 
-        EnsureReadyStatusInit();
+        if (CheckAllReady())
+        {
+            StartCoroutine(StartGame());
+        }
+        else
+        {
+            StopAllCoroutines();
+        }
     }
-    public void OnClickSetReady(bool ready)
-    {
-        //SetRea(player, ready);
-    }
 
-    void EnsureReadyStatusInit()
+    bool CheckAllReady()
     {
-
+        return readyStatus.All(r => r.Value == true);
     }
 
     private void OnPlayerJoined(PlayerInput playerInput)
@@ -71,96 +65,28 @@ public class Lobby : MonoBehaviour
         PlayerManager.instance.AddPlayer(playerInput);
         playerInput.transform.SetParent(playerSlotContainer);
 
-        playerInput.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = $"Player {playerCount + 1}";
+        playerInput.uiInputModule = playerSlots[playerCount].GetComponent<PlayerSlotUI>()
+                                    .inputSystemUIInputModule;
+
+        Debug.Log(playerSlots[playerCount].GetComponent<PlayerSlotUI>().name);  
+
+        //playerInput.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = $"Player {playerCount + 1}";
 
         //Spawn Avatar (model 3D)
         if (!spawnedAvatars.ContainsKey(playerInput))
         {
-            var model = Instantiate(playerPrefab, 
-                                    avatarStandingPosition[playerCount].position, 
+            var model = Instantiate(playerPrefab,
+                                    avatarStandingPosition[playerCount].position,
                                     Quaternion.Euler(0, 180, 0));
             spawnedAvatars.Add(playerInput, model);
+            playerSlots[playerCount].gameObject.SetActive(true);
+            playerSlots[playerCount].GetComponent<PlayerSlotUI>().InitSelector(model.GetComponent<PlayerCustom>());
             playerCount++;
-            playerInput.GetComponent<PlayerSlotUI>().InitSelector(model.GetComponent<PlayerCustom>());
+            model.GetComponent<PlayerCustom>().Init(playerInput);
         }
 
-        // Cập nhật UI NOTE: Sửa lại cho nó liên quan giữa char và slot ui. hiện tại nó chưa liên quan?
+        readyStatus.Add(playerInput, false);
+        StopAllCoroutines();
     }
-        #endregion
-
-        #region CustomCharacter
-        //public void NextHair()
-        //{
-        //    var playerCustoms = FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None);
-        //    foreach (var p in playerCustoms)
-        //        if (p.HasInputAuthority) p.GetComponent<PlayerCustom>().NextHair();
-        //}
-
-        //public void PrevHair()
-        //{
-        //    var playerCustoms = FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None);
-        //    foreach (var p in playerCustoms)
-        //        if (p.HasInputAuthority) p.GetComponent<PlayerCustom>().PrevHair();
-        //}
-
-
-        //public void NextColor()
-        //{
-        //    var playerCustoms = FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None);
-        //    foreach (var p in playerCustoms)
-        //        if (p.HasInputAuthority) p.GetComponent<PlayerCustom>().NextColor();
-
-        //}
-
-        //public void PrevColor()
-        //{
-        //    var playerCustoms = FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None);
-        //    foreach (var p in playerCustoms)
-        //        if (p.HasInputAuthority) p.GetComponent<PlayerCustom>().PrevColor();
-
-        //}
-
-        //public void NextBodypart()
-        //{
-        //    var playerCustoms = FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None);
-        //    foreach (var p in playerCustoms)
-        //        if (p.HasInputAuthority) p.GetComponent<PlayerCustom>().NextBodypart();
-
-        //}
-
-        //public void PrevBodypart()
-        //{
-        //    var playerCustoms = FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None);
-        //    foreach (var p in playerCustoms)
-        //        if (p.HasInputAuthority) p.GetComponent<PlayerCustom>().PrevBodypart();
-        //}
-
-        //public void ApplyCustom()
-        //{
-        //    var playerCustoms = FindObjectsByType<PlayerCustom>(FindObjectsSortMode.None);
-        //    foreach (var p in playerCustoms)
-        //        if (p.HasInputAuthority) p.RequestApplyCustom(p.currentHairIndex, p.currentColorIndex, p.currentBodypartIndex);
-        //}
-
-        //public void OnClickSetName(TextMeshProUGUI text)
-        //{
-        //    PlayerRef player = Runner.LocalPlayer;
-        //    NetworkString<_16> name = (NetworkString<_16>)text.text;
-        //    RPC_RequestSetName(player, name);
-        //}
-
-        //public void SetName(PlayerRef player, NetworkString<_16> name)
-        //{
-        //    BoardGameData.instance.UpdateName(player, (string)name);
-        //    if (Object.HasStateAuthority) UpdatePlayerList();
-        //}
-
-        //IEnumerator UpdateDelayAfterSetName()
-        //{
-        //    yield return new WaitForSecondsRealtime(0.3f);
-        //    UpdatePlayerList();
-        //}
-
-        #endregion
-    }
+}
 

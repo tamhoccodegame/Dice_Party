@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class PlayerSpawner : MonoBehaviour
 {
     public static PlayerSpawner instance;
-    private SystemManager networkManager;
+    private PlayerManager playerManager;
 
     public GameObject playerPrefab;
     public Transform[] spawnPosition;
@@ -17,34 +17,43 @@ public class PlayerSpawner : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
-        networkManager = FindFirstObjectByType<SystemManager>();
+        playerManager = PlayerManager.instance;
         instance = this;
+    }
+
+    private void Start()
+    {
+        SpawnPlayer();
     }
 
     public void SpawnPlayer()
     {
-        BoardGameData boardGameData = BoardGameData.instance;
-        bool isBoardScene = SceneManager.GetActiveScene().name == "TuanSceneMap";
+        foreach(var playerInput in playerManager.players)
+        {
+            MNGVongXoayController player = Instantiate(playerPrefab, spawnPosition[0].position, Quaternion.identity)
+                .GetComponent<MNGVongXoayController>();
+
+            PlayerInput p = player.GetComponent<PlayerInput>();
+            p = playerInput;
+        }
+
+        //BoardGameData boardGameData = BoardGameData.instance;
+        //bool isBoardScene = SceneManager.GetActiveScene().name == "TuanSceneMap";
 
 
-        if (boardGameData != null && boardGameData.playersCurrentNode.Count > 0 && isBoardScene)
-        {
-            TurnManager.instance.isFirstTry = false;
+        //if (boardGameData != null && boardGameData.playersCurrentNode.Count > 0 && isBoardScene)
+        //{
+        //    TurnManager.instance.isFirstTry = false;
            
-        }
-        else if (isBoardScene)
-        {
+        //}
+        //else if (isBoardScene)
+        //{
            
-        }
-        else
-        {
-            //List<PlayerRef> playerList = networkManager.GetAllPlayers();
-            //for (int i = 0; i < playerList.Count; i++)
-            //{
-            //    var go = Instantiate(playerPrefab, spawnPosition[i].position, spawnPosition[i].rotation, playerList[i]);
-            //    spawnedCharacters.Add(playerList[i], go);
-            //}
-        }
+        //}
+        //else
+        //{
+            
+        //}
 
     }
 

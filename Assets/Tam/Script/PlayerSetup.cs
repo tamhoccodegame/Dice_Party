@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerSetup : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class PlayerSetup : MonoBehaviour
 
     public void Awake()
     {
-        CustomData data = SystemManager.customData;
+        Custom data = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(GetComponent<PlayerInput>());
         UpdateCustom(data.hairIndex, data.colorIndex, data.bodyPartIndex);
     }
 

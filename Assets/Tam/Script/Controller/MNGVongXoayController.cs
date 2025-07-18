@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 
 [RequireComponent(typeof(CharacterController))]
@@ -13,6 +14,9 @@ public class MNGVongXoayController : MonoBehaviour
     public VisualEffect bloodEffect;
 
     public string currentAnim;
+
+    private Vector2 movementInput;
+
 
     public void Awake()
     {
@@ -27,6 +31,8 @@ public class MNGVongXoayController : MonoBehaviour
         Invoke(nameof(ResetGravity), 2f);
     }
 
+    public void OnMove(InputAction.CallbackContext ctx) => movementInput = ctx.ReadValue<Vector2>();
+
     void ResetGravity()
     {
 
@@ -34,7 +40,8 @@ public class MNGVongXoayController : MonoBehaviour
 
     void Update()
     {
-
+        Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
+        controller.Move(move * 3 * Time.deltaTime);
     }
 
     public void ChangeAnim(string animName, float blendTime = 0.25f)
