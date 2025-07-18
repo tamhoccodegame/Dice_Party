@@ -20,6 +20,7 @@ public class PlayerSlotUI : MonoBehaviour
     private bool isReady = false;
 
     private PlayerCustom playerCustom;
+    public PlayerInput playerInput;
 
     public InputSystemUIInputModule inputSystemUIInputModule;
 
@@ -52,7 +53,7 @@ public class PlayerSlotUI : MonoBehaviour
     public void SetReady(bool isReady)
     {
         this.isReady = isReady;
-        Lobby.instance.SetReady(GetComponent<PlayerInput>(), isReady);
+        Lobby.instance.SetReady(playerInput, isReady);
     }
 
     public void ApplyCustom()

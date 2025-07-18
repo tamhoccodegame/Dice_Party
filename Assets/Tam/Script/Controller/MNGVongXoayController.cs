@@ -15,6 +15,7 @@ public class MNGVongXoayController : MonoBehaviour
 
     public string currentAnim;
 
+    private PlayerInput input;
     private Vector2 movementInput;
 
 
@@ -31,17 +32,45 @@ public class MNGVongXoayController : MonoBehaviour
         Invoke(nameof(ResetGravity), 2f);
     }
 
-    public void OnMove(InputAction.CallbackContext ctx) => movementInput = ctx.ReadValue<Vector2>();
+    public void SetInput(PlayerInput input)
+    {
+        this.input = input;
+
+        this.input.actions["Move"].performed += OnMove;
+        this.input.actions["Move"].canceled += OnMove;
+
+        Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(input);
+        GetComponent<PlayerSetup>().UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
+    }
+
+    private void OnMove(InputAction.CallbackContext ctx)
+    {
+        movementInput = ctx.ReadValue<Vector2>();
+    }
 
     void ResetGravity()
     {
 
     }
-
     void Update()
     {
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
-        controller.Move(move * 3 * Time.deltaTime);
+        controller.Move(move * 8f * Time.deltaTime);
+
+        if(move.magnitude > 0.1f)
+        {
+            Quaternion newRotation = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 5 * Time.deltaTime);
+        }
+
+        if(move.magnitude > 0.1f)
+        {
+            ChangeAnim("Run");
+        }
+        else
+        {
+            ChangeAnim("Idle");
+        }
     }
 
     public void ChangeAnim(string animName, float blendTime = 0.25f)

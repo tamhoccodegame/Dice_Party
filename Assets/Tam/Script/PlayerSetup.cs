@@ -11,10 +11,8 @@ public class PlayerSetup : MonoBehaviour
 
     public void Awake()
     {
-        Custom data = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(GetComponent<PlayerInput>());
-        UpdateCustom(data.hairIndex, data.colorIndex, data.bodyPartIndex);
-    }
 
+    }
 
     public void UpdateCustom(int hairIndex, int colorIndex, int bodyPartIndex)
     {

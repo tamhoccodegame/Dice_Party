@@ -32,7 +32,7 @@ public class TurnManager : MonoBehaviour
         instance = this;
 
         GetComponent<PlayerSpawner>().SpawnPlayer();
-        MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
+        //MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
         StartCoroutine(FadeBlackScreen(1, 0));
 
         playerController = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.InstanceID).ToList();

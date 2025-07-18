@@ -35,7 +35,7 @@ public class Lobby : MonoBehaviour
     IEnumerator StartGame()
     {
         yield return new WaitForSeconds(1.5f);
-        SceneManager.LoadScene("TestSpawnPlayerAfterLobby");
+        SceneManager.LoadScene("Map1");
         //SceneManager.LoadScene("TuanSceneMap");
 
     }
@@ -63,7 +63,7 @@ public class Lobby : MonoBehaviour
     private void OnPlayerJoined(PlayerInput playerInput)
     {
         PlayerManager.instance.AddPlayer(playerInput);
-        playerInput.transform.SetParent(playerSlotContainer);
+        playerInput.transform.SetParent(PlayerManager.instance.transform);
 
         playerInput.uiInputModule = playerSlots[playerCount].GetComponent<PlayerSlotUI>()
                                     .inputSystemUIInputModule;
@@ -81,6 +81,7 @@ public class Lobby : MonoBehaviour
             spawnedAvatars.Add(playerInput, model);
             playerSlots[playerCount].gameObject.SetActive(true);
             playerSlots[playerCount].GetComponent<PlayerSlotUI>().InitSelector(model.GetComponent<PlayerCustom>());
+            playerSlots[playerCount].GetComponent<PlayerSlotUI>().playerInput = playerInput;
             playerCount++;
             model.GetComponent<PlayerCustom>().Init(playerInput);
         }
@@ -89,4 +90,3 @@ public class Lobby : MonoBehaviour
         StopAllCoroutines();
     }
 }
-

@@ -28,31 +28,33 @@ public class PlayerSpawner : MonoBehaviour
 
     public void SpawnPlayer()
     {
-        foreach(var playerInput in playerManager.players)
-        {
-            MNGVongXoayController player = Instantiate(playerPrefab, spawnPosition[0].position, Quaternion.identity)
-                .GetComponent<MNGVongXoayController>();
-
-            PlayerInput p = player.GetComponent<PlayerInput>();
-            p = playerInput;
-        }
+        //foreach(var playerInput in playerManager.players)
+        //{
+        //    var player = Instantiate(playerPrefab, spawnPosition[0].position, Quaternion.identity);
+        //    MNGVongXoayController p = player.GetComponent< MNGVongXoayController>();    
+        //    p.SetInput(playerInput);
+        //}
 
         //BoardGameData boardGameData = BoardGameData.instance;
         //bool isBoardScene = SceneManager.GetActiveScene().name == "TuanSceneMap";
 
+        //if (isBoardScene)
+        {
+            var player = Instantiate(playerPrefab, spawnPosition[0].position, Quaternion.identity);
+        }
 
         //if (boardGameData != null && boardGameData.playersCurrentNode.Count > 0 && isBoardScene)
         //{
         //    TurnManager.instance.isFirstTry = false;
-           
+
         //}
         //else if (isBoardScene)
         //{
-           
+
         //}
         //else
         //{
-            
+
         //}
 
     }

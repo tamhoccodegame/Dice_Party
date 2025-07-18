@@ -22,6 +22,7 @@ public class PlayerCustom : MonoBehaviour
     public void Init(PlayerInput playerInput)
     {
         this.playerInput = playerInput;
+        ApplyCustoms();
     }
 
     public void ApplyCustoms()
