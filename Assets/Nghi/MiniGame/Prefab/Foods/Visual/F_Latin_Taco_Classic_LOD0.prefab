@@ -11,12 +11,9 @@ GameObject:
   - component: {fileID: 2998041221326886313}
   - component: {fileID: 4725886994837788742}
   - component: {fileID: 2841450125794792716}
-  - component: {fileID: 6794901269009303251}
-  - component: {fileID: 6217014301866573536}
-  - component: {fileID: 7328437906194420034}
   m_Layer: 17
   m_Name: F_Latin_Taco_Classic_LOD0
-  m_TagString: Item
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -31,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.09163618, y: 0, z: -0, w: 0.99579257}
   m_LocalPosition: {x: 597.5117, y: 0.52099824, z: 114.320435}
-  m_LocalScale: {x: 15, y: 15, z: 15}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -86,74 +83,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &6794901269009303251
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2500625050079368129}
-  m_Material: {fileID: 13400000, guid: 55fea10863ff2924a82b9da4ad713b74, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.13731714
-  m_Center: {x: -0.008937374, y: 0.006535001, z: 0.000000022351742}
---- !u!54 &6217014301866573536
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2500625050079368129}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.1
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 0
-  m_CollisionDetection: 2
---- !u!114 &7328437906194420034
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2500625050079368129}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b8c36941b02d7f46949e9348ff39049, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  customGravity: -40
-  maxFallSpeed: 50
-  baseAngularSpeed: 3
-  angularRandomness: 2
-  maxAngularVelocity: 8
-  bounceForce: 10
-  bounceRandomness: 0.55
-  bounceUpwardFactor: 2
-  fadeDelay: 0.5
-  fadeDuration: 0.3
-  visualInCupPrefab: {fileID: 2500625050079368129, guid: 28b037b06da9510418697b00e29e1444, type: 3}

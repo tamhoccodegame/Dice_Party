@@ -1,127 +1,143 @@
 ﻿using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using static FallingItem;
 
 public class ItemCollector : MonoBehaviour
 {
-    //[Header("Physics Settings")]
-    //public float customGravity = -35f;
-    //public float bounceForce = 7f;
-    //public float fadeDuration = 1f;
+    [Header("Setup")]
+    public Transform itemContainer; // Trung tâm đáy ly (local)
+    public GameObject vfxPrefab;
+    public TextMeshProUGUI itemCountTMP;
 
-    //[Header("Cup Detection")]
-    //public string cupZoneTag = "InsideCup";
-    //public Transform caughtItemFollowParent; // Gán tự động khi rơi vào ly
+    [Header("Arrangement Settings")]
+    public float radius = 0.25f;             // Bán kính sắp xếp item
+    public float heightStep = 0.08f;         // Khoảng cách giữa các lớp theo chiều cao
+    public float itemSpacing = 0.2f;         // Khoảng cách giữa các item trên cùng một lớp
+    public float randomRotationAngle = 15f;  // Độ lệch ngẫu nhiên của từng item
 
-    //private Rigidbody rb;
-    //private bool isCaught = false;
-    //private bool hasLanded = false;
-    //private Material mat;
+    private List<GameObject> collectedItems = new List<GameObject>();
 
-    //void Start()
+    //public void AddItem(GameObject item, Vector3 hitPoint)
     //{
-    //    rb = GetComponent<Rigidbody>();
-    //    rb.useGravity = false;
-    //    rb.mass = 0.3f;
-    //    rb.drag = 0f;
-    //    rb.angularDrag = 0.1f;
+    //    // 1. VFX tại vị trí va chạm
+    //    if (vfxPrefab != null)
+    //        Instantiate(vfxPrefab, hitPoint, Quaternion.identity);
 
-    //    // Lấy material để fade
-    //    Renderer rend = GetComponentInChildren<Renderer>();
-    //    if (rend != null)
-    //    {
-    //        mat = rend.material;
-    //        var c = mat.color; c.a = 1f;
-    //        mat.color = c;
-    //    }
+    //    // 2. Tạo bản sao mini của item (có thể khác prefab ngoài đời)
+    //    GameObject miniItem = Instantiate(item.GetComponent<FallingItem>().visualInCupPrefab, itemContainer);
+    //    collectedItems.Add(miniItem);
+
+    //    // 3. Arrange lại toàn bộ
+    //    ArrangeItems();
+
+    //    // 4. Update UI
+    //    UpdateCountUI();
     //}
 
-    //void FixedUpdate()
-    //{
-    //    if (!isCaught && !hasLanded)
-    //    {
-    //        rb.AddForce(Vector3.up * customGravity, ForceMode.Acceleration);
-    //    }
+    private void Start()
+    {
 
-    //    // Nếu đã bị bắt → giữ vị trí tương đối
-    //    if (isCaught && caughtItemFollowParent != null)
-    //    {
-    //        transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero, 0.1f);
-    //    }
-    //}
+        itemCountTMP.text = "Collected items: 0";
+    }
 
-    //void OnTriggerEnter(Collider other)
-    //{
-    //    // Bắt được item
-    //    if (other.CompareTag(cupZoneTag) && !isCaught)
-    //    {
-    //        isCaught = true;
+    [Header("Bomb Settings")]
+    public int penaltyCount = 3;             // Số lượng item bị trừ khi trúng bomb
+    public GameObject bombVFX;
+    public void AddItem(GameObject item, Vector3 hitPoint, bool isGroundHit = false)
+    {
+        var fallingItem = item.GetComponent<FallingItem>();
+        Debug.Log($"[AddItem] Type: {fallingItem.itemType}, GroundHit: {isGroundHit}");
+        if (fallingItem.itemType == ItemType.Bomb)
+        {
+            Debug.Log("💣 Bomb detected!");
+            if (bombVFX != null)
+            {
+                Instantiate(bombVFX, hitPoint, Quaternion.identity);
+                Destroy(bombVFX, 2f); // Tự hủy sau 2 giây
+            }
+                
 
-    //        // Dính vào ly và follow theo Player
-    //        rb.velocity = Vector3.zero;
-    //        rb.isKinematic = true;
-    //        transform.SetParent(other.transform, true);
-    //        caughtItemFollowParent = other.transform;
+            if (!isGroundHit) // Chỉ trừ điểm nếu bomb trúng ly
+            {
+                Debug.Log("⚠️ Bomb hit CUP! Trừ điểm!");
+                for (int i = 0; i < penaltyCount && collectedItems.Count > 0; i++)
+                {
+                    var lastItem = collectedItems[^1];
+                    collectedItems.RemoveAt(collectedItems.Count - 1);
+                    Destroy(lastItem);
+                }
+                UpdateCountUI();
+            }
 
-    //        // Phát VFX bắt được (nếu có)
-    //        SpawnCatchVFX();
+            Destroy(item);
+            return;
+        }
 
-    //        return;
-    //    }
-    //}
+        // Item thường
+        if (vfxPrefab != null)
+        {
+            Instantiate(vfxPrefab, hitPoint, Quaternion.identity);
+            Destroy(vfxPrefab, 2f);
+        }
+            
 
-    //void OnCollisionEnter(Collision collision)
-    //{
-    //    if (isCaught) return; // Nếu đã bắt được thì không xử lý va chạm nữa
+        GameObject miniItem = Instantiate(fallingItem.visualInCupPrefab, itemContainer);
+        collectedItems.Add(miniItem);
 
-    //    if (collision.collider.CompareTag("Player") || collision.collider.CompareTag("Cup"))
-    //    {
-    //        rb.velocity = Vector3.zero;
-    //        rb.isKinematic = true;
-    //        FadeAndDestroy();
-    //        return;
-    //    }
+        ArrangeItems();
+        UpdateCountUI();
+        Destroy(item);
+    }
 
-    //    if (!hasLanded)
-    //    {
-    //        hasLanded = true;
-    //        rb.velocity = Vector3.up * bounceForce;
-    //        rb.angularVelocity = Vector3.zero;
-    //        rb.mass = 0.1f;
-    //        rb.drag = 3f;
-    //        rb.angularDrag = 3f;
-    //        Invoke(nameof(FadeAndDestroy), 0.1f);
-    //    }
-    //}
+    void ArrangeItems()
+    {
+        int itemsPerLayer = Mathf.Max(1, Mathf.FloorToInt((2 * Mathf.PI * radius) / itemSpacing));
 
-    //void SpawnCatchVFX()
-    //{
-    //    // Chỗ này gắn prefab VFX hiệu ứng chạm ly
-    //    // Instantiate(catchVFXPrefab, transform.position, Quaternion.identity);
-    //}
+        for (int i = 0; i < collectedItems.Count; i++)
+        {
+            int layer = i / itemsPerLayer;
+            int indexInLayer = i % itemsPerLayer;
 
-    //void FadeAndDestroy()
-    //{
-    //    if (mat != null)
-    //    {
-    //        mat.DOFade(0f, fadeDuration).OnComplete(() => Destroy(gameObject));
-    //    }
-    //    else
-    //    {
-    //        Destroy(gameObject);
-    //    }
-    //}
+            float angle = (360f / itemsPerLayer) * indexInLayer;
+            float y = layer * heightStep;
 
-    //void OnTransformParentChanged()
-    //{
-    //    // Nếu bị tách ra khỏi ly → rớt ra → tự hủy
-    //    if (isCaught && transform.parent == null)
-    //    {
-    //        isCaught = false;
-    //        rb.isKinematic = false;
-    //        rb.velocity = Vector3.up * 3f;
-    //        Invoke(nameof(FadeAndDestroy), 1f);
-    //    }
-    //}
+            float x = Mathf.Cos(angle * Mathf.Deg2Rad) * radius;
+            float z = Mathf.Sin(angle * Mathf.Deg2Rad) * radius;
+
+            Vector3 localPos = new Vector3(x, y, z);
+            Quaternion localRot = Quaternion.Euler(
+                Random.Range(-randomRotationAngle, randomRotationAngle),
+                Random.Range(0, 360f),
+                Random.Range(-randomRotationAngle, randomRotationAngle)
+            );
+
+            collectedItems[i].transform.localPosition = localPos;
+            collectedItems[i].transform.localRotation = localRot;
+        }
+    }
+
+    void UpdateCountUI()
+    {
+        if (itemCountTMP != null)
+            itemCountTMP.text = $"Collected items: {collectedItems.Count}";
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (itemContainer == null) return;
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(itemContainer.position, radius);
+
+        // Vẽ các lớp để debug chiều cao
+        int maxLayer = Mathf.CeilToInt(collectedItems.Count / Mathf.Max(1f, (2 * Mathf.PI * radius) / itemSpacing));
+        for (int i = 0; i < maxLayer; i++)
+        {
+            Vector3 layerPos = itemContainer.position + Vector3.up * i * heightStep;
+            Gizmos.DrawWireSphere(layerPos, radius);
+        }
+    }
 }
