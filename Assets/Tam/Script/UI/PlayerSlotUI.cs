@@ -11,13 +11,21 @@ public class PlayerSlotUI : MonoBehaviour
     public GameObject unreadyButton;
     public GameObject readyPanel;
 
+    public OptionSelector colorSelector;
     public OptionSelector hairSelector;
     public OptionSelector bodyPartSelector;
 
     private void Awake()
     {
-        hairSelector.textOptions.Clear();
-        bodyPartSelector.textOptions.Clear();
+        //hairSelector.textOptions.Clear();
+        //bodyPartSelector.textOptions.Clear();
+    }
+
+    public void InitSelector(PlayerCustom playerCustom)
+    {
+        colorSelector.playerCustom = playerCustom;
+        hairSelector.playerCustom = playerCustom;
+        bodyPartSelector.playerCustom = playerCustom;
     }
 
     public void AddHairName(string hairName)
