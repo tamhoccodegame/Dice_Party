@@ -207,7 +207,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1834132383949260783}
   - component: {fileID: 1701847592247654402}
-  - component: {fileID: 5453499840267723728}
   - component: {fileID: 2536633706578390203}
   m_Layer: 7
   m_Name: TrapDice
@@ -226,7 +225,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 16.3, y: 0, z: 6.4}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4990149301806713278}
@@ -251,25 +250,6 @@ MonoBehaviour:
   rotationDuration: 1
   shakeStrength: 0.2
   shakeDuration: 0.5
---- !u!114 &5453499840267723728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1315039009900485973}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SortKey: 2584100945
-  ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: 2536633706578390203}
-  ForceRemoteRenderTimeframe: 0
 --- !u!114 &2536633706578390203
 MonoBehaviour:
   m_ObjectHideFlags: 0

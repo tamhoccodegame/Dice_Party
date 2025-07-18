@@ -522,10 +522,7 @@ PrefabInstance:
       objectReference: {fileID: 1286974180}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 7191577024053344964, guid: 6f0d6e2e2a5d6f14b90e34112af173f5, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1753781886}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6f0d6e2e2a5d6f14b90e34112af173f5, type: 3}
 --- !u!1 &25908359
@@ -4550,7 +4547,6 @@ GameObject:
   m_Component:
   - component: {fileID: 359746374}
   - component: {fileID: 359746376}
-  - component: {fileID: 359746375}
   m_Layer: 0
   m_Name: BoardGameData
   m_TagString: Untagged
@@ -4573,24 +4569,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &359746375
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 359746373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SortKey: 1299770736
-  ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
-  NetworkedBehaviours: []
-  ForceRemoteRenderTimeframe: 0
 --- !u!114 &359746376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23456,6 +23434,22 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls: []
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!114 &756398572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27625,11 +27619,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c77bc2b2cd0b7fe4bb3220c799e872ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &1001958480 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7191577024053344964, guid: 6f0d6e2e2a5d6f14b90e34112af173f5, type: 3}
-  m_PrefabInstance: {fileID: 23147061}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1002633157
 GameObject:
   m_ObjectHideFlags: 0
@@ -31395,7 +31384,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: LevelLoader
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6728078837242155651, guid: d8ff5b57e6bd3b346bff9024fd818b00, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -44094,6 +44084,22 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls: []
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!114 &1293000815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44764,16 +44770,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 389648353}
-        m_TargetAssemblyTypeName: PopUpUIManager, Assembly-CSharp
-        m_MethodName: SwitchTo
-        m_Mode: 2
+      - m_Target: {fileID: 1185387871}
+        m_TargetAssemblyTypeName: LevelLoader, Assembly-CSharp
+        m_MethodName: LoadScene
+        m_Mode: 5
         m_Arguments:
-          m_ObjectArgument: {fileID: 436941565}
-          m_ObjectArgumentAssemblyTypeName: PopUpAnimationController, Assembly-CSharp
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: GameLobby_GetReady
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1324993739
@@ -44843,6 +44849,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
   - eventID: 0
     callback:
       m_PersistentCalls:
@@ -62842,51 +62864,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1751635521}
   m_CullTransparentMesh: 1
---- !u!1 &1753781885
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1753781886}
-  - component: {fileID: 1753781887}
-  m_Layer: 0
-  m_Name: NetworkInputManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1753781886
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1753781885}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1001958480}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1753781887
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1753781885}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 353c4751942c93347ad8cb2eeba20674, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pendingJump: 0
 --- !u!1 &1774920235
 GameObject:
   m_ObjectHideFlags: 0
