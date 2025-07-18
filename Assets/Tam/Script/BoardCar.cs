@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.VFX;
 using UnityEngine.Windows;
 
 public class BoardCar : MonoBehaviour
@@ -31,7 +33,11 @@ public class BoardCar : MonoBehaviour
     public List<GameObject> spawnedArrows;
 
     public bool isWaitingForChoice = false;
-    Coroutine moveCoroutine = null; 
+    Coroutine moveCoroutine = null;
+
+    public StepText stepTextPrefab;
+    public GameObject dice;
+    public ParticleSystem diceVFX;
 
     // Start is called before the first frame update
     void Start()
@@ -48,13 +54,20 @@ public class BoardCar : MonoBehaviour
 
     void UpdatePlayerInput()
     {
+        if(currentPlayerInput != null) 
+        currentPlayerInput.actions["Trigger"].started -= OnTrigger;
+
         currentPlayerInput = inputs[currentPlayerInputIndex];
         currentPlayerInput.actions["Trigger"].started += OnTrigger;
+        dice.SetActive(true);
+        moveCoroutine = null;
     }
 
     private void OnTrigger(InputAction.CallbackContext obj)
     {
-        stepLeft = 10;
+        if (moveCoroutine != null) return;
+
+        stepLeft = 5;
         if(currentNode.nextNodes.Count > 1)
         {
             ShowDirection();
@@ -62,7 +75,7 @@ public class BoardCar : MonoBehaviour
         else
         {
             StopAllCoroutines();
-            moveCoroutine = StartCoroutine(MoveToNextNode());
+            StartCoroutine(RollDice());
         }
     }
 
@@ -82,6 +95,19 @@ public class BoardCar : MonoBehaviour
     {
         currentNode = node;
         toMoveNode = currentNode.nextNodes[0];
+    }
+
+    IEnumerator RollDice()
+    {
+        carAnim.CrossFade("RollDice", 0.25f);
+        yield return new WaitForSeconds(0.2f);
+        dice.SetActive(false);
+        diceVFX.Play();
+        var step = Instantiate(stepTextPrefab, dice.transform.position - new Vector3(0, 1.5f, 0), Quaternion.identity)
+                   .GetComponent<StepText>();
+        step.Init(stepLeft.ToString());
+        yield return new WaitForSeconds(1f);
+        moveCoroutine = StartCoroutine(MoveToNextNode());
     }
 
     IEnumerator MoveToNextNode()

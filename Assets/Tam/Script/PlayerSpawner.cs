@@ -32,7 +32,7 @@ public class PlayerSpawner : MonoBehaviour
         //foreach(var playerInput in playerManager.players)
         //{
         //    var player = Instantiate(playerPrefab, spawnPosition[0].position, Quaternion.identity);
-        //    MNGVongXoayController p = player.GetComponent< MNGVongXoayController>();    
+        //    MNGVongXoayController p = player.GetComponent<MNGVongXoayController>();    
         //    p.SetInput(playerInput);
         //}
 
@@ -50,8 +50,16 @@ public class PlayerSpawner : MonoBehaviour
                 player.transform.SetParent(car.playerSitPositions[index]);
                 player.transform.localPosition = Vector3.zero;
                 player.transform.localRotation = Quaternion.Euler(0,0,0);
+
+                Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
+                PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
+
+                Debug.Log($"{customData.hairIndex},{customData.colorIndex}, {customData.bodyPartIndex}");
+                playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
+
                 car.animators.Add(player.GetComponent<Animator>());
                 if (index <= 1) player.GetComponent<Animator>().Play("Sit");
+                index++;
             }
 
         }

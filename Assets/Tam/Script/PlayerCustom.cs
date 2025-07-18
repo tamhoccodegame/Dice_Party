@@ -32,7 +32,6 @@ public class PlayerCustom : MonoBehaviour
         {
             Custom custom = new Custom { hairIndex = currentHairIndex, colorIndex = currentColorIndex, bodyPartIndex = currentBodypartIndex };
             customData.SaveCustom(playerInput, custom);
-
         }
         ApplyHair(currentHairIndex);
         ApplyColor(currentColorIndex);

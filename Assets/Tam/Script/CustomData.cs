@@ -5,9 +5,9 @@ using UnityEngine.InputSystem;
 
 public class Custom
 {
-    public int hairIndex { get; set; } = 0;
-    public int colorIndex { get; set; } = 0;
-    public int bodyPartIndex { get; set; } = 0;
+    public int hairIndex;
+    public int colorIndex;
+    public int bodyPartIndex;
 }
 
 public class CustomData : MonoBehaviour
@@ -18,6 +18,10 @@ public class CustomData : MonoBehaviour
     {
         if(!customs.ContainsKey(playerInput))
         customs.Add(playerInput, custom);
+        else
+        {
+            customs[playerInput] = custom;
+        }
     }
 
     public Custom GetCustom(PlayerInput playerInput)
