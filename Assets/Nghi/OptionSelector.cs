@@ -1,21 +1,27 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 public class OptionSelector : MonoBehaviour
 {
     public enum Type { Color, Text }
 
+    public enum CustomType { Color, Hair, Bodypart }
+
     [Header("General")]
     public Type selectorType;
+    public CustomType customType;
     public Button leftButton;
     public Button rightButton;
 
     [Header("UI References")]
-    public Image colorDisplay;         // D�ng cho Color
-    public TMP_Text textDisplay;       // D�ng cho Text
+    public Image colorDisplay;         // Dùng cho Color
+    public TMP_Text textDisplay;       // Dùng cho Text
 
     [Header("Values")]
     public List<Color> colorOptions;
@@ -23,13 +29,56 @@ public class OptionSelector : MonoBehaviour
 
     private int currentIndex = 0;
 
+    public bool isActive;
+    bool cacheActiveState = false;
+    public MultiplayerEventSystem eventSystem;
+
+    private Vector2 navigateValue;
+
+    public PlayerCustom playerCustom;
+
+    private float inputCooldown = 0.25f; // 250ms delay giữa mỗi lần chọn
+    private float inputTimer = 0f;
+
+
     private void Start()
     {
         leftButton.onClick.AddListener(SelectPrevious);
         rightButton.onClick.AddListener(SelectNext);
 
-        //LoadSavedIndex();
         UpdateDisplay();
+    }
+
+    private void Update()
+    {
+        isActive = eventSystem.currentSelectedGameObject == gameObject;
+
+        InputSystemUIInputModule inputModule = eventSystem.currentInputModule as InputSystemUIInputModule;
+        if (inputModule != null)
+        {
+            InputActionReference navigateAction = inputModule.move;
+            // Nếu muốn đọc raw value:
+            navigateValue = navigateAction.action.ReadValue<Vector2>();
+            Debug.Log("Navigate vector: " + navigateValue);
+        }
+
+        if (!isActive) return;
+
+        inputTimer -= Time.unscaledDeltaTime;
+
+        if (inputTimer <= 0f)
+        {
+            if (navigateValue.x < -0.5f)
+            {
+                SelectPrevious();
+                inputTimer = inputCooldown;
+            }
+            else if (navigateValue.x > 0.5f)
+            {
+                SelectNext();
+                inputTimer = inputCooldown;
+            }
+        }
     }
 
     private void SelectPrevious()
@@ -37,6 +86,19 @@ public class OptionSelector : MonoBehaviour
         currentIndex = (currentIndex - 1 + GetListCount()) % GetListCount();
         UpdateDisplay();
         SaveCurrentIndex();
+
+        switch(customType)
+        {
+            case CustomType.Color:
+                playerCustom.PrevColor();
+                break;
+            case CustomType.Hair:
+                playerCustom.PrevHair();
+                break;
+            case CustomType.Bodypart:
+                playerCustom.PrevBodypart();
+                break;
+        }
     }
 
     private void SelectNext()
@@ -44,6 +106,19 @@ public class OptionSelector : MonoBehaviour
         currentIndex = (currentIndex + 1) % GetListCount();
         UpdateDisplay();
         SaveCurrentIndex();
+
+        switch (customType)
+        {
+            case CustomType.Color:
+                playerCustom.NextColor();
+                break;
+            case CustomType.Hair:
+                playerCustom.NextHair();
+                break;
+            case CustomType.Bodypart:
+                playerCustom.NextBodypart();
+                break;
+        }
     }
 
     private int GetListCount()
