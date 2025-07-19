@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 1224862317214855252}
   - component: {fileID: 4138862500913373489}
   - component: {fileID: -223850906850885184}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: F_Asia_Onigiri_LOD0
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.000000037748947, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 613.6717, y: 0.257999, z: 124.390434}
-  m_LocalScale: {x: 20, y: 20, z: 20}
+  m_LocalScale: {x: 15, y: 15, z: 15}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -146,20 +146,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b8c36941b02d7f46949e9348ff39049, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  customGravity: -35
-  maxFallSpeed: 50
+  itemType: 0
+  customGravity: -20
+  maxFallSpeed: 20
   baseAngularSpeed: 3
   angularRandomness: 2
   maxAngularVelocity: 8
-  bounceForce: 7
-  bounceRandomness: 1.5
-  bounceUpwardFactor: 1
+  bounceForce: 2
+  bounceRandomness: 0.55
+  bounceUpwardFactor: 2
   fadeDelay: 0.5
-  fadeDuration: 1
-  cupDrag: 2
-  cupAngularDrag: 4
-  cupMass: 0.8
-  inCupLayer:
-    serializedVersion: 2
-    m_Bits: 16384
-  VFX: {fileID: 0}
+  fadeDuration: 0.3
+  visualInCupPrefab: {fileID: 7000299300339649893, guid: 9ab83794dd35d05448044bf9c9c8cb3e, type: 3}
