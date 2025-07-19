@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 
 [RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(CharacterController))]
 public class MNGVongXoayController : MonoBehaviour
 {
     private CharacterController controller;
@@ -41,6 +40,12 @@ public class MNGVongXoayController : MonoBehaviour
 
         Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(input);
         GetComponent<PlayerSetup>().UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
+    }
+
+    private void OnDisable()
+    {
+        this.input.actions["Move"].performed -= OnMove;
+        this.input.actions["Move"].canceled -= OnMove;
     }
 
     private void OnMove(InputAction.CallbackContext ctx)

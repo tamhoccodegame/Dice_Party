@@ -12,6 +12,7 @@ public class TrapActivationManager : MonoBehaviour
 
     void Start()
     {
+        player = FindFirstObjectByType<MNGChayTruongController>().transform;
         // Tìm tất cả trap trong scene (có thể tối ưu nếu có nhiều)
         TrapActivator[] foundTraps = FindObjectsOfType<TrapActivator>(true); // true để tìm cả những trap bị tắt
 

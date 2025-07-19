@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Obstacle : MonoBehaviour
+public class T_Obstacle : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {

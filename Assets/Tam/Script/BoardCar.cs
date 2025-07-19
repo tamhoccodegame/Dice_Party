@@ -1,12 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.VFX;
-using UnityEngine.Windows;
 
 public class BoardCar : MonoBehaviour
 {
@@ -50,6 +46,8 @@ public class BoardCar : MonoBehaviour
 
         FindFirstObjectByType<CinemachineCamera>().Follow = transform;
         FindFirstObjectByType<CinemachineCamera>().LookAt = transform;
+
+        WizardPartyData.instance.UpdateCarNode(currentNode);
     }
 
     void UpdatePlayerInput()
@@ -73,6 +71,8 @@ public class BoardCar : MonoBehaviour
         foreach(var playerInput in inputs)
         {
             playerInput.actions["Trigger"].started -= OnTrigger;
+            playerInput.actions["PrimaryButton"].started -= ChoosePrimaryDirection;
+            playerInput.actions["SecondaryButton"].started -= ChooseSecondaryDirection;
         }
     }
 
@@ -127,7 +127,7 @@ public class BoardCar : MonoBehaviour
     {
         carAnim.CrossFade("StartMove", 0.25f);
         yield return new WaitForSeconds(0.5f);
-        carAnim.CrossFade("Move", 0.25f);
+        carAnim.CrossFade("Moving", 0.25f);
 
         while (stepLeft > 0)
         {
@@ -164,6 +164,7 @@ public class BoardCar : MonoBehaviour
         currentPlayerInputIndex = (currentPlayerInputIndex + 1) % inputs.Count;
         UpdatePlayerInput();
         dice.SetActive(false);
+        WizardPartyData.instance.UpdateCarNode(currentNode);
     }
 
     void ClearArrow()
@@ -189,11 +190,27 @@ public class BoardCar : MonoBehaviour
 
             spawnedArrows.Add(arrow.gameObject);
         }
+        currentPlayerInput.actions["PrimaryButton"].started += ChoosePrimaryDirection;
+        currentPlayerInput.actions["SecondaryButton"].started += ChooseSecondaryDirection;
+    }
+
+    private void ChooseSecondaryDirection(InputAction.CallbackContext obj)
+    {
+        currentPlayerInput.actions["SecondaryButton"].started -= ChooseSecondaryDirection;
+        ChooseDirection(1);
+    }
+
+    private void ChoosePrimaryDirection(InputAction.CallbackContext obj)
+    {
+        currentPlayerInput.actions["PrimaryButton"].started -= ChoosePrimaryDirection;
+        ChooseDirection(0);
     }
 
     public void ChooseDirection(int index)
     {
+        ClearArrow();
         toMoveNode = currentNode.nextNodes[index];
+        Wizard.instance.AddPlayerChoseNode(toMoveNode);
         isWaitingForChoice = false;
         StopAllCoroutines();
         moveCoroutine = StartCoroutine(MoveToNextNode());

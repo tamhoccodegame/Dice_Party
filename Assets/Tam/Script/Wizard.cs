@@ -48,6 +48,8 @@ public class Wizard : MonoBehaviour
         volume.profile.TryGet(out lens);
         volume.profile.TryGet(out chroma);
         volume.profile.TryGet(out vignette);
+
+        WizardPartyData.instance.UpdateWizardNode(currentNode);
     }
 
     // Update is called once per frame
@@ -99,7 +101,7 @@ public class Wizard : MonoBehaviour
 
     IEnumerator MoveToNextNode()
     {
-        if(currentNode.nextNodes.Count > 0 && playerChoseNodeQueue.Count > 0)
+        if(currentNode.nextNodes.Count > 1 && playerChoseNodeQueue.Count > 0)
         {
             toMoveNode = playerChoseNodeQueue.Dequeue();
         }
@@ -142,6 +144,7 @@ public class Wizard : MonoBehaviour
         yield return null;
         canMove = false;
         animator.CrossFade("Idle", 0.25f);
+        WizardPartyData.instance.UpdateWizardNode(currentNode);
     }
 
     IEnumerator CastSpell()

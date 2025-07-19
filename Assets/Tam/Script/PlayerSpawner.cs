@@ -24,7 +24,12 @@ public class PlayerSpawner : MonoBehaviour
 
     private void Start()
     {
-        SpawnPlayer();
+        BoardGameData boardGameData = BoardGameData.instance;
+        bool isBoardScene = SceneManager.GetActiveScene().name == "Map1";
+        if (isBoardScene)
+        {
+            SpawnPlayer();
+        }
     }
 
     public void SpawnPlayer()
@@ -54,7 +59,6 @@ public class PlayerSpawner : MonoBehaviour
                 Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
                 PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
 
-                Debug.Log($"{customData.hairIndex},{customData.colorIndex}, {customData.bodyPartIndex}");
                 playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
 
                 car.animators.Add(player.GetComponent<Animator>());
@@ -67,7 +71,7 @@ public class PlayerSpawner : MonoBehaviour
         {
             for(int i = 0; i < playerManager.players.Count; i++) 
             {
-                MNGVongXoayController player = Instantiate(playerPrefab, spawnPosition[i].position, Quaternion.identity).GetComponent<MNGVongXoayController>();
+                MNGChayTruongController player = Instantiate(playerPrefab, spawnPosition[i].position, Quaternion.identity).GetComponent<MNGChayTruongController>();
                 player.SetInput(playerManager.players[i]);
             }
         }

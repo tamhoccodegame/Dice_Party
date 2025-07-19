@@ -174,13 +174,13 @@ PrefabInstance:
       addedObject: {fileID: 3778012891495592204}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89b5415f4300e9a4cb8cba1c36de3d8e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2741883615636558250}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89b5415f4300e9a4cb8cba1c36de3d8e, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 5894741701602348656}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89b5415f4300e9a4cb8cba1c36de3d8e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4688603809693386015}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89b5415f4300e9a4cb8cba1c36de3d8e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1935324581274055001}
   m_SourcePrefab: {fileID: 100100000, guid: 89b5415f4300e9a4cb8cba1c36de3d8e, type: 3}
 --- !u!4 &8428811764219485059 stripped
 Transform:
@@ -204,31 +204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2377a30991bce4c428fdc212915a3f8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activationDistance: 80
---- !u!114 &2741883615636558250
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9201688605999743289}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91a03e50cbe21d24daef98709d266e1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mode: 0
-  moveSpeed: 8
-  wheelRadius: 0.55
-  detectionDistance: 5
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  wheelMesh: {fileID: 8428811764219485059}
-  moveAxis: 0
-  faceAxis: 5
-  lockFacingDirection: 1
-  uprightSmoothing: 2
+  activationDistance: 200
 --- !u!136 &5894741701602348656
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -279,3 +255,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1935324581274055001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9201688605999743289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6165462c7506ed94da4ce204b8415878, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mode: 0
+  moveSpeed: 8
+  wheelRadius: 0.55
+  detectionDistance: 5
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  wheelMesh: {fileID: 8428811764219485059}
+  moveAxis: 0
+  faceAxis: 5
+  lockFacingDirection: 1
+  uprightSmoothing: 2

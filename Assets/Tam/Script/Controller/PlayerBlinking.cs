@@ -34,7 +34,7 @@ public class PlayerBlinking : MonoBehaviour
         Debug.Log("[😵 HIT] Player took damage at " + hitPoint);
         Audio_Manager.Instance.Play2D("Hurt");
 
-        Coin_Manager.Instance.DropCoins(hitPoint);
+        //GetComponent<MNGChayTruongController>().DropCoins(hitPoint);
 
         StartInvisibly();
     }

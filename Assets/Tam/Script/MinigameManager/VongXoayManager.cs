@@ -35,9 +35,6 @@ public class VongXoayManager : MonoBehaviour
     public TextMeshProUGUI whoWinsText;
     public GameObject gameOverVolume;
 
-    public Transform spawnPosition;
-
-
     public Image blackScreen;
 
     public float fadeDuration = 1f;
@@ -51,8 +48,8 @@ public class VongXoayManager : MonoBehaviour
         instance = this;
         tutorialPanel.SetActive(true);
 
-            HideTutorial();
-            InitPlayerLivesUI();
+        HideTutorial();
+        InitPlayerLivesUI();
     }
 
     private IEnumerator FadeBlackScreen(float from, float to)
@@ -78,7 +75,7 @@ public class VongXoayManager : MonoBehaviour
 
     void InitPlayerLivesUI()
     {
-        
+
     }
 
     void HideTutorial()
@@ -106,8 +103,8 @@ public class VongXoayManager : MonoBehaviour
     {
         Destroy(obj.gameObject);
         //FindFirstObjectByType<GlobalVolume>().StartFadeOut();
-        
-            isGameStarted = true;
+
+        isGameStarted = true;
     }
     private void UpdateLive()
     {
@@ -145,7 +142,7 @@ public class VongXoayManager : MonoBehaviour
     IEnumerator ReturnToBoard()
     {
         //Volume active
-        gameOverVolume.SetActive(true); 
+        gameOverVolume.SetActive(true);
         yield return new WaitForSeconds(1.5f);
         SpawnRewardAvatar();
         yield return null;

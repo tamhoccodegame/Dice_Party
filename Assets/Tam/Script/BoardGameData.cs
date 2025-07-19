@@ -36,7 +36,7 @@ public class BoardGameData : MonoBehaviour
     public Dictionary<int, string> playersName = new Dictionary<int, string>();
 
     public Dictionary<int, BoardGameStat> playersBoardStat = new Dictionary<int, BoardGameStat>();
-    public Dictionary<int, Inventory> playersInventory = new Dictionary<int       , Inventory>();
+    public Dictionary<int, Inventory> playersInventory = new Dictionary<int, Inventory>();
 
     //public PlayerRef winner;
 

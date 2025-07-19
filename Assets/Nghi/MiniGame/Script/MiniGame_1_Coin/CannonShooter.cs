@@ -49,7 +49,7 @@ public class CannonShooter : MonoBehaviour
             firePoint.rotation);  // hướng theo nòng
 
         // Khởi tạo đạn
-        if (projGO.TryGetComponent(out CannonProjectile proj))
+        if (projGO.TryGetComponent(out T_CannonProjectile proj))
             proj.Init(projectileData, firePoint.forward);
         else
             Debug.LogError("[CannonShooter] Projectile prefab lacks CannonProjectile!");

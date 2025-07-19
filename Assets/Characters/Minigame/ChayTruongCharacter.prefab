@@ -4055,11 +4055,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 0}
-  coinMask:
-    serializedVersion: 2
-    m_Bits: 2048
   currentAnim: 
   isGoal: 0
+  gravityScale: -100
+  jumpForce: 35
+  verticalVelocity: {x: 0, y: 0, z: 0}
+  coinsToDropOnHit: 3
+  coinSpawnHeight: 0
+  coinPrefab: {fileID: 8539610601687242400, guid: 94ba84bebc8cdfd4798197d347d2a9c4, type: 3}
+  coinLifetime: 2
+  pickupVFX: {fileID: 4035903591278710484, guid: aa122f157eac1c8428ae5db8a315ccd8, type: 3}
+  spawnForce: 5
 --- !u!114 &5588281625366019359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4072,7 +4078,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1737a1ed7962da344af34f684a0a9c75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 9105315542713420924}
   invincibleDuration: 2
   blinkInterval: 0.15
 --- !u!114 &8871535657960860684
