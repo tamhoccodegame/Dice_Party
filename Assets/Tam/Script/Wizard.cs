@@ -162,6 +162,6 @@ public class Wizard : MonoBehaviour
             yield return null;
         }
 
-        SceneManager.LoadScene("MNG3");
+        SceneManager.LoadScene("MiniGame_1");
     }
 }

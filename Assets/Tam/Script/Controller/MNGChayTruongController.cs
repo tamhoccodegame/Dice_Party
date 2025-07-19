@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MNGChayTruongController : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class MNGChayTruongController : MonoBehaviour
 
     public bool isGoal = false;
 
+    private PlayerInput playerInput;
+    private Vector2 movementInput;
+
     public void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -24,6 +28,18 @@ public class MNGChayTruongController : MonoBehaviour
             //VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
 
             Invoke(nameof(ResetGravity), 2f);
+    }
+
+    public void SetInput(PlayerInput playerInput)
+    {
+        this.playerInput = playerInput;
+        playerInput.actions["Move"].started += OnMove;
+        playerInput.actions["Move"].canceled += OnMove;
+    }
+
+    private void OnMove(InputAction.CallbackContext ctx)
+    {
+        movementInput = ctx.ReadValue<Vector2>();
     }
 
     void ResetGravity()
