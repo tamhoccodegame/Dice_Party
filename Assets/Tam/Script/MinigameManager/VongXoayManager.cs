@@ -47,7 +47,7 @@ public class VongXoayManager : MonoBehaviour
 
     public void Awake()
     {
-        MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
+        //MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
         instance = this;
         tutorialPanel.SetActive(true);
 
@@ -88,16 +88,16 @@ public class VongXoayManager : MonoBehaviour
 
     IEnumerator HideTutorialCouroutine()
     {
-        yield return new WaitForSecondsRealtime(10f);
+        yield return new WaitForSeconds(10f);
 
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         tutorialPanel.SetActive(false);
 
-        yield return new WaitForSecondsRealtime(5f);
+        yield return new WaitForSeconds(5f);
         GetComponent<PlayerSpawner>().SpawnPlayer();
         introCutscene.Play();
         introCutscene.stopped += StartGame;
-        yield return new WaitForSecondsRealtime(1f);
+        yield return new WaitForSeconds(1f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
 
     }
@@ -146,14 +146,14 @@ public class VongXoayManager : MonoBehaviour
     {
         //Volume active
         gameOverVolume.SetActive(true); 
-        yield return new WaitForSecondsRealtime(1.5f);
+        yield return new WaitForSeconds(1.5f);
         SpawnRewardAvatar();
         yield return null;
         gameOverPanel.SetActive(true);
         gameOverVolume.SetActive(false);
-        yield return new WaitForSecondsRealtime(6f);
+        yield return new WaitForSeconds(6f);
         yield return StartCoroutine(FadeBlackScreen(0, 1));
-        yield return new WaitForSecondsRealtime(3f);
+        yield return new WaitForSeconds(3f);
 
         SceneManager.LoadScene("TuanSceneMap");
     }

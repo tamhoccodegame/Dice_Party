@@ -54,6 +54,11 @@ public class BoardCar : MonoBehaviour
 
     void UpdatePlayerInput()
     {
+        if(currentPlayerInput != null && currentPlayerInputIndex == 0)
+        {
+            Wizard.instance.SetCanMove(true);
+        }
+
         if(currentPlayerInput != null) 
         currentPlayerInput.actions["Trigger"].started -= OnTrigger;
 
@@ -61,6 +66,14 @@ public class BoardCar : MonoBehaviour
         currentPlayerInput.actions["Trigger"].started += OnTrigger;
         dice.SetActive(true);
         moveCoroutine = null;
+    }
+
+    private void OnDisable()
+    {
+        foreach(var playerInput in inputs)
+        {
+            playerInput.actions["Trigger"].started -= OnTrigger;
+        }
     }
 
     private void OnTrigger(InputAction.CallbackContext obj)
@@ -150,6 +163,7 @@ public class BoardCar : MonoBehaviour
         yield return null;
         currentPlayerInputIndex = (currentPlayerInputIndex + 1) % inputs.Count;
         UpdatePlayerInput();
+        dice.SetActive(false);
     }
 
     void ClearArrow()

@@ -36,10 +36,10 @@ public class PlayerSpawner : MonoBehaviour
         //    p.SetInput(playerInput);
         //}
 
-        //BoardGameData boardGameData = BoardGameData.instance;
-        //bool isBoardScene = SceneManager.GetActiveScene().name == "TuanSceneMap";
+        BoardGameData boardGameData = BoardGameData.instance;
+        bool isBoardScene = SceneManager.GetActiveScene().name == "Map1";
 
-        //if (isBoardScene)
+        if (isBoardScene)
         {
             BoardCar car = Instantiate(boardCarPrefab, spawnPosition[0].position, Quaternion.identity)
                               .GetComponent<BoardCar>();
@@ -63,20 +63,15 @@ public class PlayerSpawner : MonoBehaviour
             }
 
         }
-
-        //if (boardGameData != null && boardGameData.playersCurrentNode.Count > 0 && isBoardScene)
-        //{
-        //    TurnManager.instance.isFirstTry = false;
-
-        //}
-        //else if (isBoardScene)
-        //{
-
-        //}
-        //else
-        //{
-
-        //}
+        else
+        {
+            for(int i = 0; i < playerManager.players.Count; i++) 
+            {
+                MNGVongXoayController player = Instantiate(playerPrefab, spawnPosition[i].position, Quaternion.identity).GetComponent<MNGVongXoayController>();
+                player.SetInput(playerManager.players[i]);
+            }
+        }
+        
 
     }
 

@@ -2531,7 +2531,6 @@ GameObject:
   m_Component:
   - component: {fileID: 183450108}
   - component: {fileID: 183450110}
-  - component: {fileID: 183450109}
   - component: {fileID: 183450111}
   m_Layer: 0
   m_Name: VongXoayManager
@@ -2555,26 +2554,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &183450109
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 183450107}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SortKey: 2781063214
-  ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: 183450110}
-  - {fileID: 183450111}
-  ForceRemoteRenderTimeframe: 0
 --- !u!114 &183450110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2587,12 +2566,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6dd2134cc2329e848abaed68da6d8388, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerLives:
-    _items: []
-  _playerRanks:
-    _items: []
-  _isGameOver: 0
-  _isGameStarted: 0
   introCutscene: {fileID: 2022461064}
   rankPositions:
   - {fileID: 1144137130}
@@ -2627,14 +2600,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a82aa8e7d01a8824b9b44584b925ec8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boardCarPrefab: {fileID: 0}
   playerPrefab: {fileID: 2591654762118859964, guid: fca935c52d2e2fb46a2a909e1999d049, type: 3}
   spawnPosition:
   - {fileID: 1058512854}
   - {fileID: 356456142}
   - {fileID: 863775279}
   - {fileID: 1925417447}
-  _spawnedCharacters:
-    _items: []
 --- !u!1001 &188759578
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -43335,7 +43307,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &2681602322576008654
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -45551,9 +45523,7 @@ MonoBehaviour:
   currentMilestoneIndex: 0
   engineSound: {fileID: 9206373411219043354}
   bladeSound: {fileID: 9206373411219043355}
-  _time: 0
   cachedState: 0
-  _state: 0
   animator: {fileID: 9206373411219043351}
 --- !u!114 &9206373411219043353
 MonoBehaviour:
