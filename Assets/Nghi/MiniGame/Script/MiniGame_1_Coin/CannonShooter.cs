@@ -15,7 +15,7 @@ public class CannonShooter : MonoBehaviour
 
     private float _nextFireTime;
 
-    public void Update()
+    private void Update()
     {
         if (Time.time < _nextFireTime) return;
 
@@ -32,13 +32,21 @@ public class CannonShooter : MonoBehaviour
         }
 
         // 1. VFX tại nòng đại bác khi bắn
-        if (projectileData.shootVFX != null)
+        if (projectileData.shootVFX != null && !projectileData.shootVFX.Equals(null))
         {
             GameObject flash = Instantiate(projectileData.shootVFX, firePoint.position, firePoint.rotation);
+            Destroy(flash, 2f); // auto cleanup
+        }
+        else
+        {
+            Debug.LogWarning("[CannonShooter] shootVFX prefab missing or destroyed.");
         }
 
         // Spawn đạn tại firePoint
-        GameObject projGO = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+        GameObject projGO = Instantiate(
+            projectilePrefab,
+            firePoint.position,
+            firePoint.rotation);  // hướng theo nòng
 
         // Khởi tạo đạn
         if (projGO.TryGetComponent(out CannonProjectile proj))

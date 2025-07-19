@@ -7,7 +7,7 @@ public class CannonProjectile : MonoBehaviour
     private Rigidbody _rb;
     private ProjectileData _data;
 
-    public void Awake()
+    private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
         _rb.interpolation = RigidbodyInterpolation.Interpolate;
@@ -33,9 +33,9 @@ public class CannonProjectile : MonoBehaviour
 
         if (collision.collider.CompareTag("Player"))
         {
-            PlayerBlinking player = collision.collider.GetComponent<PlayerBlinking>();
+            PlayerController_N player = collision.collider.GetComponent<PlayerController_N>();
             if (player == null)
-                player = collision.collider.GetComponentInParent<PlayerBlinking>();
+                player = collision.collider.GetComponentInParent<PlayerController_N>();
 
             if (player != null)
             {

@@ -75,6 +75,6 @@ public class MNGChayTruongController : MonoBehaviour
         if (isGoal) return;
         isGoal = true;
 
-        Coin_Manager.Instance.UpdateGameState();
+        //Coin_Manager.Instance.UpdateGameState();
     }
 }

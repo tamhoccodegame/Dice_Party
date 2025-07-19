@@ -56,7 +56,8 @@ public class ItemCollector : MonoBehaviour
             if (bombVFX != null)
             {
                 Instantiate(bombVFX, hitPoint, Quaternion.identity);
-                Destroy(bombVFX, 2f); // Tự hủy sau 2 giây
+                GameObject vfx = Instantiate(bombVFX, hitPoint, Quaternion.identity);
+                Destroy(vfx, 2f);
             }
                 
 
@@ -79,8 +80,9 @@ public class ItemCollector : MonoBehaviour
         // Item thường
         if (vfxPrefab != null)
         {
-            Instantiate(vfxPrefab, hitPoint, Quaternion.identity);
-            Destroy(vfxPrefab, 2f);
+            //Instantiate(vfxPrefab, hitPoint, Quaternion.identity);
+            GameObject vfx_Normal = Instantiate(vfxPrefab, hitPoint, Quaternion.identity);
+            Destroy(vfx_Normal, 2f);
         }
             
 

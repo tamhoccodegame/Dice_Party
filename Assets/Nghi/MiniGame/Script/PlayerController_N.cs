@@ -35,7 +35,7 @@ public class PlayerController_N : MonoBehaviour
         Debug.Log("[😵 HIT] Player took damage at " + hitPoint);
         Audio_Manager.Instance.Play2D("Hurt");
 
-        //Coin_Manager.Instance.DropCoins(hitPoint);
+        Coin_Manager.Instance.DropCoins(hitPoint);
 
         StartCoroutine(InvincibilityRoutine());
     }
@@ -74,5 +74,6 @@ public class PlayerController_N : MonoBehaviour
     }
 
     public bool IsInvincible() => isInvincible;
+
 
 }

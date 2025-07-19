@@ -7,10 +7,11 @@ public class TrapActivator : MonoBehaviour
     public float activationDistance = 20f;
     private Transform player;
 
-    public void Awake()
+    private void Awake()
     {
-        gameObject.SetActive(false);
+        gameObject.SetActive(false); // Ban đầu luôn tắt
     }
+
     public void Init(Transform playerRef)
     {
         player = playerRef;
@@ -18,7 +19,6 @@ public class TrapActivator : MonoBehaviour
 
     public void CheckActivation()
     {
-
         if (player == null) return;
 
         float distance = Vector3.Distance(player.position, transform.position);
@@ -29,4 +29,5 @@ public class TrapActivator : MonoBehaviour
         else if (!shouldBeActive && gameObject.activeSelf)
             gameObject.SetActive(false);
     }
+
 }
