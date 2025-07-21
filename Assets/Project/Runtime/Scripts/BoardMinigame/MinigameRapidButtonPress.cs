@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,7 +13,7 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
     public Vector3 startPosition;
     public Transform targetPosition;
 
-    public float moveSpeed = 1.2f;        // tốc độ tiến
+    public float moveSpeed = 2.5f;        // tốc độ tiến
     public float fallbackSpeed = 0.2f;  // tốc độ lùi khi không bấm
     public float inputDecayTime = 0.3f; // sau bao lâu không bấm thì lùi
 
@@ -22,6 +23,9 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
 
     public event Action OnMinigameFinished;
     public bool IsFinished { get; set; }
+
+    public float bounceAmplitude = 0.5f; // độ cao dao động
+    public float bounceFrequency = 5f;   // tần số dao động
 
     public void Init(BoardCar player)
     {
@@ -39,11 +43,11 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
     public void StartMinigame()
     {
         isRunning = true;
+        CinecameraManager.instance.TriggerCamera(GetComponentInChildren<CinemachineCamera>());
     }
 
     public void EndMinigame()
     {
-        isRunning = false;
         // Ẩn UI, gọi animation thành công, v.v.
         car.SetCurrentNode(targetPosition.GetComponent<BoardNode>());
         car.TryMove();
@@ -71,14 +75,22 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
         progress = Mathf.Clamp01(progress);
 
         // Move player theo progress
-        playerTransform.position = Vector3.Lerp(startPosition, targetPosition.position, progress);
+        Vector3 flatPosition = Vector3.Lerp(startPosition, targetPosition.position, progress);
+
+        // Tính noise sóng sine
+        float bounceOffset = Mathf.Sin(Time.time * bounceFrequency) * bounceAmplitude;
+
+        // Thêm vào trục Y
+        playerTransform.position = flatPosition + new Vector3(0, bounceOffset, 0);
 
         // Check xong
         if (progress >= 1f)
         {
             IsFinished = true;
-            OnMinigameFinished?.Invoke();
             EndMinigame();
+            OnMinigameFinished?.Invoke();
+            CinecameraManager.instance.ResetCamera();
         }
     }
+
 }
