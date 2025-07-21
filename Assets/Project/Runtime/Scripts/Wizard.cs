@@ -34,7 +34,7 @@ public class Wizard : MonoBehaviour
     private Vignette vignette;
 
 
-    private CinemachineCamera cam;
+    public CinemachineCamera cam;
 
     private void Awake()
     {
@@ -47,7 +47,6 @@ public class Wizard : MonoBehaviour
         animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
         player = FindFirstObjectByType<BoardCar>();
-        cam = GetComponentInChildren<CinemachineCamera>();  
         dice.SetActive(false);
 
         volume.profile.TryGet(out lens);
