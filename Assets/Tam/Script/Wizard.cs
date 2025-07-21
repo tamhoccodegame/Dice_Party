@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -32,6 +33,9 @@ public class Wizard : MonoBehaviour
     private ChromaticAberration chroma;
     private Vignette vignette;
 
+
+    private CinemachineCamera cam;
+
     private void Awake()
     {
         instance = this;
@@ -43,6 +47,7 @@ public class Wizard : MonoBehaviour
         animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
         player = FindFirstObjectByType<BoardCar>();
+        cam = GetComponentInChildren<CinemachineCamera>();  
         dice.SetActive(false);
 
         volume.profile.TryGet(out lens);
@@ -88,6 +93,8 @@ public class Wizard : MonoBehaviour
 
     IEnumerator RollDice()
     {
+        CinecameraManager.instance.TriggerCamera(cam);
+        yield return new WaitForSeconds(2.5f);
         animator.CrossFade("RollDice", 0.25f);
         yield return new WaitForSeconds(0.4f);
         diceVFX.Play();
@@ -95,8 +102,10 @@ public class Wizard : MonoBehaviour
         stepLeft = 10;
         var stepText = Instantiate(stepTextPrefab, dice.transform.position - new Vector3(0, 1.5f, 0), Quaternion.identity);
         stepText.Init(stepLeft.ToString());
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1.5f);
         StartCoroutine(MoveToNextNode());
+        yield return new WaitForSeconds(0.5f);
+        CinecameraManager.instance.ResetCamera();
     }
 
     IEnumerator MoveToNextNode()

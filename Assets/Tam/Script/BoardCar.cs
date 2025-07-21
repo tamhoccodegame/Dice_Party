@@ -80,7 +80,7 @@ public class BoardCar : MonoBehaviour
     {
         if (moveCoroutine != null) return;
 
-        stepLeft = 5;
+        stepLeft = 99;
         if(currentNode.nextNodes.Count > 1)
         {
             ShowDirection();
@@ -97,19 +97,23 @@ public class BoardCar : MonoBehaviour
         if (toMoveNode != null)
         {
             Vector3 direction = toMoveNode.transform.position - transform.position;
-            direction.y = 0;
+            //direction.y = 0;
             Quaternion newRotation = Quaternion.LookRotation(direction);
             if(Quaternion.Angle(transform.rotation, newRotation) > 0.1f)
             transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 5 *  Time.deltaTime);
         }
     }
 
-    private void SetCurrentNode(BoardNode node)
+    public void SetCurrentNode(BoardNode node)
     {
         currentNode = node;
         toMoveNode = currentNode.nextNodes[0];
     }
 
+    public PlayerInput GetInput()
+    {
+        return inputs[currentPlayerInputIndex];
+    }
     IEnumerator RollDice()
     {
         carAnim.CrossFade("RollDice", 0.25f);
@@ -121,6 +125,25 @@ public class BoardCar : MonoBehaviour
         step.Init(stepLeft.ToString());
         yield return new WaitForSeconds(1f);
         moveCoroutine = StartCoroutine(MoveToNextNode());
+    }
+
+    public void TryMove()
+    {
+        if(stepLeft > 0)
+        {
+            if(currentNode.nextNodes.Count > 1)
+            {
+                ShowDirection();
+            }
+            else
+            {
+                StartCoroutine(MoveToNextNode());
+            }
+        }
+        else
+        {
+            carAnim.CrossFade("Idle", 0.25f);
+        }
     }
 
     IEnumerator MoveToNextNode()
@@ -214,5 +237,14 @@ public class BoardCar : MonoBehaviour
         isWaitingForChoice = false;
         StopAllCoroutines();
         moveCoroutine = StartCoroutine(MoveToNextNode());
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.TryGetComponent<IMinigame>(out var minigame))
+        {
+            minigame.Init(this);
+            minigame.StartMinigame();
+        }
     }
 }
