@@ -45,6 +45,11 @@ public class MNGChayTruongController : MonoBehaviour
         GetComponent<PlayerSetup>().UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
     }
 
+    public PlayerInput GetPlayerInput()
+    {
+        return playerInput;
+    }
+
     void Update()
     {
         // Lấy input
@@ -115,7 +120,7 @@ public class MNGChayTruongController : MonoBehaviour
         if (isGoal) return;
         isGoal = true;
 
-        //Coin_Manager.Instance.UpdateGameState();
+        T_Coin_Manager.Instance.UpdateGoal(playerInput, gameObject);
     }
 
     //public void AddCoins(int amount)

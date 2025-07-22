@@ -33,7 +33,7 @@ public class SystemManager : MonoBehaviour
     void Start()
     {
         customData = GetComponent<CustomData>();
-        MusicManager.instance.PlayMusic(MusicManager.MusicType.Menu);
+        //MusicManager.instance.PlayMusic(MusicManager.MusicType.Menu);
     }
 
     private void Update()

@@ -14,7 +14,7 @@ public class MNGVongXoayController : MonoBehaviour
 
     public string currentAnim;
 
-    private PlayerInput input;
+    public PlayerInput input;
     private Vector2 movementInput;
 
 
@@ -99,11 +99,18 @@ public class MNGVongXoayController : MonoBehaviour
             Debug.Log("DIEE");
             BloodEffect();
 
-            //int currentLive = VongXoayManager.instance.playerLives.Get(Object.Id);
-            //VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
-
-        ChangeAnim("Die");
-        DisableInput();
+        int currentLives = WizardPartyData.instance.playerLives[input];
+        int newLives = Mathf.Max(0, currentLives - 1);
+        if (newLives > 0)
+        {
+            WizardPartyData.instance.UpdatePlayerLive(input, newLives);
+        }
+        else
+        {
+            ChangeAnim("Die");
+            DisableInput();
+        }
+            
     }
 
     void DisableInput()

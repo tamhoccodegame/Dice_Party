@@ -16,6 +16,8 @@ public class GlassCouple
 
 public class GlassBreakManager : MonoBehaviour
 {
+    public AudioClip music;
+
     public static GlassBreakManager instance;
     public GlassCouple[] glassCouples;
 
@@ -77,7 +79,7 @@ public class GlassBreakManager : MonoBehaviour
         countDownText.text = time.ToString();
         InvokeRepeating(nameof(CountDown), 0f, 1f);
 
-        MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
+        MusicManager.instance.PlayMusic(music);
         instance = this;
         tutorialPanel.SetActive(true);
 

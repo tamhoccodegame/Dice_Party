@@ -12,6 +12,14 @@ public class WizardPartyData : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void Start()
+    {
+        foreach(var player in PlayerManager.instance.players)
+        {
+            playerLives.Add(player, 6);
+        }
+    }
+
     public BoardNode carNode;
     public BoardNode wizardNode;
 
@@ -29,13 +37,7 @@ public class WizardPartyData : MonoBehaviour
 
     public void UpdatePlayerLive(PlayerInput input, int live)
     {
-        if(!playerLives.ContainsKey(input))
-        {
-            playerLives.Add(input, live);
-        }
-        else
-        {
-            playerLives[input] = live;
-        }
+        if (live < 0) live = 0;
+        playerLives[input] = live;
     }
 }

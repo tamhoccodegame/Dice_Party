@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerBlinking : MonoBehaviour
 {
@@ -29,6 +30,11 @@ public class PlayerBlinking : MonoBehaviour
             Debug.Log("[⚡ IMMUNE] Player is invincible");
             return;
         }
+
+        PlayerInput playerInput = GetComponent<MNGChayTruongController>().GetPlayerInput();
+        int currentLives = WizardPartyData.instance.playerLives[playerInput];
+        WizardPartyData.instance.UpdatePlayerLive(playerInput, currentLives - 1);
+        T_Coin_Manager.Instance.UpdateHUD();
 
         PlayHurtAnim();
         Debug.Log("[😵 HIT] Player took damage at " + hitPoint);

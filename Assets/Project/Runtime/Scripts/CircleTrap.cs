@@ -42,6 +42,10 @@ public class CircleTrap : MonoBehaviour
     public void Awake()
     {
         state = State.Null;
+    }
+
+    private void Start()
+    {
         InvokeRepeating(nameof(CountDown), 1f, 1f);
     }
 
@@ -57,6 +61,7 @@ public class CircleTrap : MonoBehaviour
     }
     private void Update()
     {
+        if (VongXoayManager.instance == null) return; 
         if (!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
 
         if (state == State.Null) TryChangeState();

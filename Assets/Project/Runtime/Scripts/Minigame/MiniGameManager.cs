@@ -16,6 +16,9 @@ public class MiniGameManager : MonoBehaviour
 
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
+    public Transform[] avatarHUDPositions;
+
+    public GameObject emptyComponentAvatarPrefab;
 
     public TextMeshProUGUI[] playerTextUI;
 
@@ -48,6 +51,15 @@ public class MiniGameManager : MonoBehaviour
     {
         for(int i = 0; i < PlayerManager.instance.players.Count; i++)
         {
+            var playerInput = PlayerManager.instance.players[i];
+
+            var playerHUDAvatar = Instantiate(emptyComponentAvatarPrefab, avatarHUDPositions[i].position, Quaternion.Euler(0, -90, 0));
+            Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
+            PlayerSetup playerSetup = playerHUDAvatar.GetComponent<PlayerSetup>();
+            playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
+            playerHUDAvatar.GetComponent<Animator>().enabled = false;
+
+
             playerTextUI[i].transform.parent.gameObject.SetActive(true);
         }
     }
@@ -106,7 +118,6 @@ public class MiniGameManager : MonoBehaviour
     private void StartGame(PlayableDirector obj)
     {
         Destroy(obj.gameObject);
-        //FindFirstObjectByType<GlobalVolume>().StartFadeOut();
 
         isGameStarted = true;
     }

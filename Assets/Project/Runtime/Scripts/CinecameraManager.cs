@@ -26,6 +26,8 @@ public class CinecameraManager : MonoBehaviour
         {
             c.enabled = c == cam;
         }
+        primaryvCam.Follow = cam.transform.parent;
+        primaryvCam.LookAt = cam.transform.parent;
     }
 
     public void ResetCamera()

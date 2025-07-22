@@ -6,20 +6,8 @@ public class MusicManager : MonoBehaviour
 {
     public static MusicManager instance;
 
-    public AudioClip menuMusic;
-    public AudioClip boardMusic;
-    public AudioClip[] mngMusics;
-
     private AudioSource audioSource;
-
-    public enum MusicType
-    {
-        Menu,
-        Board,
-        MNG,
-    }
-
-    public MusicType type;
+    public AudioClip mainTheme;
 
     [Header("Fade Settings")]
     public float fadeDuration = 1f;
@@ -36,35 +24,20 @@ public class MusicManager : MonoBehaviour
         DontDestroyOnLoad(this);
 
         audioSource = GetComponent<AudioSource>();
-        type = MusicType.Menu;
-        PlayMusic(type); // Ban đầu phát nhạc Menu
+        PlayMusic(mainTheme);
     }
 
-    public void PlayMusic(MusicType musicType, int mngIndex = 0)
+    public void PlayMusic(AudioClip newClip)
     {
-        if (musicType == type) return;
-        StartCoroutine(SwitchTrack(musicType, mngIndex));
+        if (audioSource.clip == newClip) return;
+        StartCoroutine(SwitchTrack(newClip));
     }
 
-    private IEnumerator SwitchTrack(MusicType newType, int mngIndex)
+    private IEnumerator SwitchTrack(AudioClip newClip)
     {
         yield return StartCoroutine(FadeOut());
 
-        switch (newType)
-        {
-            case MusicType.Menu:
-                audioSource.clip = menuMusic;
-                break;
-            case MusicType.Board:
-                audioSource.clip = boardMusic;
-                break;
-            case MusicType.MNG:
-                if (mngIndex >= 0 && mngIndex < mngMusics.Length)
-                    audioSource.clip = mngMusics[mngIndex];
-                break;
-        }
-
-        type = newType;
+        audioSource.clip = newClip;
 
         yield return StartCoroutine(FadeIn());
     }

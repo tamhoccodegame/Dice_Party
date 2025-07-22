@@ -61,7 +61,7 @@ public class PlayerSpawner : MonoBehaviour
 
                 playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
 
-                car.animators.Add(player.GetComponent<Animator>());
+                //car.animators.Add(player.GetComponent<Animator>());
                 if (index <= 1) player.GetComponent<Animator>().Play("Sit");
                 index++;
             }
@@ -69,9 +69,15 @@ public class PlayerSpawner : MonoBehaviour
         }
         else
         {
-            for(int i = 0; i < playerManager.players.Count; i++) 
+            for(int i = 0; i < PlayerManager.instance.players.Count; i++) 
             {
-                MNGChayTruongController player = Instantiate(playerPrefab, spawnPosition[i].position, Quaternion.identity).GetComponent<MNGChayTruongController>();
+                PlayerInput playerInput = PlayerManager.instance.players[i];
+                var player = Instantiate(playerPrefab, spawnPosition[i].position, Quaternion.identity).GetComponent<MNGChayTruongController>();
+                Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
+                PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
+
+                playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
+
                 player.SetInput(playerManager.players[i]);
             }
         }
