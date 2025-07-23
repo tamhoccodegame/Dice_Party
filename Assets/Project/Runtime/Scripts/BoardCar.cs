@@ -287,7 +287,6 @@ public class BoardCar : MonoBehaviour
         if(other.TryGetComponent<IMinigame>(out var minigame))
         {
             minigame.Init(this);
-            minigame.StartMinigame();
         }
     }
 }

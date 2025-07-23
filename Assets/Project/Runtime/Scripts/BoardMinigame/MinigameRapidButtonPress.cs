@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Playables;
 
 public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
 {
+    public PlayableDirector introCutscene;
+    public Transform capy;
     private BoardCar car;
     private PlayerInput input;
     public Transform playerTransform;
@@ -41,18 +44,34 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
         progress = 0f;
         lastPressTime = Time.time;
         IsFinished = false;
+        introCutscene.Play();
+        introCutscene.stopped += IntroCutscene_stopped;
+        MusicManager.instance.PlayMusic(music);
+        CinecameraManager.instance.TriggerCamera(GetComponentInChildren<CinemachineCamera>());
+    }
+
+    private void IntroCutscene_stopped(PlayableDirector obj)
+    {
+        StartMinigame();
     }
 
     public void StartMinigame()
     {
         isRunning = true;
-        MusicManager.instance.PlayMusic(music);
-        CinecameraManager.instance.TriggerCamera(GetComponentInChildren<CinemachineCamera>());
+        capy.transform.SetParent(playerTransform);
+        capy.transform.localPosition = Vector3.zero;    
+
+        capy.transform.localPosition -= new Vector3(0, 2, 0);
+        capy.GetComponentInChildren<Animator>().Play("Carry");
+        capy.GetComponentInChildren<Animator>().enabled = false;
+        capy.transform.GetChild(0).transform.localPosition = Vector3.zero;
+        capy.transform.localRotation = Quaternion.Euler(0, 0, 0);
     }
 
     public void EndMinigame()
     {
         isRunning = false;
+        Destroy(capy.gameObject);
         StartCoroutine(DelayEndMinigame());
     }
 

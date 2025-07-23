@@ -6,17 +6,18 @@ using UnityEngine;
 public class StepText : MonoBehaviour
 {
     private Transform cam;
+    bool isInited = false;
 
     // Start is called before the first frame update
     void Start()
     {
         cam = Camera.main.transform;
-        Destroy(gameObject, 4f);
     }
 
     public void Init(string currentStep)
     {
         GetComponentInChildren<TextMeshPro>().text = currentStep;
+        Destroy(gameObject, 4f);
     }
 
     // Update is called once per frame
