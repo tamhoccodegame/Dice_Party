@@ -61,7 +61,7 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
         capy.transform.SetParent(playerTransform);
         capy.transform.localPosition = Vector3.zero;    
 
-        capy.transform.localPosition -= new Vector3(0, 2, 0);
+        capy.transform.localPosition -= new Vector3(0, 1, 0);
         capy.GetComponentInChildren<Animator>().Play("Carry");
         capy.GetComponentInChildren<Animator>().enabled = false;
         capy.transform.GetChild(0).transform.localPosition = Vector3.zero;
@@ -82,7 +82,7 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
         car.SetCurrentNode(null);
         car.transform.rotation = Quaternion.Euler(0, -90, 0);
 
-        for(int i = 0; i < anims.Length; i++)
+        for (int i = 0; i < anims.Length; i++)
         {
             if(i > 2)
             {

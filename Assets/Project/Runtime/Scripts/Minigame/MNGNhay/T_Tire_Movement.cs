@@ -148,17 +148,16 @@ public class T_Tire_Movement : MonoBehaviour
             _ => transform.forward
         };
     }
-
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.collider.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            var player = collision.collider.GetComponent<PlayerBlinking>() ??
-                         collision.collider.GetComponentInParent<PlayerBlinking>();
+            var player = other.GetComponent<PlayerBlinking>() ??
+                         other.GetComponentInParent<PlayerBlinking>();
 
             if (player != null)
             {
-                Vector3 hitPoint = collision.contacts[0].point;
+                Vector3 hitPoint = other.ClosestPoint(transform.position);
                 player.OnHitByObstacle(hitPoint);
             }
         }
