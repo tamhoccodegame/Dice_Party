@@ -319,4 +319,9 @@ public class BoardCar : PlayerController
     {
         return currentPlayerInput;
     }
+
+    public override void SetInput(PlayerInput input)
+    {
+        
+    }
 }

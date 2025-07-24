@@ -67,12 +67,12 @@ public class PlayerSpawner : MonoBehaviour
             for(int i = 0; i < PlayerManager.instance.players.Count; i++) 
             {
                 PlayerInput playerInput = PlayerManager.instance.players[i];
-                var player = Instantiate(playerPrefab, spawnPosition[i].position, Quaternion.identity).GetComponent<MNGChayTruongController>();
+                var player = Instantiate(playerPrefab, spawnPosition[i].position, Quaternion.identity).GetComponent<PlayerController>();
                 Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
                 PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
 
                 playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
-
+                Debug.Log(playerManager.players[i]);
                 player.SetInput(playerManager.players[i]);
             }
         }

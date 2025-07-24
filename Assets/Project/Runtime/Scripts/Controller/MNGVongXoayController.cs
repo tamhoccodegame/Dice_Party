@@ -31,7 +31,7 @@ public class MNGVongXoayController : PlayerController
         Invoke(nameof(ResetGravity), 2f);
     }
 
-    public void SetInput(PlayerInput input)
+    public override void SetInput(PlayerInput input)
     {
         this.input = input;
 

@@ -13951,9 +13951,10 @@ GameObject:
   - component: {fileID: 2968938621624997460}
   - component: {fileID: 1230463179684365249}
   - component: {fileID: 2991487068947042609}
-  - component: {fileID: 3784998257076836422}
+  - component: {fileID: 185359002213890841}
+  - component: {fileID: -3837585758042149227}
   m_Layer: 3
-  m_Name: VongXoayCharacter_Update
+  m_Name: NhayCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14018,9 +14019,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpForce: 80
-  maxJumpTime: 0.5
-  fallMultiplier: 20
-  lowJumpMultiplier: 20
   groundCheck: {fileID: 3440068594511454633}
   groundLayer:
     serializedVersion: 2
@@ -14074,7 +14072,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0.16, z: 0}
---- !u!114 &3784998257076836422
+--- !u!114 &185359002213890841
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14083,27 +14081,67 @@ MonoBehaviour:
   m_GameObject: {fileID: 8016881336126542858}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Script: {fileID: 11500000, guid: 1737a1ed7962da344af34f684a0a9c75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 2a1900da8cf58224695bb8034e1b959a, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
+  animator: {fileID: 0}
+  invincibleDuration: 2
+  blinkInterval: 0.15
+--- !u!114 &-3837585758042149227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8016881336126542858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b8d48cade35023408dfbd668f812fb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hairs:
+  - {fileID: 2651425166977114230}
+  - {fileID: 864308792143736034}
+  - {fileID: 1567224639459442995}
+  - {fileID: 5879815475215063735}
+  - {fileID: 7461580758862979283}
+  - {fileID: 2074113562963049579}
+  - {fileID: 3434304656713976557}
+  - {fileID: 1355540489083820268}
+  - {fileID: 3655958775559948513}
+  - {fileID: 582611507685952669}
+  - {fileID: 29365979954172954}
+  - {fileID: 6658527444792950215}
+  - {fileID: 1675992535676083537}
+  - {fileID: 5896658399672810262}
+  - {fileID: 4291458143535597803}
+  - {fileID: 4905712990853846361}
+  - {fileID: 3486268077912932649}
+  - {fileID: 8726106351631936927}
+  - {fileID: 5689952697902821179}
+  - {fileID: 8027865811694176284}
+  - {fileID: 6035504994099019563}
+  - {fileID: 6953522537211730605}
+  colors:
+  - {fileID: 464142510692380428}
+  - {fileID: 1757380638576574256}
+  - {fileID: 3006180454306658264}
+  - {fileID: 2919709127916503292}
+  - {fileID: 1957554721528980019}
+  - {fileID: 4953743892174887802}
+  bodyparts:
+  - {fileID: 2519650199488806081}
+  - {fileID: 8066028588554183914}
+  - {fileID: 5019319749159785722}
+  - {fileID: 1156481290202361094}
+  - {fileID: 569324706423801036}
+  - {fileID: 3969486709061735076}
+  - {fileID: 78276231171145844}
+  - {fileID: 8450270005110056780}
+  - {fileID: 1953879226331336193}
+  - {fileID: 9051708831942145871}
+  - {fileID: 301951172782747383}
+  - {fileID: 5728863966448538981}
 --- !u!1 &8027865811694176284
 GameObject:
   m_ObjectHideFlags: 0

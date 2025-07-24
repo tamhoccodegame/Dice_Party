@@ -37,7 +37,7 @@ public class MNGChayTruongController : PlayerController
         cam = Camera.main;
     }
 
-    public void SetInput(PlayerInput playerInput)
+    public override void SetInput(PlayerInput playerInput)
     {
         this.playerInput = playerInput;
 

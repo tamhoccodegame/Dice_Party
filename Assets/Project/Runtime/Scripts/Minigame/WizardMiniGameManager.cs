@@ -41,11 +41,11 @@ public class WizardMiniGameManager : MonoBehaviour
 
     protected virtual void Awake()
     {
-        GetComponent<PlayerSpawner>().SpawnPlayer();
     }
 
     protected virtual void Start()
     {
+        GetComponent<PlayerSpawner>().SpawnPlayer();
         tutorialPanel.SetActive(true);
         HideTutorial();
         InitHUD();

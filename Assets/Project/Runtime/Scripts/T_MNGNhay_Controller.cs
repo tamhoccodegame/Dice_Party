@@ -12,7 +12,7 @@ public class T_MNGNhay_Controller : PlayerController
     public float groundCheckRadius = 0.1f;
     private bool isGrounded;
 
-    public void SetPlayerInput(PlayerInput input)
+    public override void SetInput(PlayerInput input)
     {
         this.playerInput = input;
     }
@@ -20,7 +20,6 @@ public class T_MNGNhay_Controller : PlayerController
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        playerInput = GetComponent<PlayerInput>();
     }
 
     void Update()
@@ -29,7 +28,7 @@ public class T_MNGNhay_Controller : PlayerController
 
         isGrounded = Physics.OverlapSphere(groundCheck.position, groundCheckRadius, groundLayer).Length > 0;
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (playerInput.actions["Trigger"].triggered && isGrounded)
         {
             rb.velocity = Vector3.up * jumpForce;
         }

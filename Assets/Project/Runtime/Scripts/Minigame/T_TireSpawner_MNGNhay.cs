@@ -12,10 +12,10 @@ public class T_TireSpawner_MNGNhay : MonoBehaviour
 
     public Dictionary<float, float> sizeAndSpeed = new Dictionary<float, float>
     {
-        { 9f, 320f },
-        { 8f, 310f },
-        { 7f, 300f },
-        { 6f, 290f }
+        { 9f, 350f },
+        { 8f, 340f },
+        { 7f, 330f },
+        { 6f, 320f }
     };
 
     public List<GameObject> activeObjects = new List<GameObject>();
