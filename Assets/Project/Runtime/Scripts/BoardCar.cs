@@ -100,7 +100,7 @@ public class BoardCar : MonoBehaviour
     {
         if (moveCoroutine != null || !canMove) return;
 
-        stepLeft = 15;
+        stepLeft = 20;
         if(currentNode.nextNodes.Count > 1)
         {
             ShowDirection();
@@ -205,7 +205,7 @@ public class BoardCar : MonoBehaviour
              
             currentNode = toMoveNode;
 
-            if(currentNode.nextNodes.Count > 1)
+            if(currentNode.nextNodes.Count > 1 && stepLeft > 0)
             {
                 carAnim.CrossFade("EndMove", 0.25f);
                 yield return new WaitForSeconds(0.5f);
@@ -226,9 +226,9 @@ public class BoardCar : MonoBehaviour
         if(currentPlayerInputIndex == 0) isTurnDone = true;
 
         yield return new WaitForSeconds(2f);
-        UpdatePlayerInput();
         dice.SetActive(false);
         startEngineSFX.Play();
+        currentNode.ProcessNode(this);
         WizardPartyData.instance.UpdateCarNode(currentNode);
     }
 

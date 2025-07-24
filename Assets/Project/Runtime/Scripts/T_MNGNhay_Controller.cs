@@ -35,45 +35,15 @@ public class T_MNGNhay_Controller : MonoBehaviour
 
         isGrounded = Physics.OverlapSphere(groundCheck.position, groundCheckRadius, groundLayer).Length > 0;
 
-        float triggerValue = playerInput.actions["Jump"].ReadValue<float>();
-
-        // Nếu nhấn trigger và đang đứng dưới đất => nhảy lên
-        if (triggerValue > 0.1f && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            isJumping = true;
-            jumpTimeCounter = maxJumpTime;
-            rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
+            rb.velocity = Vector3.up * jumpForce;
         }
 
-        // Nếu đang nhảy và vẫn giữ trigger => tiếp tục nhảy
-        if (triggerValue > 0.1f && isJumping)
-        {
-            if (jumpTimeCounter > 0)
-            {
-                rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
-                jumpTimeCounter -= Time.deltaTime;
-            }
-            else
-            {
-                isJumping = false;
-            }
-        }
-
-        // Nếu buông trigger => dừng nhảy
-        if (triggerValue <= 0.1f)
-        {
-            isJumping = false;
-        }
-
-        // Tăng trọng lực khi rơi xuống
-        if (rb.velocity.y < 0)
-        {
-            rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
-        }
-        // Nếu nhảy nhưng thả nút sớm => tăng trọng lực sớm hơn (low jump)
-        else if (rb.velocity.y > 0 && !isJumping)
-        {
-            rb.velocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
-        }
+        //// Tăng trọng lực khi rơi xuống
+        //if (rb.velocity.y < 0)
+        //{
+        //    rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+        //}
     }
 }

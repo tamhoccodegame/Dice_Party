@@ -21,6 +21,11 @@ public class BoardNode : MonoBehaviour
 
     }
 
+    public virtual void ProcessNode(BoardCar player)
+    {
+
+    }
+
     //public virtual void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
     //{
     //    EndTurn(playerRef);
