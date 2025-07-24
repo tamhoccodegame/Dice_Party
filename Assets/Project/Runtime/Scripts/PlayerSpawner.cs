@@ -34,13 +34,6 @@ public class PlayerSpawner : MonoBehaviour
 
     public void SpawnPlayer()
     {
-        //foreach(var playerInput in playerManager.players)
-        //{
-        //    var player = Instantiate(playerPrefab, spawnPosition[0].position, Quaternion.identity);
-        //    MNGVongXoayController p = player.GetComponent<MNGVongXoayController>();    
-        //    p.SetInput(playerInput);
-        //}
-
         BoardGameData boardGameData = BoardGameData.instance;
         bool isBoardScene = SceneManager.GetActiveScene().name == "Map1";
 
@@ -49,6 +42,7 @@ public class PlayerSpawner : MonoBehaviour
             BoardCar car = Instantiate(boardCarPrefab, spawnPosition[0].position, Quaternion.identity)
                               .GetComponent<BoardCar>();
             int index = 0;
+            if(playerManager.players.Count > 0)
             foreach(var playerInput in playerManager.players)
             {
                 var player = Instantiate(playerPrefab, car.playerSitPositions[index].position, Quaternion.identity);
@@ -61,8 +55,9 @@ public class PlayerSpawner : MonoBehaviour
 
                 playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
 
-                //car.animators.Add(player.GetComponent<Animator>());
-                if (index <= 1) player.GetComponent<Animator>().Play("Sit");
+                    //car.animators.Add(player.GetComponent<Animator>());
+                    if (index <= 1) player.GetComponent<Animator>().Play("Sit");
+                    else player.GetComponent<Animator>().Play("Idle");
                 index++;
             }
 

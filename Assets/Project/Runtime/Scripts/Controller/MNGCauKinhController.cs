@@ -3,8 +3,8 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Playables;
 
-[RequireComponent(typeof(CharacterController))]
-public class MNGCauKinhController : MonoBehaviour
+//[RequireComponent(typeof(CharacterController))]
+//public class MNGCauKinhController : PlayerController
 {
     //public CinemachineCamera cam;
     //private Vector3 clientCamForward;

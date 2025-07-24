@@ -53,6 +53,11 @@ public class Wizard : MonoBehaviour
         volume.profile.TryGet(out chroma);
         volume.profile.TryGet(out vignette);
 
+        BoardNode savedNode = WizardPartyData.instance.wizardNode;
+        if(savedNode != null)
+        {
+            currentNode = savedNode;
+        }
         WizardPartyData.instance.UpdateWizardNode(currentNode);
     }
 
@@ -175,7 +180,7 @@ public class Wizard : MonoBehaviour
             yield return null;
         }
 
-        SceneManager.LoadScene("MiniGame_1");
+        SceneManager.LoadScene(WizardPartyData.instance.GetMinigame());
         //SceneManager.LoadScene("MNG3");
     }
 }

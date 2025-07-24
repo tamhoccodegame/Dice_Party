@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class WizardPartyData : MonoBehaviour
 {
     public static WizardPartyData instance;
+    public List<string> minigames;
 
     private void Awake()
     {
@@ -39,5 +40,12 @@ public class WizardPartyData : MonoBehaviour
     {
         if (live < 0) live = 0;
         playerLives[input] = live;
+    }
+
+    public string GetMinigame()
+    {
+        string pendingMinigame = minigames[0];
+        minigames.RemoveAt(0);
+        return pendingMinigame;
     }
 }

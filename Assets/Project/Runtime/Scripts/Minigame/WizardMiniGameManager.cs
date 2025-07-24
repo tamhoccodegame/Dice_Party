@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class MiniGameManager : MonoBehaviour
+public class WizardMiniGameManager : MonoBehaviour
 {
     public bool isGameOver { get; set; } = false;
-
     public bool isGameStarted { get; set; } = false;
 
     public PlayableDirector introCutscene;
@@ -34,6 +34,10 @@ public class MiniGameManager : MonoBehaviour
     public Image blackScreen;
 
     public float fadeDuration = 1f;
+
+    public Dictionary<PlayerInput, int> playerInitLives = new Dictionary<PlayerInput, int>();
+
+    public Dictionary<PlayerInput, GameObject> playerObjects = new Dictionary<PlayerInput, GameObject>();
 
     protected virtual void Awake()
     {
@@ -135,7 +139,7 @@ public class MiniGameManager : MonoBehaviour
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         yield return new WaitForSeconds(3f);
 
-        SceneManager.LoadScene("TuanSceneMap");
+        SceneManager.LoadScene("Map1");
     }
 
     public virtual bool CheckGameOver()

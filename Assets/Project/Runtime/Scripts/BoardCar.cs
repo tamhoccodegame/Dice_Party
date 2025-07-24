@@ -4,11 +4,10 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class BoardCar : MonoBehaviour
+public class BoardCar : PlayerController    
 {
     public AudioClip music;
     public AudioSource startEngineSFX;
-
 
     private CharacterController controller;
 
@@ -50,8 +49,20 @@ public class BoardCar : MonoBehaviour
     {
         inputs = PlayerManager.instance.players;
         UpdatePlayerInput();
-        currentNode = PlayerSpawner.instance.spawnPosition[0].GetComponent<BoardNode>();
+
+        BoardNode savedNode = WizardPartyData.instance.carNode;
+        if(savedNode != null)
+        {
+            currentNode = savedNode;
+        }
+        else
+        {
+            currentNode = PlayerSpawner.instance.spawnPosition[0].GetComponent<BoardNode>();
+        }
+
         toMoveNode = currentNode.nextNodes[0];
+
+
         controller = GetComponent<CharacterController>();
         Wizard.instance.player = this;
 
@@ -67,11 +78,10 @@ public class BoardCar : MonoBehaviour
     void UpdatePlayerInput()
     {
         MusicManager.instance.PlayMusic(music);
+
         if(isTurnDone)
         {
-            canMove = false;
-            isTurnDone = false;
-            Wizard.instance.SetCanMove(true);
+            StartCoroutine(DelaySetWizardCanMove());
             return;
         }
 
@@ -84,6 +94,14 @@ public class BoardCar : MonoBehaviour
         currentPlayerInput.actions["Trigger"].started += OnTrigger;
         dice.SetActive(true);
         moveCoroutine = null;
+    }
+
+    IEnumerator DelaySetWizardCanMove()
+    {
+        yield return new WaitForSeconds(4f);
+        canMove = false;
+        isTurnDone = false;
+        Wizard.instance.SetCanMove(true);
     }
 
     private void OnDisable()
@@ -100,7 +118,7 @@ public class BoardCar : MonoBehaviour
     {
         if (moveCoroutine != null || !canMove) return;
 
-        stepLeft = 20;
+        stepLeft = 2;
         if(currentNode.nextNodes.Count > 1)
         {
             ShowDirection();
@@ -142,6 +160,11 @@ public class BoardCar : MonoBehaviour
         toMoveNode = currentNode.nextNodes[0];
         else 
             toMoveNode = null;
+    }
+
+    public void UpdateCurrentNodeData(BoardNode node)
+    {
+        WizardPartyData.instance.carNode = node;
     }
 
     public PlayerInput GetInput()
@@ -204,8 +227,9 @@ public class BoardCar : MonoBehaviour
             stepLeft--;
              
             currentNode = toMoveNode;
+            UpdateCurrentNodeData(currentNode);
 
-            if(currentNode.nextNodes.Count > 1 && stepLeft > 0)
+            if (currentNode.nextNodes.Count > 1 && stepLeft > 0)
             {
                 carAnim.CrossFade("EndMove", 0.25f);
                 yield return new WaitForSeconds(0.5f);
@@ -221,6 +245,7 @@ public class BoardCar : MonoBehaviour
 
                 yield return null;
         }
+
         yield return null;
         currentPlayerInputIndex = (currentPlayerInputIndex + 1) % inputs.Count;
         if(currentPlayerInputIndex == 0) isTurnDone = true;
@@ -288,5 +313,10 @@ public class BoardCar : MonoBehaviour
         {
             minigame.Init(this);
         }
+    }
+
+    public override PlayerInput GetPlayerInput()
+    {
+        return currentPlayerInput;
     }
 }

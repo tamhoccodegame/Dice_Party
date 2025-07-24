@@ -31,10 +31,16 @@ public class PlayerBlinking : MonoBehaviour
             return;
         }
 
-        PlayerInput playerInput = GetComponent<MNGChayTruongController>().GetPlayerInput();
+        PlayerInput playerInput = GetComponent<PlayerController>().GetPlayerInput();
         int currentLives = WizardPartyData.instance.playerLives[playerInput];
         WizardPartyData.instance.UpdatePlayerLive(playerInput, currentLives - 1);
         T_Coin_Manager.Instance.UpdateHUD();
+        if(currentLives - 1 <= 0)
+        {
+            T_Coin_Manager.Instance.playersGoal.Add(playerInput, gameObject);
+            GetComponent<PlayerController>().enabled = false;
+            GetComponent<Animator>().Play("Die");
+        }
 
         PlayHurtAnim();
         Debug.Log("[😵 HIT] Player took damage at " + hitPoint);

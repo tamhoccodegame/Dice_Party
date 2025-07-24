@@ -1,13 +1,17 @@
 ﻿using Dreamteck.Splines;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class T_Coin_Manager : MiniGameManager
+public class T_Coin_Manager : WizardMiniGameManager
 {
     public static T_Coin_Manager Instance { get; private set; }
     public Dictionary<PlayerInput, GameObject> playersGoal = new Dictionary<PlayerInput, GameObject>();
     private Dictionary<PlayerInput, int> playerInitLives = new Dictionary<PlayerInput, int>();
+
+    public AudioClip music;
+    public AudioClip winMusic;
 
     protected override void Awake()
     {
@@ -25,6 +29,7 @@ public class T_Coin_Manager : MiniGameManager
             playerInitLives.Add(player, lives);
         }
         UpdateHUD();
+        MusicManager.instance.PlayMusic(music);
     }
 
     protected override void TriggerAfterTutorial()
@@ -61,19 +66,21 @@ public class T_Coin_Manager : MiniGameManager
             inputGo.transform.position = rankPositions[i].position;
             inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
 
-
-
             int currentLives = WizardPartyData.instance.playerLives[inputs[i]];
             gameOverSlots[i].gameObject.SetActive(true);
             gameOverSlots[i].keyQtyText.text = currentLives.ToString();
             if (playerInitLives[inputs[i]] > currentLives)
             {
                 gameOverSlots[i].rankText.text = "-" + Mathf.Max(0, (playerInitLives[inputs[i]] - currentLives)).ToString();
-                inputGo.GetComponent<Animator>().Play("Lose");
+                inputGo.GetComponent<Animator>().Play($"Lose{i+1}");
+                if(currentLives <= 0)
+                {
+                    PlayerManager.instance.RemovePlayer(inputs[i]);
+                }
             }
-            else
+            else if (currentLives > 0) 
             {
-                inputGo.GetComponent<Animator>().Play("Win");
+                inputGo.GetComponent<Animator>().Play($"Win{i+1}");
                 gameOverSlots[i].rankText.text = "";
             }
         }
@@ -82,20 +89,28 @@ public class T_Coin_Manager : MiniGameManager
     public override void UpdateHUD()
     {
         List<PlayerInput> inputs = PlayerManager.instance.players;
-
+        
         for (int i = 0; i < inputs.Count; i++)
         {
-            playerTextUI[i].text = WizardPartyData.instance.playerLives[inputs[i]].ToString();
+            int currentPlayerLive = WizardPartyData.instance.playerLives[inputs[i]];
+            playerTextUI[i].text = currentPlayerLive.ToString();
+        }
+
+        if (CheckGameOver())
+        {
+            ShowGameOverPanel();
         }
     }
 
     public override void ShowGameOverPanel()
     {
+        MusicManager.instance.PlayMusic(winMusic);
         base.ShowGameOverPanel();
     }
 
     public override bool CheckGameOver()
     {
-        return playersGoal.Count == PlayerManager.instance.players.Count;
+        var playerLives = WizardPartyData.instance.playerLives;
+        return playersGoal.Count == PlayerManager.instance.players.Count || playerLives.All(p => p.Value <= 0);
     }
 }

@@ -82,15 +82,24 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
         car.SetCurrentNode(null);
         car.transform.rotation = Quaternion.Euler(0, -90, 0);
 
+        int lastAnimationIndex = -1;
+
         for (int i = 0; i < anims.Length; i++)
         {
             if(i > 2)
             {
-                anims[i].Play("Win");
+                int randomIndex = -1;
+
+                do
+                    randomIndex = UnityEngine.Random.Range(1, 7);
+                while (lastAnimationIndex != -1 && randomIndex == lastAnimationIndex);
+
+                lastAnimationIndex = randomIndex;
+                anims[i].Play($"Win{randomIndex}");
             }
             else
             {
-                anims[i].Play("Win");
+                anims[i].Play("SitWin");
             }
         }
 

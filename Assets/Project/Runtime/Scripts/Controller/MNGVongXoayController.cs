@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 
 [RequireComponent(typeof(CharacterController))]
-public class MNGVongXoayController : MonoBehaviour
+public class MNGVongXoayController : PlayerController
 {
     private CharacterController controller;
     private Animator animator;
@@ -121,5 +121,10 @@ public class MNGVongXoayController : MonoBehaviour
     void EnableRagdoll()
     {
         GetComponent<Ragdoll>().EnableRagdoll();
+    }
+
+    public override PlayerInput GetPlayerInput()
+    {
+        return input;
     }
 }

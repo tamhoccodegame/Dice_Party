@@ -23,7 +23,7 @@ public class BoardNode : MonoBehaviour
 
     public virtual void ProcessNode(BoardCar player)
     {
-
+        player.SetCanMove(true);
     }
 
     //public virtual void ProcessNode(PlayerRef playerRef, NetworkId playerObject)

@@ -5,13 +5,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class VongXoayManager : MiniGameManager
+public class VongXoayManager : WizardMiniGameManager
 {
     public static VongXoayManager instance;
-
-    public Dictionary<PlayerInput, int> playerInitLives = new Dictionary<PlayerInput, int>();
-
-    public Dictionary<PlayerInput, GameObject> playerObjects = new Dictionary<PlayerInput, GameObject>();
 
     public float time;
     public TextMeshProUGUI timeText;
@@ -20,11 +16,6 @@ public class VongXoayManager : MiniGameManager
     {
         instance = this;
         base.Awake();
-        //MusicManager.instance.PlayMusic(MusicManager.MusicType.MNG);
-        tutorialPanel.SetActive(true);
-
-        HideTutorial();
-        InitPlayerLivesUI();
     }
 
     protected override void Start()
@@ -38,23 +29,6 @@ public class VongXoayManager : MiniGameManager
         time -= 1;
         time = Mathf.Max(time, 0f);
         timeText.text = time.ToString();
-    }
-
-    void InitPlayerLivesUI()
-    {
-
-    }
-
-    private void UpdateLive(PlayerInput playerInput, int lives)
-    {
-        foreach(var player in PlayerManager.instance.players)
-        {
-            if(playerInput == player)
-            {
-                WizardPartyData.instance.UpdatePlayerLive(player, lives);
-            }
-        }
-        CheckGameOver();
     }
 
     public override bool CheckGameOver()

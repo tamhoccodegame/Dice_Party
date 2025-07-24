@@ -15,8 +15,8 @@ public class StepBackNode : BoardNode
     IEnumerator ProcessCoroutine(BoardCar player)
     {
         CinecameraManager.instance.ResetCamera();
-        yield return new WaitForSeconds(2f);
         horse.SetActive(true);
+        yield return new WaitForSeconds(2f);
         horse.GetComponent<ParticleSystem>().Play();
         yield return new WaitForSeconds(0.5f);
         player.enabled = false;
@@ -28,6 +28,13 @@ public class StepBackNode : BoardNode
         }
         horse.SetActive(false);
         player.SetCurrentNode(nodeToStepBack);
+
+        foreach(var anim in player.animators)
+        {
+            anim.Play("Dizzy"); 
+        }
+
+        yield return new WaitForSeconds(2f);
         player.SetCanMove(true);
         yield return null;
     }

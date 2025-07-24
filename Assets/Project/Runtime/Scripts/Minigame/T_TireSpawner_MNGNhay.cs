@@ -7,14 +7,18 @@ using UnityEngine;
 public class T_TireSpawner_MNGNhay : MonoBehaviour
 {
     public GameObject tirePrefab;
-    public Transform spawnPosition;
+    public Transform leftSpawnPosition;
+    public Transform rightSpawnPosition;
+
     public Dictionary<float, float> sizeAndSpeed = new Dictionary<float, float>
     {
-        { 6f, 180f },
-        { 7f, 170f },
-        { 8f, 150f },
-        { 9f, 130f }
+        { 9f, 320f },
+        { 8f, 310f },
+        { 7f, 300f },
+        { 6f, 290f }
     };
+
+    public List<GameObject> activeObjects = new List<GameObject>();
 
     public float spawnInterval = 3f;
 
@@ -29,12 +33,19 @@ public class T_TireSpawner_MNGNhay : MonoBehaviour
 
     void SpawnTire()
     {
+        if (activeObjects.Count >= 5) return;
         int index = Random.Range(0, sizeAndSpeed.Count);
         float newSize = sizeAndSpeed.ElementAt(index).Key;
         float newSpeed = sizeAndSpeed.ElementAt(index).Value;
-        var go = Instantiate(tirePrefab, spawnPosition.position, Quaternion.identity);
+        int randomIndex = Random.Range(0, 2);
+        Vector3 spawnPosition = randomIndex == 0 ? leftSpawnPosition.position : rightSpawnPosition.position;
+
+        var go = Instantiate(tirePrefab, spawnPosition, Quaternion.identity);
         go.transform.localScale = new Vector3(newSize, newSize, newSize);
+
         go.GetComponent<T_Tire_MNGNhay>().rollSpeed = newSpeed;
+        go.GetComponent<T_Tire_MNGNhay>().Init(randomIndex == 0 ? 1 : -1, () => activeObjects.Remove(go));
+        activeObjects.Add(go);
     }
 
     // Update is called once per frame
