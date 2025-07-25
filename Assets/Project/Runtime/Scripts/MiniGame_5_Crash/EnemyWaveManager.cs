@@ -1,4 +1,5 @@
-﻿using Dreamteck.Utilities;
+﻿using Dreamteck.Splines;
+using Dreamteck.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,89 +9,86 @@ using UnityEngine;
 //Điều khiển từng nhóm chạy theo turn.
 public class EnemyWaveManager : MonoBehaviour
 {
-    [System.Serializable]
-    public class EnemyGroup
-    {
-        public string groupName;
-        public List<Wave_AI> enemies = new List<Wave_AI>();
-    }
+    public List<GameObject> horizontalEnemies = new List<GameObject>();
+    public List<GameObject> verticalEnemies = new List<GameObject>();
+    public int minGroup = 2, maxGroup = 4;
+    public float speedMin = 2f, speedMax = 5f;
 
-    public List<EnemyGroup> groups = new List<EnemyGroup>();
-    public float cycleTime = 5f;
-    private int previousGroupIndex = -1;
+    private List<GameObject> current = new List<GameObject>();
 
-    private void Start()
+    void Start()
     {
-        if (groups.Count == 0)
+        var all = FindObjectsOfType<Wave_AI>(true);
+        foreach (var e in all)
         {
-            Debug.LogError("[EnemyWaveManager] ❌ Không có group nào được setup!");
-            return;
+            if (e.direction == EnemyDirection.Horizontal)
+                horizontalEnemies.Add(e.gameObject);
+            else
+                verticalEnemies.Add(e.gameObject);
+            e.gameObject.SetActive(false);
         }
-
-        // Chạy group đầu tiên ngay khi bắt đầu
-        StartCoroutine(CycleGroups());
+        StartCoroutine(NextGroup());
     }
 
-    private IEnumerator CycleGroups()
+    IEnumerator NextGroup()
     {
-        while (true)
+        yield return new WaitForSeconds(1f);
+        SpawnGroup();
+    }
+
+    void SpawnGroup()
+    {
+        foreach (var e in current) e.SetActive(false);
+        current.Clear();
+
+        int count = Random.Range(minGroup, maxGroup + 1);
+        int vertCount = Random.Range(1, count);
+        int horCount = count - vertCount;
+
+        var verts = GetValidEnemies(verticalEnemies, vertCount, EnemyDirection.Vertical);
+        var hors = GetValidEnemies(horizontalEnemies, horCount, EnemyDirection.Horizontal);
+        current.AddRange(verts); current.AddRange(hors);
+
+        foreach (var go in current)
         {
-            int groupIndex = PickNextGroup();
-            if (groupIndex == -1)
-            {
-                Debug.LogWarning("[EnemyWaveManager] ❗Không tìm thấy group hợp lệ.");
-                yield return new WaitForSeconds(cycleTime);
-                continue;
-            }
-
-            Debug.Log($"[EnemyWaveManager] 🌀 Activating group: {groups[groupIndex].groupName}");
-
-            // Tắt tất cả group
-            for (int i = 0; i < groups.Count; i++)
-            {
-                bool isActive = (i == groupIndex);
-                foreach (var enemy in groups[i].enemies)
-                {
-                    enemy.SetActiveState(isActive);
-                }
-            }
-
-            previousGroupIndex = groupIndex;
-
-            yield return new WaitForSeconds(cycleTime);
+            go.SetActive(true);
+            var ai = go.GetComponent<Wave_AI>();
+            float speed = Random.Range(speedMin, speedMax);
+            //ai.StartMoving(speed, OnFinished);
         }
     }
 
-    private int PickNextGroup()
+    void OnFinished(GameObject go)
     {
-        List<int> validIndices = new List<int>();
+        go.SetActive(false);
+        current.Remove(go);
+        if (current.Count == 0) StartCoroutine(NextGroup());
+    }
 
-        for (int i = 0; i < groups.Count; i++)
+    List<GameObject> GetValidEnemies(List<GameObject> list, int needed, EnemyDirection dir)
+    {
+        var temp = new List<GameObject>(list);
+        var valid = new List<GameObject>();
+        while (valid.Count < needed && temp.Count > 0)
         {
-            if (groups[i].enemies.Count >= 2 && i != previousGroupIndex)
+            var pick = temp[Random.Range(0, temp.Count)];
+            temp.Remove(pick);
+
+            bool conflict = false;
+            foreach (var e in valid)
             {
-                validIndices.Add(i);
+                var ai1 = pick.GetComponent<Wave_AI>();
+                var ai2 = e.GetComponent<Wave_AI>();
+                // nếu cùng chiều và trên cùng line => conflict
+                if (dir == EnemyDirection.Horizontal &&
+                    Mathf.Abs(pick.transform.position.z - e.transform.position.z) < 0.1f)
+                    conflict = true;
+                if (dir == EnemyDirection.Vertical &&
+                    Mathf.Abs(pick.transform.position.x - e.transform.position.x) < 0.1f)
+                    conflict = true;
             }
+            if (!conflict) valid.Add(pick);
         }
-
-        if (validIndices.Count == 0)
-        {
-            // fallback: nếu không còn group nào hợp lệ (tất cả đều đã dùng hoặc chỉ có 1 enemy), cho phép trùng
-            for (int i = 0; i < groups.Count; i++)
-            {
-                if (groups[i].enemies.Count >= 2)
-                {
-                    validIndices.Add(i);
-                }
-            }
-        }
-
-        if (validIndices.Count == 0)
-        {
-            return -1;
-        }
-
-        int chosen = validIndices[Random.Range(0, validIndices.Count)];
-        return chosen;
+        return valid;
     }
 }

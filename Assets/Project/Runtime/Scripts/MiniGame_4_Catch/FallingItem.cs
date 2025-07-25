@@ -37,6 +37,9 @@ public class FallingItem : MonoBehaviour
     [Header("Cup Visual Settings")]
     public GameObject visualInCupPrefab; // Prefab nhỏ để hiện trong ly
 
+    public GameObject shadowPrefab; // Prefab bóng
+
+    private Transform shadowInstance;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -65,6 +68,26 @@ public class FallingItem : MonoBehaviour
             color.a = 1f;
             mat.color = color;
         }
+
+
+
+        // Spawn shadow
+        if (shadowPrefab != null)
+        {
+            shadowInstance = Instantiate(shadowPrefab).transform;
+
+            // Gán target cho bóng
+            var shadowFollower = shadowInstance.GetComponent<BlobShadowFollower>();
+            shadowFollower.target = this.transform;
+        }
+
+    }
+
+    void OnDestroy()
+    {
+        // Khi item bị hủy → hủy bóng
+        if (shadowInstance != null)
+            Destroy(shadowInstance.gameObject);
     }
 
     void FixedUpdate()
