@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class T_Tire_MNGNhay : MonoBehaviour
 {
@@ -32,5 +33,16 @@ public class T_Tire_MNGNhay : MonoBehaviour
     {
         transform.Rotate(0, 0, -(rollSpeed * direction) * Time.deltaTime);
         rb.velocity = Vector3.right * direction * rollSpeed / 10;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.TryGetComponent<PlayerController>(out var controller))
+        {
+            PlayerInput playerInput = controller.GetPlayerInput();
+            int currentLives = WizardPartyData.instance.playerLives[playerInput];
+            WizardPartyData.instance.UpdatePlayerLive(playerInput, Mathf.Max(0, currentLives - 1));
+            NhayLopManager.instance.UpdateHUD();
+        }
     }
 }

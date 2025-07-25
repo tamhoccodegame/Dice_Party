@@ -1,27 +1,23 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class VongXoayManager : WizardMiniGameManager
+public class NhayLopManager : WizardMiniGameManager
 {
-    public static VongXoayManager instance;
-
     public float time;
     public TextMeshProUGUI timeText;
 
     protected override void Awake()
     {
-        base.Awake();
         instance = this;
+        base.Awake();
     }
 
     protected override void Start()
     {
         base.Start();
-        InvokeRepeating(nameof(CountDown), 0f, 1f);
         foreach (var player in PlayerManager.instance.players)
         {
             int lives = WizardPartyData.instance.playerLives[player];
@@ -31,18 +27,15 @@ public class VongXoayManager : WizardMiniGameManager
         MusicManager.instance.PlayMusic(music);
     }
 
-    void CountDown()
+    private void Update()
     {
-        if(isGameOver || !isGameStarted) return;
-        time -= 1;
-        time = Mathf.Max(time, 0f);
+        time -= Time.deltaTime;
         timeText.text = time.ToString();
-        if (CheckGameOver())
+        if(CheckGameOver())
         {
-            isGameOver = true;
             ShowGameOverPanel();
         }
-    }   
+    }
 
     public override bool CheckGameOver()
     {
@@ -62,7 +55,9 @@ public class VongXoayManager : WizardMiniGameManager
         {
             var inputGo = playerObjects[inputs[i]];
             inputGo.GetComponent<PlayerController>().enabled = false;
-            inputGo.GetComponent<CharacterController>().enabled = false;
+
+            if(inputGo.TryGetComponent<CharacterController>(out var charControl))
+            charControl.enabled = false;
             inputGo.transform.position = rankPositions[i].position;
             inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
 

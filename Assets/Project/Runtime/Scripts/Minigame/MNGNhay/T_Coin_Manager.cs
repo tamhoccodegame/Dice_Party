@@ -8,7 +8,6 @@ public class T_Coin_Manager : WizardMiniGameManager
 {
     public static T_Coin_Manager Instance { get; private set; }
     public Dictionary<PlayerInput, GameObject> playersGoal = new Dictionary<PlayerInput, GameObject>();
-    private Dictionary<PlayerInput, int> playerInitLives = new Dictionary<PlayerInput, int>();
 
     public AudioClip music;
     public AudioClip winMusic;

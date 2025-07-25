@@ -47,13 +47,20 @@ public class CircleTrap : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(WaitToStart());
+    }
+
+    IEnumerator WaitToStart()
+    {
+        while(!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) yield return null;
+
         TryChangeState();
         InvokeRepeating(nameof(CountDown), 1f, 1f);
     }
 
     void CountDown()
     {
-        //if(!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
+        if (!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
         time += 1;
         if(time >= framerateMilestones[currentMilestoneIndex].time && currentMilestoneIndex < framerateMilestones.Count - 1)
         {

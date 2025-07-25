@@ -9,8 +9,15 @@ public class WizardPartyData : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
-        DontDestroyOnLoad(gameObject);
+        if(instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Start()
@@ -21,19 +28,19 @@ public class WizardPartyData : MonoBehaviour
         }
     }
 
-    public BoardNode carNode;
-    public BoardNode wizardNode;
+    public string carNode;
+    public string wizardNode;
 
     public Dictionary<PlayerInput, int> playerLives = new Dictionary<PlayerInput, int>();
 
     public void UpdateCarNode(BoardNode node)
     {
-        carNode = node;
+        carNode = node.name;
     }
 
     public void UpdateWizardNode(BoardNode node)
     {
-        wizardNode = node;
+        wizardNode = node.name;
     }
 
     public void UpdatePlayerLive(PlayerInput input, int live)

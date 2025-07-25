@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,11 @@ public class TrapActivationManager : MonoBehaviour
     private List<TrapActivator> traps = new List<TrapActivator>();
 
     void Start()
+    {
+        Invoke(nameof(DelayFindTrap), 0.8f);
+    }
+
+    void DelayFindTrap()
     {
         player = FindFirstObjectByType<MNGChayTruongController>().transform;
         // Tìm tất cả trap trong scene (có thể tối ưu nếu có nhiều)

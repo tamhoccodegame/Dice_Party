@@ -17,6 +17,15 @@ public class MNGVongXoayController : PlayerController
     public PlayerInput input;
     private Vector2 movementInput;
 
+    private float verticalVelocity = 0f;
+    public float gravity = -20f;
+    public float jumpForce = 10f;
+
+    public float groundCheckDistance = 0.1f;
+    public LayerMask groundLayer;
+    private bool isGrounded;
+
+    public Transform groundCheck;
 
     public void Awake()
     {
@@ -26,55 +35,70 @@ public class MNGVongXoayController : PlayerController
         animator = GetComponent<Animator>();
 
         if (VongXoayManager.instance != null)
+        {
             //VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
+        }
+    }
 
-        Invoke(nameof(ResetGravity), 2f);
+    private void Start()
+    {
+        if (VongXoayManager.instance != null && input != null)
+        {
+            VongXoayManager.instance.playerObjects.Add(input, gameObject);
+        }
     }
 
     public override void SetInput(PlayerInput input)
     {
         this.input = input;
-
-        this.input.actions["Move"].performed += OnMove;
-        this.input.actions["Move"].canceled += OnMove;
-
-        Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(input);
-        GetComponent<PlayerSetup>().UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
     }
 
-    private void OnDisable()
-    {
-        this.input.actions["Move"].performed -= OnMove;
-        this.input.actions["Move"].canceled -= OnMove;
-    }
-
-    private void OnMove(InputAction.CallbackContext ctx)
-    {
-        movementInput = ctx.ReadValue<Vector2>();
-    }
-
-    void ResetGravity()
-    {
-
-    }
     void Update()
     {
-        Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
-        controller.Move(move * 8f * Time.deltaTime);
+        if (input == null) return;
 
-        if(move.magnitude > 0.1f)
+        movementInput = input.actions["Move"].ReadValue<Vector2>();
+        Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
+
+        // Ground check
+        isGrounded = controller.isGrounded;
+
+        if (isGrounded && verticalVelocity < 0)
         {
-            Quaternion newRotation = Quaternion.LookRotation(move);
-            transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 5 * Time.deltaTime);
+            verticalVelocity = -2f; // giữ cho player dính mặt đất
         }
 
-        if(move.magnitude > 0.1f)
+        // Jump khi bấm Trigger
+        if (input.actions["Trigger"].triggered && isGrounded)
         {
-            ChangeAnim("Run");
+            verticalVelocity = jumpForce;
+            ChangeAnim("Jump");
         }
         else
         {
-            ChangeAnim("Idle");
+            verticalVelocity += gravity * Time.deltaTime;
+        }
+
+        move.y = verticalVelocity;
+
+        // Move
+        controller.Move(move * 8f * Time.deltaTime);
+
+        // Rotate theo hướng di chuyển (chỉ trên mặt phẳng ngang)
+        Vector3 horizontalMove = new Vector3(move.x, 0, move.z);
+        if (horizontalMove.magnitude > 0.1f)
+        {
+            Quaternion newRotation = Quaternion.LookRotation(horizontalMove);
+            transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 5 * Time.deltaTime);
+        }
+
+        // Animation
+        if (isGrounded)
+        {
+            if (horizontalMove.magnitude > 0.1f)
+                ChangeAnim("Run");
+            else
+                ChangeAnim("Idle");
         }
     }
 
@@ -96,8 +120,8 @@ public class MNGVongXoayController : PlayerController
     {
         if (VongXoayManager.instance.isGameOver) return;
 
-            Debug.Log("DIEE");
-            BloodEffect();
+        Debug.Log("DIEE");
+        BloodEffect();
 
         int currentLives = WizardPartyData.instance.playerLives[input];
         int newLives = Mathf.Max(0, currentLives - 1);
@@ -110,12 +134,12 @@ public class MNGVongXoayController : PlayerController
             ChangeAnim("Die");
             DisableInput();
         }
-            
+        VongXoayManager.instance.UpdateHUD();
     }
 
     void DisableInput()
     {
-        Destroy(this);
+        this.enabled = false;
     }
 
     void EnableRagdoll()

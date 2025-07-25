@@ -50,16 +50,17 @@ public class BoardCar : PlayerController
         inputs = PlayerManager.instance.players;
         UpdatePlayerInput();
 
-        BoardNode savedNode = WizardPartyData.instance.carNode;
-        if(savedNode != null)
+        string savedNode = WizardPartyData.instance.carNode;
+        if (!string.IsNullOrEmpty(savedNode))
         {
-            currentNode = savedNode;
+            currentNode = GameObject.Find(savedNode).GetComponent<BoardNode>();
         }
         else
         {
             currentNode = PlayerSpawner.instance.spawnPosition[0].GetComponent<BoardNode>();
         }
 
+        transform.position = currentNode.transform.position;
         toMoveNode = currentNode.nextNodes[0];
 
 
@@ -98,7 +99,7 @@ public class BoardCar : PlayerController
 
     IEnumerator DelaySetWizardCanMove()
     {
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(2.5f);
         canMove = false;
         isTurnDone = false;
         Wizard.instance.SetCanMove(true);
@@ -164,7 +165,7 @@ public class BoardCar : PlayerController
 
     public void UpdateCurrentNodeData(BoardNode node)
     {
-        WizardPartyData.instance.carNode = node;
+        WizardPartyData.instance.UpdateCarNode(node);
     }
 
     public PlayerInput GetInput()
@@ -250,9 +251,8 @@ public class BoardCar : PlayerController
         currentPlayerInputIndex = (currentPlayerInputIndex + 1) % inputs.Count;
         if(currentPlayerInputIndex == 0) isTurnDone = true;
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         dice.SetActive(false);
-        startEngineSFX.Play();
         currentNode.ProcessNode(this);
         WizardPartyData.instance.UpdateCarNode(currentNode);
     }

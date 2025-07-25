@@ -40,12 +40,10 @@ public class MNGChayTruongController : PlayerController
     public override void SetInput(PlayerInput playerInput)
     {
         this.playerInput = playerInput;
-
-        Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
-        GetComponent<PlayerSetup>().UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
     }
     void Update()
     {
+        if (playerInput == null) return;
         // Lấy input
         movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
 

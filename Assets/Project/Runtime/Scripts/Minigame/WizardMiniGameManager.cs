@@ -9,10 +9,12 @@ using UnityEngine.UI;
 
 public class WizardMiniGameManager : MonoBehaviour
 {
+    public static WizardMiniGameManager instance;
     public bool isGameOver { get; set; } = false;
     public bool isGameStarted { get; set; } = false;
 
     public PlayableDirector introCutscene;
+    public AudioClip music;
 
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
@@ -46,6 +48,7 @@ public class WizardMiniGameManager : MonoBehaviour
     protected virtual void Start()
     {
         GetComponent<PlayerSpawner>().SpawnPlayer();
+        MusicManager.instance.PlayMusic(music);
         tutorialPanel.SetActive(true);
         HideTutorial();
         InitHUD();
@@ -101,7 +104,7 @@ public class WizardMiniGameManager : MonoBehaviour
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         tutorialPanel.SetActive(false);
 
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(2.5f);
 
         if(introCutscene != null && introCutscene.gameObject.activeSelf)
         {
@@ -111,7 +114,6 @@ public class WizardMiniGameManager : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
-        TriggerAfterTutorial();
     }
 
     protected virtual void TriggerAfterTutorial()
@@ -121,6 +123,7 @@ public class WizardMiniGameManager : MonoBehaviour
 
     private void StartGame(PlayableDirector obj)
     {
+        TriggerAfterTutorial();
         Destroy(obj.gameObject);
 
         isGameStarted = true;

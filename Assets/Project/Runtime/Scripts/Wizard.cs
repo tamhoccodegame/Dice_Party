@@ -53,11 +53,12 @@ public class Wizard : MonoBehaviour
         volume.profile.TryGet(out chroma);
         volume.profile.TryGet(out vignette);
 
-        BoardNode savedNode = WizardPartyData.instance.wizardNode;
-        if(savedNode != null)
+        string savedNode = WizardPartyData.instance.wizardNode;
+        if(!string.IsNullOrEmpty(savedNode))
         {
-            currentNode = savedNode;
+            currentNode = GameObject.Find(savedNode).GetComponent<BoardNode>();
         }
+        transform.position = currentNode.transform.position;
         WizardPartyData.instance.UpdateWizardNode(currentNode);
     }
 
@@ -137,6 +138,7 @@ public class Wizard : MonoBehaviour
             stepLeft--;
 
             currentNode = toMoveNode;
+            WizardPartyData.instance.UpdateWizardNode(currentNode);
 
             if (currentNode.nextNodes.Count > 1 && playerChoseNodeQueue.Count > 0)
             {
@@ -159,7 +161,6 @@ public class Wizard : MonoBehaviour
         canMove = false;
         player.SetCanMove(true);
         animator.CrossFade("Idle", 0.25f);
-        WizardPartyData.instance.UpdateWizardNode(currentNode);
     }
 
     IEnumerator CastSpell()

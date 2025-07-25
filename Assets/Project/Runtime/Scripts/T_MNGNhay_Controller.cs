@@ -5,6 +5,7 @@ public class T_MNGNhay_Controller : PlayerController
 {
     private PlayerInput playerInput;
     private Rigidbody rb;
+    private Animator animator;
 
     public float jumpForce = 12f;
     public Transform groundCheck;
@@ -15,11 +16,13 @@ public class T_MNGNhay_Controller : PlayerController
     public override void SetInput(PlayerInput input)
     {
         this.playerInput = input;
+        NhayLopManager.instance.playerObjects.Add(playerInput, gameObject);
     }
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -31,6 +34,12 @@ public class T_MNGNhay_Controller : PlayerController
         if (playerInput.actions["Trigger"].triggered && isGrounded)
         {
             rb.velocity = Vector3.up * jumpForce;
+            animator.Play("Jump");
+        }
+
+        if (isGrounded && !animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+        {
+            animator.Play("Idle");
         }
     }
 
