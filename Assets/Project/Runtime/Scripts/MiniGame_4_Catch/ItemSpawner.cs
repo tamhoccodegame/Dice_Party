@@ -5,65 +5,74 @@ using UnityEngine;
 public class ItemSpawner : MonoBehaviour
 {
     [Header("Spawn Area Settings")]
-    public float spawnRadius = 5f;              // Bán kính vùng spawn hình tròn
-    public float spawnHeight = 10f;             // Độ cao bắt đầu spawn trên trời
+    public float spawnRadius = 5f;
+    public float spawnHeight = 10f;
 
     [Header("Item Spawn Settings")]
-    public int itemsPerBatch = 10;              // Bao nhiêu item spawn cùng lúc
-    public float spawnInterval = 1f;            // Bao lâu spawn 1 đợt
-    public List<GameObject> itemPrefabs;        // List các prefab item
+    public int itemsPerBatch = 10;         // Bao nhiêu item trong 1 batch
+    public float batchInterval = 2f;       // Thời gian giữa các batch
 
-    [Header("Item Physics Settings")]
+    [Header("Random Delay Per Item")]
+    public float minDelay = 0.05f;         // Delay tối thiểu giữa 2 item
+    public float maxDelay = 0.3f;          // Delay tối đa giữa 2 item
+
+    [Header("Item Physics Random")]
     public float minGravity = -5f;
     public float maxGravity = -20f;
-
     public float minFallSpeed = 1f;
     public float maxFallSpeed = 5f;
 
-    private float timer;
+    public List<GameObject> itemPrefabs;
 
-    void Update()
+    void Start()
     {
-        timer += Time.deltaTime;
-        if (timer >= spawnInterval)
-        {
-            SpawnItems();
-            timer = 0f;
-        }
-
-        
+        // Tự động spawn theo batch
+        InvokeRepeating(nameof(StartSpawnBatch), 0f, batchInterval);
     }
 
-    void SpawnItems()
+    void StartSpawnBatch()
     {
-        if (itemPrefabs == null || itemPrefabs.Count == 0) return;
+        StartCoroutine(SpawnBatchCoroutine());
+    }
+
+    IEnumerator SpawnBatchCoroutine()
+    {
+        if (itemPrefabs == null || itemPrefabs.Count == 0) yield break;
 
         for (int i = 0; i < itemsPerBatch; i++)
         {
-            // Random vị trí trong vòng tròn
-            Vector2 circle = Random.insideUnitCircle * spawnRadius;
-            Vector3 spawnPos = new Vector3(circle.x, spawnHeight, circle.y) + transform.position;
+            SpawnSingleItem();
 
-            // Random chọn prefab
-            GameObject prefab = itemPrefabs[Random.Range(0, itemPrefabs.Count)];
-            GameObject item = Instantiate(prefab, spawnPos, Quaternion.identity);
+            // Random delay giữa các item
+            yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
+        }
+    }
 
-            // Gán thông số vật lý ngẫu nhiên nếu có Rigidbody
-            Rigidbody rb = item.GetComponent<Rigidbody>();
-            if (rb != null)
+    void SpawnSingleItem()
+    {
+        // Random vị trí spawn trong vòng tròn
+        Vector2 circle = Random.insideUnitCircle * spawnRadius;
+        Vector3 spawnPos = new Vector3(circle.x, spawnHeight, circle.y) + transform.position;
+
+        // Random chọn prefab
+        GameObject prefab = itemPrefabs[Random.Range(0, itemPrefabs.Count)];
+        GameObject item = Instantiate(prefab, spawnPos, Quaternion.Euler(0, Random.Range(0f, 360f), 0));
+
+        // Gán physics random
+        Rigidbody rb = item.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            float gravity = Random.Range(minGravity, maxGravity);
+            float fallSpeed = Random.Range(minFallSpeed, maxFallSpeed);
+
+            rb.useGravity = false;
+            rb.velocity = Vector3.down * fallSpeed;
+
+            // Set custom gravity cho script FallingItem
+            FallingItem fallingScript = item.GetComponent<FallingItem>();
+            if (fallingScript != null)
             {
-                float gravity = Random.Range(minGravity, maxGravity);
-                float fallSpeed = Random.Range(minFallSpeed, maxFallSpeed);
-
-                rb.useGravity = false; // Tắt gravity mặc định
-                rb.velocity = Vector3.down * fallSpeed; // Set tốc độ rơi ban đầu
-
-                // Thêm trọng lực tùy chỉnh trong Update
-                FallingItem fallingScript = item.GetComponent<FallingItem>();
-                if (fallingScript != null)
-                {
-                    fallingScript.customGravity = gravity;
-                }
+                fallingScript.customGravity = gravity;
             }
         }
     }
@@ -72,20 +81,17 @@ public class ItemSpawner : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         int segments = 60;
-        float angle = 0f;
-
         Vector3 center = transform.position;
         Vector3 prevPoint = center + new Vector3(Mathf.Cos(0) * spawnRadius, 0, Mathf.Sin(0) * spawnRadius);
 
         for (int i = 1; i <= segments; i++)
         {
-            angle = i * Mathf.PI * 2f / segments;
+            float angle = i * Mathf.PI * 2f / segments;
             Vector3 newPoint = center + new Vector3(Mathf.Cos(angle) * spawnRadius, 0, Mathf.Sin(angle) * spawnRadius);
             Gizmos.DrawLine(prevPoint, newPoint);
             prevPoint = newPoint;
         }
 
-        // Vẽ luôn đường lên cao (spawnHeight) cho dễ thấy
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.up * spawnHeight);
     }
