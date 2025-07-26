@@ -88,7 +88,7 @@ public class NhayLopManager : WizardMiniGameManager
         for (int i = 0; i < inputs.Count; i++)
         {
             int currentPlayerLive = WizardPartyData.instance.playerLives[inputs[i]];
-            playerTextUI[i].text = currentPlayerLive.ToString();
+            //playerTextUI[i].text = currentPlayerLive.ToString();
         }
 
         if (CheckGameOver())

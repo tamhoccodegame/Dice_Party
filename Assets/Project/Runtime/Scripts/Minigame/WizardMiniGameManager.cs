@@ -7,6 +7,13 @@ using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+[System.Serializable]
+public class PlayerSlotHUD
+{
+    public TextMeshProUGUI textUI;
+    public Image avatar;
+}
+
 public class WizardMiniGameManager : MonoBehaviour
 {
     public static WizardMiniGameManager instance;
@@ -22,7 +29,7 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public GameObject emptyComponentAvatarPrefab;
 
-    public TextMeshProUGUI[] playerTextUI;
+    public PlayerSlotHUD[] playerHUDs;
 
     [Header("Tutorial Panel")]
     public GameObject tutorialPanel;
@@ -58,16 +65,16 @@ public class WizardMiniGameManager : MonoBehaviour
     {
         for(int i = 0; i < PlayerManager.instance.players.Count; i++)
         {
-            var playerInput = PlayerManager.instance.players[i];
+            Sprite playerAvatar = AvatarLoader.instance.GetAvatarSprite(i);
 
-            var playerHUDAvatar = Instantiate(emptyComponentAvatarPrefab, avatarHUDPositions[i].position, Quaternion.Euler(0, -90, 0));
-            Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
-            PlayerSetup playerSetup = playerHUDAvatar.GetComponent<PlayerSetup>();
-            playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
-            playerHUDAvatar.GetComponent<Animator>().enabled = false;
+            if(playerAvatar == null)
+            {
+                Debug.LogError("Cannot find Player Avatar");
+                return;
+            }
 
-
-            playerTextUI[i].transform.parent.gameObject.SetActive(true);
+            playerHUDs[i].avatar.sprite = playerAvatar;
+            playerHUDs[i].textUI.transform.parent.gameObject.SetActive(true);
         }
     }
 
