@@ -28,6 +28,16 @@ public class TiltAI : MonoBehaviour
     private int currentIndex = 0;
     private float timer = 0f;
 
+    void Start()
+    {
+        Collider c1 = horizontalRoller.GetComponent<Collider>();
+        Collider c2 = verticalRoller.GetComponent<Collider>();
+
+        if (c1 != null && c2 != null)
+            Physics.IgnoreCollision(c1, c2, true);
+    }
+
+
     void FixedUpdate()
     {
         // 1. Đếm thời gian → đổi hướng
