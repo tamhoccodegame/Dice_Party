@@ -22,6 +22,7 @@ public class TMPArtStyle : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public float outlineGradientSpeed = 2f;
 
     [Header("BLINK SETTINGS")]
+    public bool useBlink = true;
     public bool blinkOnHover = true;
     public bool blinkOnAwake = false;  // NEW ✅
     public float blinkSpeed = 4f;
@@ -49,7 +50,8 @@ public class TMPArtStyle : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         ApplyStyle();
 
         // Nếu tick Blink On Awake
-        if (blinkOnAwake) isBlinking = true;
+        if (useBlink && blinkOnAwake)
+            isBlinking = true;
     }
 
     //void OnValidate()
@@ -74,7 +76,7 @@ public class TMPArtStyle : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         }
 
         // Blink
-        if (isBlinking)
+        if (useBlink && isBlinking)
         {
             blinkTimer += Time.deltaTime * blinkSpeed;
             blinkState = Mathf.PingPong(blinkTimer, 1f) > 0.5f;
@@ -108,12 +110,12 @@ public class TMPArtStyle : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (blinkOnHover) isBlinking = true;
+        if (useBlink && blinkOnHover) isBlinking = true;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (blinkOnHover) isBlinking = false;
+        if (useBlink && blinkOnHover) isBlinking = false;
         tmp.color = topColor;
     }
 }
