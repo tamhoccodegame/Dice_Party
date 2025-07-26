@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 
 public class Wizard : MonoBehaviour
 {
+    public AudioClip music;
     public static Wizard instance;
 
     private Animator animator;
@@ -26,7 +27,7 @@ public class Wizard : MonoBehaviour
     public GameObject dice;
     public ParticleSystem diceVFX;
 
-    private BoardCar player;
+    public BoardCar player;
 
     public Volume volume;
     private LensDistortion lens;
@@ -46,13 +47,18 @@ public class Wizard : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
-        player = FindFirstObjectByType<BoardCar>();
         dice.SetActive(false);
 
         volume.profile.TryGet(out lens);
         volume.profile.TryGet(out chroma);
         volume.profile.TryGet(out vignette);
 
+        string savedNode = WizardPartyData.instance.wizardNode;
+        if(!string.IsNullOrEmpty(savedNode))
+        {
+            currentNode = GameObject.Find(savedNode).GetComponent<BoardNode>();
+        }
+        transform.position = currentNode.transform.position;
         WizardPartyData.instance.UpdateWizardNode(currentNode);
     }
 
@@ -87,6 +93,7 @@ public class Wizard : MonoBehaviour
         {
             dice.SetActive(true);
             StartCoroutine(RollDice());
+            MusicManager.instance.PlayMusic(music);
         }
     }
 
@@ -98,7 +105,7 @@ public class Wizard : MonoBehaviour
         yield return new WaitForSeconds(0.4f);
         diceVFX.Play();
         dice.SetActive(false);
-        stepLeft = 10;
+        stepLeft = 20;
         var stepText = Instantiate(stepTextPrefab, dice.transform.position - new Vector3(0, 1.5f, 0), Quaternion.identity);
         stepText.Init(stepLeft.ToString());
         yield return new WaitForSeconds(1.5f);
@@ -131,6 +138,7 @@ public class Wizard : MonoBehaviour
             stepLeft--;
 
             currentNode = toMoveNode;
+            WizardPartyData.instance.UpdateWizardNode(currentNode);
 
             if (currentNode.nextNodes.Count > 1 && playerChoseNodeQueue.Count > 0)
             {
@@ -151,8 +159,8 @@ public class Wizard : MonoBehaviour
         }
         yield return null;
         canMove = false;
+        player.SetCanMove(true);
         animator.CrossFade("Idle", 0.25f);
-        WizardPartyData.instance.UpdateWizardNode(currentNode);
     }
 
     IEnumerator CastSpell()
@@ -173,6 +181,7 @@ public class Wizard : MonoBehaviour
             yield return null;
         }
 
-        SceneManager.LoadScene("MiniGame_1");
+        SceneManager.LoadScene(WizardPartyData.instance.GetMinigame());
+        //SceneManager.LoadScene("MNG3");
     }
 }

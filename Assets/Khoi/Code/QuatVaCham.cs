@@ -15,7 +15,6 @@ public class QuatVaCham : MonoBehaviour
             player.Die();
             StartCoroutine(Reset());
         }
-        
     }
 
     IEnumerator Reset()

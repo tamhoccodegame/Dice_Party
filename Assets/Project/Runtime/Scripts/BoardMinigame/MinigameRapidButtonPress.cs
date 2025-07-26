@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Playables;
 
 public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
 {
+    public PlayableDirector introCutscene;
+    public Transform capy;
     private BoardCar car;
     private PlayerInput input;
     public Transform playerTransform;
@@ -27,29 +30,98 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
     public float bounceAmplitude = 0.5f; // độ cao dao động
     public float bounceFrequency = 5f;   // tần số dao động
 
+    public AudioClip music;
+
     public void Init(BoardCar player)
     {
         playerTransform = player.transform;
         input = player.GetInput();
         car = player;
+        car.GetComponent<CharacterController>().enabled = false;
         car.SetCurrentNode(GetComponentInParent<BoardNode>());
         car.StopAllCoroutines();
         startPosition = playerTransform.position;
         progress = 0f;
         lastPressTime = Time.time;
         IsFinished = false;
+        introCutscene.Play();
+        introCutscene.stopped += IntroCutscene_stopped;
+        MusicManager.instance.PlayMusic(music);
+        CinecameraManager.instance.TriggerCamera(GetComponentInChildren<CinemachineCamera>());
+    }
+
+    private void IntroCutscene_stopped(PlayableDirector obj)
+    {
+        StartMinigame();
     }
 
     public void StartMinigame()
     {
         isRunning = true;
-        CinecameraManager.instance.TriggerCamera(GetComponentInChildren<CinemachineCamera>());
+        capy.transform.SetParent(playerTransform);
+        capy.transform.localPosition = Vector3.zero;    
+
+        capy.transform.localPosition -= new Vector3(0, 1, 0);
+        capy.GetComponentInChildren<Animator>().Play("Carry");
+        capy.GetComponentInChildren<Animator>().enabled = false;
+        capy.transform.GetChild(0).transform.localPosition = Vector3.zero;
+        capy.transform.localRotation = Quaternion.Euler(0, 0, 0);
     }
 
     public void EndMinigame()
     {
+        isRunning = false;
+        Destroy(capy.gameObject);
+        StartCoroutine(DelayEndMinigame());
+    }
+
+    IEnumerator DelayEndMinigame()
+    {
+        CinecameraManager.instance.TriggerCamera(car.closeCam);
+        Animator[] anims = car.animators;
+        car.SetCurrentNode(null);
+        car.transform.rotation = Quaternion.Euler(0, -90, 0);
+
+        int lastAnimationIndex = -1;
+
+        for (int i = 0; i < anims.Length; i++)
+        {
+            if(i > 2)
+            {
+                int randomIndex = -1;
+
+                do
+                    randomIndex = UnityEngine.Random.Range(1, 7);
+                while (lastAnimationIndex != -1 && randomIndex == lastAnimationIndex);
+
+                lastAnimationIndex = randomIndex;
+                anims[i].Play($"Win{randomIndex}");
+            }
+            else
+            {
+                anims[i].Play("SitWin");
+            }
+        }
+
+        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(4f);
         // Ẩn UI, gọi animation thành công, v.v.
         car.SetCurrentNode(targetPosition.GetComponent<BoardNode>());
+        car.GetComponent<CharacterController>().enabled = true;
+
+        for(int i = 0; i < anims.Length; i++)
+        {
+            if(i > 2)
+            {
+                anims[i].Play("Idle");
+            }
+            else
+            {
+                anims[i].Play("Sit");
+            }
+        }
+
+        CinecameraManager.instance.ResetCamera();
         car.TryMove();
     }
 
@@ -89,7 +161,6 @@ public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
             IsFinished = true;
             EndMinigame();
             OnMinigameFinished?.Invoke();
-            CinecameraManager.instance.ResetCamera();
         }
     }
 

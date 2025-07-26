@@ -4,8 +4,11 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class BoardCar : MonoBehaviour
+public class BoardCar : PlayerController    
 {
+    public AudioClip music;
+    public AudioSource startEngineSFX;
+
     private CharacterController controller;
 
     public BoardNode currentNode;
@@ -20,7 +23,7 @@ public class BoardCar : MonoBehaviour
     public Transform[] playerSitPositions;
 
     [Header("Players Animator")]
-    public List<Animator> animators;
+    public Animator[] animators;
 
     [Header("Car Animator")]
     public Animator carAnim;
@@ -35,35 +38,71 @@ public class BoardCar : MonoBehaviour
     public GameObject dice;
     public ParticleSystem diceVFX;
 
+    public CinemachineCamera rollCam;
+    public CinemachineCamera closeCam;
+
+    public bool canMove = true;
+    private bool isTurnDone = false;
+
     // Start is called before the first frame update
     void Start()
     {
         inputs = PlayerManager.instance.players;
         UpdatePlayerInput();
-        currentNode = PlayerSpawner.instance.spawnPosition[0].GetComponent<BoardNode>();
+
+        string savedNode = WizardPartyData.instance.carNode;
+        if (!string.IsNullOrEmpty(savedNode))
+        {
+            currentNode = GameObject.Find(savedNode).GetComponent<BoardNode>();
+        }
+        else
+        {
+            currentNode = PlayerSpawner.instance.spawnPosition[0].GetComponent<BoardNode>();
+        }
+
+        transform.position = currentNode.transform.position;
         toMoveNode = currentNode.nextNodes[0];
+
+
         controller = GetComponent<CharacterController>();
+        Wizard.instance.player = this;
 
         FindFirstObjectByType<CinemachineCamera>().Follow = transform;
         FindFirstObjectByType<CinemachineCamera>().LookAt = transform;
 
+        animators = GetComponentsInChildren<Animator>();
+
         WizardPartyData.instance.UpdateCarNode(currentNode);
+        canMove = true;
     }
 
     void UpdatePlayerInput()
     {
-        if(currentPlayerInput != null && currentPlayerInputIndex == 0)
+        MusicManager.instance.PlayMusic(music);
+
+        if(isTurnDone)
         {
-            Wizard.instance.SetCanMove(true);
+            StartCoroutine(DelaySetWizardCanMove());
+            return;
         }
 
-        if(currentPlayerInput != null) 
+        CinecameraManager.instance.TriggerCamera(rollCam);
+
+        if (currentPlayerInput != null) 
         currentPlayerInput.actions["Trigger"].started -= OnTrigger;
 
         currentPlayerInput = inputs[currentPlayerInputIndex];
         currentPlayerInput.actions["Trigger"].started += OnTrigger;
         dice.SetActive(true);
         moveCoroutine = null;
+    }
+
+    IEnumerator DelaySetWizardCanMove()
+    {
+        yield return new WaitForSeconds(2.5f);
+        canMove = false;
+        isTurnDone = false;
+        Wizard.instance.SetCanMove(true);
     }
 
     private void OnDisable()
@@ -78,9 +117,9 @@ public class BoardCar : MonoBehaviour
 
     private void OnTrigger(InputAction.CallbackContext obj)
     {
-        if (moveCoroutine != null) return;
+        if (moveCoroutine != null || !canMove) return;
 
-        stepLeft = 99;
+        stepLeft = 2;
         if(currentNode.nextNodes.Count > 1)
         {
             ShowDirection();
@@ -92,14 +131,25 @@ public class BoardCar : MonoBehaviour
         }
     }
 
+    public void SetCanMove(bool canMove)
+    {
+        this.canMove = canMove;
+        if (canMove)
+        {
+            UpdatePlayerInput();
+        }
+    }
+
     private void Update()
     {
         if (toMoveNode != null)
         {
             Vector3 direction = toMoveNode.transform.position - transform.position;
-            //direction.y = 0;
+            if (Mathf.Abs(transform.position.y - toMoveNode.transform.position.y) >= 3f)
+            {
+                direction.y = 0;
+            }
             Quaternion newRotation = Quaternion.LookRotation(direction);
-            if(Quaternion.Angle(transform.rotation, newRotation) > 0.1f)
             transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 5 *  Time.deltaTime);
         }
     }
@@ -107,7 +157,15 @@ public class BoardCar : MonoBehaviour
     public void SetCurrentNode(BoardNode node)
     {
         currentNode = node;
+        if(currentNode != null)
         toMoveNode = currentNode.nextNodes[0];
+        else 
+            toMoveNode = null;
+    }
+
+    public void UpdateCurrentNodeData(BoardNode node)
+    {
+        WizardPartyData.instance.UpdateCarNode(node);
     }
 
     public PlayerInput GetInput()
@@ -125,10 +183,12 @@ public class BoardCar : MonoBehaviour
         step.Init(stepLeft.ToString());
         yield return new WaitForSeconds(1f);
         moveCoroutine = StartCoroutine(MoveToNextNode());
+        yield return new WaitForSeconds(0.5f);
     }
 
     public void TryMove()
     {
+        MusicManager.instance.PlayMusic(music);
         if(stepLeft > 0)
         {
             if(currentNode.nextNodes.Count > 1)
@@ -148,8 +208,10 @@ public class BoardCar : MonoBehaviour
 
     IEnumerator MoveToNextNode()
     {
+        CinecameraManager.instance.TriggerCamera(closeCam);
+        startEngineSFX.Play();
         carAnim.CrossFade("StartMove", 0.25f);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         carAnim.CrossFade("Moving", 0.25f);
 
         while (stepLeft > 0)
@@ -166,8 +228,9 @@ public class BoardCar : MonoBehaviour
             stepLeft--;
              
             currentNode = toMoveNode;
+            UpdateCurrentNodeData(currentNode);
 
-            if(currentNode.nextNodes.Count > 1)
+            if (currentNode.nextNodes.Count > 1 && stepLeft > 0)
             {
                 carAnim.CrossFade("EndMove", 0.25f);
                 yield return new WaitForSeconds(0.5f);
@@ -183,10 +246,14 @@ public class BoardCar : MonoBehaviour
 
                 yield return null;
         }
+
         yield return null;
         currentPlayerInputIndex = (currentPlayerInputIndex + 1) % inputs.Count;
-        UpdatePlayerInput();
+        if(currentPlayerInputIndex == 0) isTurnDone = true;
+
+        yield return new WaitForSeconds(1f);
         dice.SetActive(false);
+        currentNode.ProcessNode(this);
         WizardPartyData.instance.UpdateCarNode(currentNode);
     }
 
@@ -201,6 +268,7 @@ public class BoardCar : MonoBehaviour
 
     void ShowDirection()
     {
+        CinecameraManager.instance.ResetCamera();
         ClearArrow();
         for(int i = 0; i < currentNode.nextNodes.Count; i++)
         {
@@ -244,7 +312,16 @@ public class BoardCar : MonoBehaviour
         if(other.TryGetComponent<IMinigame>(out var minigame))
         {
             minigame.Init(this);
-            minigame.StartMinigame();
         }
+    }
+
+    public override PlayerInput GetPlayerInput()
+    {
+        return currentPlayerInput;
+    }
+
+    public override void SetInput(PlayerInput input)
+    {
+        
     }
 }

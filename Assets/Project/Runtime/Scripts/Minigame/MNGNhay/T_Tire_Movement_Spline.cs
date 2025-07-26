@@ -26,21 +26,6 @@ public class T_Tire_Movement_Spline : MonoBehaviour
     private Vector3 lastPos;
     private bool goingBack = false;
 
-    //void Start()
-    //{
-    //    if (wheelMesh == null || follower == null)
-    //    {
-    //        Debug.LogError("Missing wheel mesh or spline follower.");
-    //        enabled = false;
-    //        return;
-    //    }
-
-    //    lastPos = transform.position;
-
-    //    // Event khi tới cuối
-    //    follower.onEndReached += OnEndReached;
-    //}
-
     void Start()
     {
         if (wheelMesh == null || follower == null)

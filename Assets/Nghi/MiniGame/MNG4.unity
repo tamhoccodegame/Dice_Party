@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.1510033, g: 0.3948526, b: 0.44829175, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -653,6 +652,7 @@ Terrain:
   m_DetailObjectDensity: 1
   m_HeightmapPixelError: 5
   m_SplatMapDistance: 1000
+  m_HeightmapMinimumLODSimplification: 0
   m_HeightmapMaximumLOD: 0
   m_ShadowCastingMode: 2
   m_DrawHeightmap: 1
@@ -922,12 +922,12 @@ MonoBehaviour:
   m_RequiresColorTexture: 0
   m_Version: 2
   m_TaaSettings:
-    quality: 3
-    frameInfluence: 0.1
-    jitterScale: 1
-    mipBias: 0
-    varianceClampScale: 0.9
-    contrastAdaptiveSharpening: 0
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1 &1250654990
 GameObject:
   m_ObjectHideFlags: 0
@@ -958,15 +958,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnRadius: 12
-  spawnHeight: 50
-  itemsPerBatch: 6
-  batchInterval: 2
-  minDelay: 0.05
-  maxDelay: 0.3
-  minGravity: -5
-  maxGravity: -20
-  minFallSpeed: 1
-  maxFallSpeed: 5
+  spawnHeight: 100
+  itemsPerBatch: 3
+  spawnInterval: 2
   itemPrefabs:
   - {fileID: 7000299300339649893, guid: 77bc69947e2a3da4d966d7130c53f6a5, type: 3}
   - {fileID: 2802934860503175779, guid: acb9683e3b60b2c429d721054bd367c9, type: 3}
@@ -974,6 +968,10 @@ MonoBehaviour:
   - {fileID: 7056128085982252083, guid: 45fd61db761a0964796463a399979280, type: 3}
   - {fileID: 2500625050079368129, guid: 4aae2465ca0878140afdb3196df27e84, type: 3}
   - {fileID: 5268433258422448672, guid: b631f03f8f74776469be4df79b3a3ef0, type: 3}
+  minGravity: -5
+  maxGravity: -20
+  minFallSpeed: 1
+  maxFallSpeed: 5
 --- !u!4 &1250654992
 Transform:
   m_ObjectHideFlags: 0

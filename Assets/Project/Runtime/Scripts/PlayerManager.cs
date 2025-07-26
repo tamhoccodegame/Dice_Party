@@ -25,4 +25,12 @@ public class PlayerManager : MonoBehaviour
     {
         players.Add(input);
     }
+
+    public void RemovePlayer(PlayerInput input)
+    {
+        if (players.Contains(input))
+        {
+            players.Remove(input);
+        }
+    }
 }

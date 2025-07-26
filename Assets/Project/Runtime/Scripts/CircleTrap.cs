@@ -15,6 +15,8 @@ public class CircleTrap : MonoBehaviour
 
     public int currentMilestoneIndex = 0;
 
+    public Animator wizardAnimator;
+
     public AudioSource engineSound;
     public AudioSource bladeSound;
 
@@ -41,15 +43,26 @@ public class CircleTrap : MonoBehaviour
 
     public void Awake()
     {
-        state = State.Null;
+    }
+
+    private void Start()
+    {
+        StartCoroutine(WaitToStart());
+    }
+
+    IEnumerator WaitToStart()
+    {
+        while(!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) yield return null;
+
+        TryChangeState();
         InvokeRepeating(nameof(CountDown), 1f, 1f);
     }
 
     void CountDown()
     {
-        if(!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
+        if (!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
         time += 1;
-        if(time >= framerateMilestones[currentMilestoneIndex].time && currentMilestoneIndex < framerateMilestones.Count)
+        if(time >= framerateMilestones[currentMilestoneIndex].time && currentMilestoneIndex < framerateMilestones.Count - 1)
         {
             currentMilestoneIndex++;
             animator.speed = framerateMilestones[currentMilestoneIndex].speed;
@@ -57,32 +70,40 @@ public class CircleTrap : MonoBehaviour
     }
     private void Update()
     {
-        if (!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
-
-        if (state == State.Null) TryChangeState();
-
-        if (cachedState != state)
-        {
-            cachedState = state;
-            ChangeAnimation();
-        }
+        //if (VongXoayManager.instance == null) return; 
+        //if (!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) return;
     }
 
     public void TryChangeState()
     {
-        animator.CrossFade("PhaseTransition", 0.1f);
-        StartCoroutine(ChangeStateCoroutine());
+        StartCoroutine(TryChangeStateCoroutine());
+    }
+
+    IEnumerator TryChangeStateCoroutine()
+    {
+        state = (State)Random.Range(0, 3);
+        if (state != cachedState)
+        {
+            cachedState = state;
+            wizardAnimator.CrossFade("Cast", 0.25f);
+            yield return new WaitForSeconds(1f);
+            animator.CrossFade("PhaseTransition", 0.1f);
+            wizardAnimator.CrossFade("Idle", 0.25f);
+            StartCoroutine(ChangeStateCoroutine());
+        }
+        else
+        {
+            animator.CrossFade("PhaseTransition", 0.1f);
+            StartCoroutine(ChangeStateCoroutine());
+        }
+
     }
 
     IEnumerator ChangeStateCoroutine()
     {
         yield return new WaitForSecondsRealtime(0.8f);
-
-        state = (State)Random.Range(0, 3);
-        if(state == cachedState)
-        {
-            ChangeAnimation();
-        }
+        ChangeAnimation();
+    
     }
 
     void ChangeAnimation()

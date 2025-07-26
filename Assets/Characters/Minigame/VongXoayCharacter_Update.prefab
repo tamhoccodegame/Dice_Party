@@ -3962,6 +3962,7 @@ GameObject:
   - component: {fileID: 8355820250530106322}
   - component: {fileID: -8644249349779267298}
   - component: {fileID: 6520835551716081343}
+  - component: {fileID: 8729870313781098001}
   - component: {fileID: 4946760513217065626}
   m_Layer: 3
   m_Name: VongXoayCharacter_Update
@@ -4111,6 +4112,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bloodEffect: {fileID: 2703216707630584684}
   currentAnim: 
+  input: {fileID: 0}
+  gravity: -20
+  jumpForce: 6
+  groundCheckDistance: 0.1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheck: {fileID: 0}
+--- !u!114 &8729870313781098001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1737a1ed7962da344af34f684a0a9c75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 0}
+  invincibleDuration: 2
+  blinkInterval: 0.15
 --- !u!114 &4946760513217065626
 MonoBehaviour:
   m_ObjectHideFlags: 0

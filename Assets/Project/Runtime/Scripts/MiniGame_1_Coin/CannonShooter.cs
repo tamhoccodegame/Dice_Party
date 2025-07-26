@@ -17,6 +17,7 @@ public class CannonShooter : MonoBehaviour
 
     private void Update()
     {
+        if (!T_Coin_Manager.Instance.isGameStarted || T_Coin_Manager.Instance.isGameOver) return;
         if (Time.time < _nextFireTime) return;
 
         Shoot();
