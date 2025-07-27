@@ -86,7 +86,7 @@ public class BoardCar : PlayerController
             return;
         }
 
-        CinecameraManager.instance.TriggerCamera(rollCam);
+        //CinecameraManager.instance.TriggerCamera(rollCam);
 
         if (currentPlayerInput != null) 
         currentPlayerInput.actions["Trigger"].started -= OnTrigger;
@@ -208,7 +208,7 @@ public class BoardCar : PlayerController
 
     IEnumerator MoveToNextNode()
     {
-        CinecameraManager.instance.TriggerCamera(closeCam);
+        //CinecameraManager.instance.TriggerCamera(closeCam);
         startEngineSFX.Play();
         carAnim.CrossFade("StartMove", 0.25f);
         yield return new WaitForSeconds(1f);
@@ -268,7 +268,7 @@ public class BoardCar : PlayerController
 
     void ShowDirection()
     {
-        CinecameraManager.instance.ResetCamera();
+        //CinecameraManager.instance.ResetCamera();
         ClearArrow();
         for(int i = 0; i < currentNode.nextNodes.Count; i++)
         {

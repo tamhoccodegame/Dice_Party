@@ -24,7 +24,6 @@ public class CameraCaptureAvatar : MonoBehaviour
 
     private IEnumerator CaptureCamera(Camera cc)
     {
-        RenderTexture prevRT = cc.targetTexture;
         RenderTexture rt = new RenderTexture(resolutionWidth, resolutionHeight, 24);
         cc.targetTexture = rt;
 
@@ -35,8 +34,8 @@ public class CameraCaptureAvatar : MonoBehaviour
         image.ReadPixels(new Rect(0, 0, resolutionWidth, resolutionHeight), 0, 0);
         image.Apply();
 
-        cc.targetTexture = prevRT;
-        RenderTexture.active = prevRT;
+        cc.targetTexture = null;
+        RenderTexture.active = null;
         Destroy(rt);
 
         string fileName = $"Player_{characterCameras.IndexOf(cc) + 1}_Avatar" + ".png";

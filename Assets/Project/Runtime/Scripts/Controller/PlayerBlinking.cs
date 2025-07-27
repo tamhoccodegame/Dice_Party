@@ -37,7 +37,8 @@ public class PlayerBlinking : MonoBehaviour
         T_Coin_Manager.Instance.UpdateHUD();
         if(currentLives - 1 <= 0)
         {
-            T_Coin_Manager.Instance.playersGoal.Add(playerInput, gameObject);
+            WizardPartyData.instance.UpdatePlayerLive(playerInput, 0);
+            T_Coin_Manager.Instance.UpdateGoal(playerInput, gameObject);
             GetComponent<PlayerController>().enabled = false;
             GetComponent<Animator>().Play("Die");
         }

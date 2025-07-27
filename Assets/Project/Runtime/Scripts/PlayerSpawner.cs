@@ -62,7 +62,7 @@ public class PlayerSpawner : MonoBehaviour
             }
 
         }
-        else
+        else //Minigaem Spawn
         {
             for(int i = 0; i < PlayerManager.instance.players.Count; i++) 
             {
@@ -72,6 +72,7 @@ public class PlayerSpawner : MonoBehaviour
                 PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
                 playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
                 player.SetInput(playerManager.players[i]);
+                WizardMiniGameManager.instance.playerObjects.Add(playerInput, player.gameObject);
             }
         }
         

@@ -27,8 +27,6 @@ public class WizardMiniGameManager : MonoBehaviour
     public Transform[] rankPositions;
     public Transform[] avatarHUDPositions;
 
-    public GameObject emptyComponentAvatarPrefab;
-
     public PlayerSlotHUD[] playerHUDs;
 
     [Header("Tutorial Panel")]
@@ -46,10 +44,12 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public Dictionary<PlayerInput, int> playerInitLives = new Dictionary<PlayerInput, int>();
 
+    //Từng player tự đăng ký vô
     public Dictionary<PlayerInput, GameObject> playerObjects = new Dictionary<PlayerInput, GameObject>();
 
     protected virtual void Awake()
     {
+        instance = this;
     }
 
     protected virtual void Start()

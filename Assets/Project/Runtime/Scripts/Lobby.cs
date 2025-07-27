@@ -68,6 +68,7 @@ public class Lobby : MonoBehaviour
         playerInput.uiInputModule = playerSlots[playerCount].GetComponent<PlayerSlotUI>()
                                     .inputSystemUIInputModule;
 
+
         Debug.Log(playerSlots[playerCount].GetComponent<PlayerSlotUI>().name);  
 
         //playerInput.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = $"Player {playerCount + 1}";

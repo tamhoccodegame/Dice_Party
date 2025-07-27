@@ -1,13 +1,14 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class DoanTauManager : WizardMiniGameManager
 {
     public static DoanTauManager instance;
 
-    public List<Sprite> playerAvatars = new List<Sprite>();
+    public Dictionary<PlayerInput, Sprite> playerAvatars = new Dictionary<PlayerInput, Sprite>();
 
     public List<GachaGun> gachaGuns;
 
@@ -23,7 +24,7 @@ public class DoanTauManager : WizardMiniGameManager
             Sprite playerAvatar = AvatarLoader.instance.GetAvatarSprite(i);
             if(playerAvatar != null)
             {
-                playerAvatars.Add(playerAvatar);
+                playerAvatars.Add(players[i], playerAvatar);
             }
         }
 
@@ -35,49 +36,71 @@ public class DoanTauManager : WizardMiniGameManager
         base.Awake();
     }
 
+    public void Update()
+    {
+        time -= Time.deltaTime;
+    }
+
     IEnumerator FireGunRepeat()
     {
-        while(time > 0)
+        while (playerObjects.Count <= 0) yield return null;
+
+        while (time > 0)
         {
+            foreach(var gun in gachaGuns) gun.lockSign.SetActive(false);
+
             foreach (var gun in gachaGuns)
             {
                 gun.SpinGacha();
+                yield return new WaitForSeconds(0.1f);
                 while (!gun.readyToFire) yield return null;
             }
 
-            bool isAllReadyToSpinAgain = true;
+            yield return new WaitForSeconds(1.5f);
+
+            foreach(var gun in gachaGuns)
+            {
+                gun.Fire();
+                yield return null;
+            }
+
+            bool isAllReadyToSpinAgain = false;
+            Debug.Log($"Before While");
+
             while (!isAllReadyToSpinAgain)
             {
                 foreach(var gun in gachaGuns)
                 {
                     if (!gun.readyToChooseTarget)
                     {
-                        isAllReadyToSpinAgain = false;
                         yield return new WaitForSeconds(0.1f);
+                        Debug.Log($"{gun.name} is not ready");
                         break;
                     }
+                    Debug.Log($"All Gun Ready");
+                    isAllReadyToSpinAgain = true;
+                    yield return null;
                 }
+                yield return null;
             }
+
         }
         
     }
 
-    public void ReadyToFire()
+    public void StartAllFakeGacha()
     {
-        bool isAllReady = gachaGuns.All(g => g.readyToFire);
 
-        if (isAllReady)
+        foreach (var gun in gachaGuns)
         {
-            foreach(var gun in gachaGuns)
-            {
-                gun.Fire();
-            }
+            gun.StartFakeGacha();
         }
     }
 
     protected override void Start()
     {
         base.Start();
+        StartCoroutine(FireGunRepeat());
     }
 
     public override bool CheckGameOver()
