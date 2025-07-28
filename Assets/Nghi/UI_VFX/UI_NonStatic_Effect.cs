@@ -10,7 +10,8 @@ public enum AnimationType
     ShakeVertical,
     PingPongX,
     PingPongY,
-    Swing
+    Swing,
+    PressScale
 }
 
 public enum PlayMode
@@ -49,6 +50,14 @@ public class UI_NonStatic_Effect : MonoBehaviour
 
         [HideInInspector] public Tween currentTween;
         [HideInInspector] public Tween currentTweenB;
+
+
+        [Header("Press Scale Settings")]
+        public float minScale = 0.9f;
+        public float maxScale = 1.2f;
+        public int pressLoopCount = 2;   // số lần scale to nhỏ
+        public float pressDuration = 0.3f; // thời gian 1 lần to hoặc nhỏ
+
     }
 
     public List<UIEffectItem> effectItems = new List<UIEffectItem>();
@@ -110,6 +119,23 @@ public class UI_NonStatic_Effect : MonoBehaviour
                 item.currentTween = item.target.DOLocalRotate(Vector3.zero, item.duration, RotateMode.Fast)
                     .SetEase(Ease.OutElastic).SetDelay(item.delay).SetLoops(item.loop ? -1 : 0, LoopType.Restart);
                 break;
+            case AnimationType.PressScale:
+                {
+                    // Reset scale về 1
+                    item.target.localScale = Vector3.one;
+
+                    // Tạo tween scale to nhỏ liên tục
+                    item.currentTween = DOTween.Sequence()
+                        .Append(item.target.DOScale(item.maxScale, item.pressDuration).SetEase(Ease.OutQuad))
+                        .Append(item.target.DOScale(item.minScale, item.pressDuration).SetEase(Ease.InQuad))
+                        .SetLoops(item.pressLoopCount * 2, LoopType.Yoyo) // nhân đôi vì to nhỏ là 1 chu kỳ
+                        .SetDelay(item.delay);
+
+                    if (item.loop)
+                        item.currentTween.SetLoops(-1, LoopType.Yoyo);
+                }
+                break;
+
         }
     }
 
@@ -140,6 +166,21 @@ public class UI_NonStatic_Effect : MonoBehaviour
                 item.currentTweenB = item.targetB.DOLocalRotate(Vector3.zero, item.durationB, RotateMode.Fast)
                     .SetEase(Ease.OutElastic).SetDelay(item.delayB).SetLoops(item.loopB ? -1 : 0, LoopType.Restart);
                 break;
+            case AnimationType.PressScale:
+                {
+                    item.targetB.localScale = Vector3.one;
+
+                    item.currentTweenB = DOTween.Sequence()
+                        .Append(item.targetB.DOScale(item.maxScale, item.pressDuration).SetEase(Ease.OutQuad))
+                        .Append(item.targetB.DOScale(item.minScale, item.pressDuration).SetEase(Ease.InQuad))
+                        .SetLoops(item.pressLoopCount * 2, LoopType.Yoyo)
+                        .SetDelay(item.delayB);
+
+                    if (item.loopB)
+                        item.currentTweenB.SetLoops(-1, LoopType.Yoyo);
+                }
+                break;
+
         }
     }
 
