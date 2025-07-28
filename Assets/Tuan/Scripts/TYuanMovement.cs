@@ -24,7 +24,7 @@ public class TYuanMovement : MonoBehaviour
     private Vector3 currentMove;
     private Vector3 velocitySmooth;
     private bool canTakeDamage = false;
-    private bool hasTouchedWater = false;
+
 
     public int maxHealth = 3;
     private int currentHealth;
@@ -94,7 +94,7 @@ public class TYuanMovement : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        if (!canTakeDamage || isInvincible || hasTouchedWater) return;
+        if (!canTakeDamage || isInvincible) return;
 
         if (other.CompareTag("Water"))
         {
@@ -118,7 +118,6 @@ public class TYuanMovement : MonoBehaviour
         }
 
         StartCoroutine(InvincibilityFlash());
-        StartCoroutine(ResetWaterTouchFlag());
     }
     IEnumerator Respawn()
     {
@@ -196,10 +195,5 @@ public class TYuanMovement : MonoBehaviour
             GameObject splash = Instantiate(splashEffectPrefab, transform.position, Quaternion.identity);
             Destroy(splash, 2f);
         }
-    }
-    IEnumerator ResetWaterTouchFlag()
-    {
-        yield return new WaitForSeconds(0.5f);
-        hasTouchedWater = false;
     }
 }
