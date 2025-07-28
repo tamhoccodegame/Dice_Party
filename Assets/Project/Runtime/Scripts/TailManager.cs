@@ -26,20 +26,26 @@ public class TailManager : MonoBehaviour
 
         while (true)
         {
-            yield return TriggerRandomTentacleAttack();
+            StartCoroutine(TriggerRandomTentacleAttack());
 
             yield return new WaitForSeconds(currentDelay);
-
             currentDelay = Mathf.Max(minDelay, currentDelay - speedUpRate);
         }
     }
+    int lastIndex = -1;
     IEnumerator TriggerRandomTentacleAttack()
     {
 
         if (tentacleAnimators.Count == 0)
             yield break;
 
-        int randomIndex = Random.Range(1, tentacleAnimators.Count);
+        int randomIndex;
+        do
+        {
+            randomIndex = Random.Range(0, tentacleAnimators.Count);
+        } while (randomIndex == lastIndex && tentacleAnimators.Count > 1);
+
+        lastIndex = randomIndex;
         Animator selectedTentacle = tentacleAnimators[randomIndex];
 
         Vector3 warningPos = selectedTentacle.transform.position;
