@@ -14,150 +14,165 @@ public class UI_NonStatic_EffectEditor : Editor
 
         reorderableList = new ReorderableList(serializedObject, effectItems, true, true, true, true);
 
+        // Header
         reorderableList.drawHeaderCallback = (Rect rect) =>
         {
-            EditorGUI.LabelField(rect, "UI Effect Items");
+            EditorGUI.LabelField(rect, "UI Effect Items", EditorStyles.boldLabel);
         };
 
+        // Element Height
         reorderableList.elementHeightCallback = (int index) =>
         {
             var element = effectItems.GetArrayElementAtIndex(index);
-            float height = EditorGUIUtility.singleLineHeight * 8f;
+            float height = EditorGUIUtility.singleLineHeight * 6f; // target + playMode + animType + duration + delay + loop
 
-            // AnimationType A
+            // Extra cho AnimationType A
             var animType = element.FindPropertyRelative("animationType");
             var type = (AnimationType)animType.enumValueIndex;
             if (type == AnimationType.ShakeHorizontal || type == AnimationType.ShakeVertical)
-                height += EditorGUIUtility.singleLineHeight * 2;
+                height += EditorGUIUtility.singleLineHeight * 2f;
             else if (type == AnimationType.PingPongX || type == AnimationType.PingPongY)
                 height += EditorGUIUtility.singleLineHeight;
             else if (type == AnimationType.PressScale)
-                height += EditorGUIUtility.singleLineHeight * 5; // 1 dòng header + 4 field
+                height += EditorGUIUtility.singleLineHeight * 5f;
 
             // Target B
             var useB = element.FindPropertyRelative("useTargetB");
             if (useB.boolValue)
             {
-                height += EditorGUIUtility.singleLineHeight * 6f;
+                height += EditorGUIUtility.singleLineHeight * 5f; // targetB + animTypeB + durationB + delayB + loopB
 
                 var animTypeB = element.FindPropertyRelative("animationTypeB");
                 var typeB = (AnimationType)animTypeB.enumValueIndex;
                 if (typeB == AnimationType.ShakeHorizontal || typeB == AnimationType.ShakeVertical)
-                    height += EditorGUIUtility.singleLineHeight * 2;
+                    height += EditorGUIUtility.singleLineHeight * 2f;
                 else if (typeB == AnimationType.PingPongX || typeB == AnimationType.PingPongY)
                     height += EditorGUIUtility.singleLineHeight;
                 else if (typeB == AnimationType.PressScale)
-                    height += EditorGUIUtility.singleLineHeight * 5; // header + 4 field
+                    height += EditorGUIUtility.singleLineHeight * 5f;
             }
-            return height + 10f;
+
+            return height + 50f; // padding bottom
         };
 
+        // Draw Element
         reorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
         {
             var element = effectItems.GetArrayElementAtIndex(index);
             rect.y += 2;
             float y = rect.y;
+            float line = EditorGUIUtility.singleLineHeight;
+            float spacing = 2;
 
             // Target A
-            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("target"));
-            y += EditorGUIUtility.singleLineHeight + 2;
+            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("target"));
+            y += line + spacing;
 
-            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("playMode"));
-            y += EditorGUIUtility.singleLineHeight + 2;
+            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("playMode"));
+            y += line + spacing;
 
-            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("animationType"));
-            y += EditorGUIUtility.singleLineHeight + 2;
+            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("animationType"));
+            y += line + spacing;
 
-            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("duration"));
-            y += EditorGUIUtility.singleLineHeight + 2;
+            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("duration"));
+            y += line + spacing;
 
-            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("delay"));
-            y += EditorGUIUtility.singleLineHeight + 2;
+            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("delay"));
+            y += line + spacing;
 
-            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("loop"));
-            y += EditorGUIUtility.singleLineHeight + 2;
+            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("loop"));
+            y += line + spacing;
 
-            // Extra fields for type A
+            // Extra settings cho Animation A
             var animType = element.FindPropertyRelative("animationType");
             var type = (AnimationType)animType.enumValueIndex;
             if (type == AnimationType.ShakeHorizontal || type == AnimationType.ShakeVertical)
             {
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("shakeStrength"));
-                y += EditorGUIUtility.singleLineHeight + 2;
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("shakeVibrato"));
-                y += EditorGUIUtility.singleLineHeight + 2;
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("shakeStrength"));
+                y += line + spacing;
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("shakeVibrato"));
+                y += line + spacing;
             }
             else if (type == AnimationType.PingPongX || type == AnimationType.PingPongY)
             {
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("pingPongDistance"));
-                y += EditorGUIUtility.singleLineHeight + 2;
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("pingPongDistance"));
+                y += line + spacing;
             }
             else if (type == AnimationType.PressScale)
             {
-                // Draw header
-                EditorGUI.LabelField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), "Press Scale Settings", EditorStyles.boldLabel);
-                y += EditorGUIUtility.singleLineHeight + 2;
+                EditorGUI.LabelField(new Rect(rect.x, y, rect.width, line), "Press Scale Settings", EditorStyles.boldLabel);
+                y += line + spacing;
 
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("minScale"));
-                y += EditorGUIUtility.singleLineHeight + 2;
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("maxScale"));
-                y += EditorGUIUtility.singleLineHeight + 2;
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("pressLoopCount"));
-                y += EditorGUIUtility.singleLineHeight + 2;
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("pressDuration"));
-                y += EditorGUIUtility.singleLineHeight + 2;
+                EditorGUI.indentLevel++;
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("minScale"));
+                y += line + spacing;
+
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("maxScale"));
+                y += line + spacing;
+
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("pressLoopCount"));
+                y += line + spacing;
+
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("pressDuration"));
+                y += line + spacing;
+                EditorGUI.indentLevel--;
             }
 
-            // Use Target B
+            // Use Target B toggle
             var useTargetB = element.FindPropertyRelative("useTargetB");
-            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), useTargetB);
-            y += EditorGUIUtility.singleLineHeight + 2;
+            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), useTargetB);
+            y += line + spacing;
 
+            // Target B fields
             if (useTargetB.boolValue)
             {
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("targetB"));
-                y += EditorGUIUtility.singleLineHeight + 2;
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("targetB"));
+                y += line + spacing;
 
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("animationTypeB"));
-                y += EditorGUIUtility.singleLineHeight + 2;
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("animationTypeB"));
+                y += line + spacing;
 
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("durationB"));
-                y += EditorGUIUtility.singleLineHeight + 2;
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("durationB"));
+                y += line + spacing;
 
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("delayB"));
-                y += EditorGUIUtility.singleLineHeight + 2;
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("delayB"));
+                y += line + spacing;
 
-                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("loopB"));
-                y += EditorGUIUtility.singleLineHeight + 2;
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("loopB"));
+                y += line + spacing;
 
-                // Extra fields for type B
                 var animTypeB = element.FindPropertyRelative("animationTypeB");
                 var typeB = (AnimationType)animTypeB.enumValueIndex;
                 if (typeB == AnimationType.ShakeHorizontal || typeB == AnimationType.ShakeVertical)
                 {
-                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("shakeStrengthB"));
-                    y += EditorGUIUtility.singleLineHeight + 2;
-                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("shakeVibratoB"));
-                    y += EditorGUIUtility.singleLineHeight + 2;
+                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("shakeStrengthB"));
+                    y += line + spacing;
+                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("shakeVibratoB"));
+                    y += line + spacing;
                 }
                 else if (typeB == AnimationType.PingPongX || typeB == AnimationType.PingPongY)
                 {
-                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("pingPongDistanceB"));
-                    y += EditorGUIUtility.singleLineHeight + 2;
+                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("pingPongDistanceB"));
+                    y += line + spacing;
                 }
                 else if (typeB == AnimationType.PressScale)
                 {
-                    EditorGUI.LabelField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), "Press Scale Settings (B)", EditorStyles.boldLabel);
-                    y += EditorGUIUtility.singleLineHeight + 2;
+                    EditorGUI.LabelField(new Rect(rect.x, y, rect.width, line), "Press Scale Settings (B)", EditorStyles.boldLabel);
+                    y += line + spacing;
 
-                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("minScale"));
-                    y += EditorGUIUtility.singleLineHeight + 2;
-                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("maxScale"));
-                    y += EditorGUIUtility.singleLineHeight + 2;
-                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("pressLoopCount"));
-                    y += EditorGUIUtility.singleLineHeight + 2;
-                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("pressDuration"));
-                    y += EditorGUIUtility.singleLineHeight + 2;
+                    EditorGUI.indentLevel++;
+                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("minScale"));
+                    y += line + spacing;
+
+                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("maxScale"));
+                    y += line + spacing;
+
+                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("pressLoopCount"));
+                    y += line + spacing;
+
+                    EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), element.FindPropertyRelative("pressDuration"));
+                    y += line + spacing;
+                    EditorGUI.indentLevel--;
                 }
             }
         };
@@ -169,7 +184,6 @@ public class UI_NonStatic_EffectEditor : Editor
         reorderableList.DoLayoutList();
         serializedObject.ApplyModifiedProperties();
     }
-
 
 
     //private SerializedProperty effectItems;
