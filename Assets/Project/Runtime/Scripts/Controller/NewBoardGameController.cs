@@ -307,6 +307,7 @@ public class NewBoardGameController : PlayerController
     public void EnableRagdoll()
     {
         Vector3 spawnPosition = transform.position + new Vector3(0, 15, 0);
+        ChangeState(idleState);
         var clone = Instantiate(gameObject, spawnPosition, Quaternion.identity);
         clone.GetComponent<PlayerController>().enabled = false;
 

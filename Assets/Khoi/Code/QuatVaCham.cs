@@ -7,19 +7,9 @@ public class QuatVaCham : MonoBehaviour
 
     void OnTriggerEnter(Collider hitObject)
     {
-        if (isColliding) return;
-
-        if(hitObject.TryGetComponent<MNGVongXoayController>(out var player))
+        if (hitObject.TryGetComponent<PlayerBlinking>(out var player))
         {
-            isColliding = true;
-            player.Die();
-            StartCoroutine(Reset());
+            player.OnHitByObstacle(hitObject.ClosestPoint(transform.position));    
         }
-    }
-
-    IEnumerator Reset()
-    {
-        yield return new WaitForSecondsRealtime(1f);
-        isColliding = false;
     }
 }

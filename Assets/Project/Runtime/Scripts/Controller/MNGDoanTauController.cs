@@ -89,27 +89,7 @@ public class MNGDoanTauController : PlayerController
         animator.CrossFade(animName, blendTime);
     }
 
-    [ContextMenu("Die Simu")]
-    public void Die()
-    {
-        if (VongXoayManager.instance.isGameOver) return;
-
-        Debug.Log("DIEE");
-
-        int currentLives = WizardPartyData.instance.playersKey[playerInput];
-        int newLives = Mathf.Max(0, currentLives - 1);
-        if (newLives > 0)
-        {
-            WizardPartyData.instance.UpdatePlayerKey(playerInput, newLives);
-        }
-        else
-        {
-            ChangeAnim("Die");
-            DisableInput();
-        }
-        WizardMiniGameManager.instance.UpdateHUD();
-    }
-
+ 
     void DisableInput()
     {
         this.enabled = false;

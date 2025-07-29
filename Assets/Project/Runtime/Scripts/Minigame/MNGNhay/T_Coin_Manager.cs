@@ -18,13 +18,7 @@ public class T_Coin_Manager : WizardMiniGameManager
     protected override void Start()
     {
         base.Start();
-        foreach(var player in PlayerManager.instance.players)
-        {
-            int lives = WizardPartyData.instance.playersKey[player];
-            playerInitLives.Add(player, lives);
-        }
         UpdateHUD();
-        MusicManager.instance.PlayMusic(music);
     }
 
     protected override void TriggerAfterTutorial()
@@ -50,7 +44,6 @@ public class T_Coin_Manager : WizardMiniGameManager
 
     public override bool CheckGameOver()
     {
-        var playerLives = WizardPartyData.instance.playersKey;
-        return playersCompleteGame.Count == PlayerManager.instance.players.Count || playerLives.All(p => p.Value <= 0);
+        return playersCompleteGame.Count == PlayerManager.instance.players.Count || playerScores.All(p => p.Value <= 0);
     }
 }

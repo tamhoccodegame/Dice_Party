@@ -21,11 +21,12 @@ public class GachaGun : MonoBehaviour
 
     private Coroutine fakeGachaRoutine;
     public GameObject lockSign;
+    public ParticleSystem fireEffect;
 
     public void Init(Dictionary<PlayerInput, Sprite> _playerAvatars)
     {
         playerAvatars = _playerAvatars;
-        avatarRenderer.sprite = playerAvatars.ElementAt(0).Value;
+        FitSpriteToOriginalSize(playerAvatars.ElementAt(0).Value);
     }
 
     private void Start()
@@ -102,6 +103,7 @@ public class GachaGun : MonoBehaviour
 
     public void Fire()
     {
+        fireEffect.Play();
         readyToChooseTarget = false;
         readyToFire = false;
 

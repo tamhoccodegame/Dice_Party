@@ -63,10 +63,9 @@ public class WizardPartyData : MonoBehaviour
         wizardNode = node.name;
     }
 
-    public void UpdatePlayerKey(PlayerInput input, int live)
+    public void UpdatePlayerKey(PlayerInput input, int key)
     {
-        if (live < 0) live = 0;
-        playersKey[input] = live;
+        playersKey[input] = key;
     }
 
     public string GetMinigame()

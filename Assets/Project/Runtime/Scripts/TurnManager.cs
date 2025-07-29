@@ -132,20 +132,24 @@ public class TurnManager : MonoBehaviour
         Dictionary<PlayerInput, PlayerBoardStat> dictCopy = WizardPartyData.instance.playersStat;
         dictCopy.OrderByDescending(d => d.Value.cupQty);
 
-        foreach (var kvp in dictCopy)
-        {
-            RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
-            slotRect.gameObject.SetActive(true);
+        //foreach (var kvp in dictCopy)
+        //{
+        //    RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
+        //    slotRect.gameObject.SetActive(true);
 
-            BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
+        //    BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
 
-            boardSlotRect.UpdateCup(kvp.Value.cupQty);
-            boardSlotRect.UpdateKey(kvp.Value.keyQty);
-            boardSlotRect.UpdateHealth(kvp.Value.health);
-            
-            int index = PlayerManager.instance.players.IndexOf(kvp.Key);
-            boardSlotRect.UpdateName($"Player {index + 1}");
-        }
+        //    boardSlotRect.UpdateCup(kvp.Value.cupQty);
+        //    boardSlotRect.UpdateKey(kvp.Value.keyQty);
+        //    boardSlotRect.UpdateHealth(kvp.Value.health);
+
+        //    string playerName = BoardGameData.instance.GetName(kvp.Key);
+
+        //    if (string.IsNullOrEmpty(playerName))
+        //        boardSlotRect.UpdateName(kvp.Key.PlayerId.ToString());
+        //    else
+        //        boardSlotRect.UpdateName(playerName);
+        //}
         #endregion
     }
 
@@ -180,21 +184,9 @@ public class TurnManager : MonoBehaviour
 
         if (currentPlayerIndex != 0)
         {
-            playerControllers.ElementAt(currentPlayerIndex).Value.enabled = true;
             playerControllers.ElementAt(currentPlayerIndex).Value.StartTurn();
             UpdateTurnUI();
         }
-    }
-
-    void LoadScene(string sceneName)
-    {
-        StartCoroutine(LoadSceneCoroutine(sceneName));
-    }
-
-    IEnumerator LoadSceneCoroutine(string sceneName)
-    {
-        yield return new WaitForSeconds(2f);
-        LevelLoader.instance.LoadScene(sceneName);
     }
 
     void UpdateTurnUI()
@@ -236,6 +228,16 @@ public class TurnManager : MonoBehaviour
         blackScreen.color = newColor;
     }
 
+    void LoadScene(string sceneName)
+    {
+        StartCoroutine(LoadSceneCoroutine(sceneName));
+    }
+
+    IEnumerator LoadSceneCoroutine(string sceneName)
+    {
+        yield return null;
+        LevelLoader.instance.LoadScene(sceneName);
+    }
     #endregion
 
 }

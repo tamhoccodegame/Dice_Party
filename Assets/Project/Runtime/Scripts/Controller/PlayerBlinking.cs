@@ -32,15 +32,16 @@ public class PlayerBlinking : MonoBehaviour
         }
 
         PlayerInput playerInput = GetComponent<PlayerController>().GetPlayerInput();
-        int currentLives = WizardPartyData.instance.playersKey[playerInput];
-        WizardPartyData.instance.UpdatePlayerKey(playerInput, currentLives - 1);
-        if(currentLives - 1 <= 0)
+        int score = WizardMiniGameManager.instance.playerScores[playerInput];
+
+        if (score - 20 <= 0)
         {
-            WizardPartyData.instance.UpdatePlayerKey(playerInput, 0);
-            WizardMiniGameManager.instance.playersCompleteGame.Add(playerInput);
-            GetComponent<PlayerController>().enabled = false;
-            GetComponent<Animator>().Play("Die");
+            score = 0;
         }
+        else score -= 20;
+
+        WizardMiniGameManager.instance.playerScores[playerInput] = score;
+
         WizardMiniGameManager.instance.UpdateHUD();
 
 
@@ -48,7 +49,7 @@ public class PlayerBlinking : MonoBehaviour
         Debug.Log("[😵 HIT] Player took damage at " + hitPoint);
 
         if (Audio_Manager.Instance != null)
-        Audio_Manager.Instance.Play2D("Hurt");
+            Audio_Manager.Instance.Play2D("Hurt");
 
         //GetComponent<MNGChayTruongController>().DropCoins(hitPoint);
 

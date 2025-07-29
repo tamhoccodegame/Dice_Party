@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -46,8 +47,9 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public float fadeDuration = 1f;
 
-    public Dictionary<PlayerInput, int> playerInitLives = new Dictionary<PlayerInput, int>();
+    public Dictionary<PlayerInput, int> playerScores = new Dictionary<PlayerInput, int>();
 
+    //Từng player tự đăng ký vô
     public Dictionary<PlayerInput, GameObject> playerObjects = new Dictionary<PlayerInput, GameObject>();
 
     public List<PlayerInput> playersCompleteGame = new List<PlayerInput>();
@@ -65,10 +67,19 @@ public class WizardMiniGameManager : MonoBehaviour
         HideTutorial();
         InitHUD();
 
-        if(time != -1)
+        if (time != -1)
         {
             InvokeRepeating(nameof(CountDown), 0f, 1f);
         }
+        else
+        {
+            timeText.transform.parent.gameObject.SetActive(false);
+        }
+
+            foreach (var player in playerObjects.Keys)
+            {
+                playerScores.Add(player, 1000); //Mỗi player khởi đầu 1k điểm
+            }
     }
 
     protected void CountDown()
@@ -78,7 +89,7 @@ public class WizardMiniGameManager : MonoBehaviour
         time = Mathf.Max(time, 0);
         timeText.text = time.ToString();
 
-        if(CheckGameOver())
+        if (CheckGameOver())
         {
             ShowGameOverPanel();
         }
@@ -86,11 +97,11 @@ public class WizardMiniGameManager : MonoBehaviour
 
     void InitHUD()
     {
-        for(int i = 0; i < PlayerManager.instance.players.Count; i++)
+        for (int i = 0; i < PlayerManager.instance.players.Count; i++)
         {
             Sprite playerAvatar = AvatarLoader.instance.GetAvatarSprite(i);
 
-            if(playerAvatar == null)
+            if (playerAvatar == null)
             {
                 Debug.LogError("Cannot find Player Avatar");
                 return;
@@ -136,7 +147,7 @@ public class WizardMiniGameManager : MonoBehaviour
 
         yield return new WaitForSeconds(2.5f);
 
-        if(introCutscene != null && introCutscene.gameObject.activeSelf)
+        if (introCutscene != null && introCutscene.gameObject.activeSelf)
         {
             introCutscene.Play();
             introCutscene.stopped += StartGame;
@@ -187,33 +198,22 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public virtual void SpawnRewardAvatar()
     {
-        List<PlayerInput> inputs = PlayerManager.instance.players;
+        playerScores = playerScores
+                       .OrderByDescending(c => c.Value)
+                       .ToDictionary(c => c.Key, c => c.Value);
 
-        for (int i = 0; i < inputs.Count; i++)
+
+        for (int i = 0; i < playerScores.Count; i++)
         {
-            var inputGo = playerObjects[inputs[i]];
+            gameOverSlots[i].gameObject.SetActive(true);
+            var inputGo = playerObjects[playerScores.ElementAt(i).Key];
+            if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
+            else       inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+            
             inputGo.GetComponent<PlayerController>().enabled = false;
             inputGo.GetComponent<CharacterController>().enabled = false;
             inputGo.transform.position = rankPositions[i].position;
             inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
-
-            int currentLives = WizardPartyData.instance.playersKey[inputs[i]];
-            gameOverSlots[i].gameObject.SetActive(true);
-            gameOverSlots[i].keyQtyText.text = currentLives.ToString();
-            if (playerInitLives[inputs[i]] > currentLives)
-            {
-                gameOverSlots[i].rankText.text = "-" + Mathf.Max(0, (playerInitLives[inputs[i]] - currentLives)).ToString();
-                inputGo.GetComponent<Animator>().Play($"Lose{i + 1}");
-                if (currentLives <= 0)
-                {
-                    PlayerManager.instance.RemovePlayer(inputs[i]);
-                }
-            }
-            else if (currentLives > 0)
-            {
-                inputGo.GetComponent<Animator>().Play($"Win{i + 1}");
-                gameOverSlots[i].rankText.text = "";
-            }
         }
     }
 
@@ -223,13 +223,14 @@ public class WizardMiniGameManager : MonoBehaviour
 
         for (int i = 0; i < inputs.Count; i++)
         {
-            int currentPlayerLive = WizardPartyData.instance.playersKey[inputs[i]];
-            playerHUDs[i].textUI.text = currentPlayerLive.ToString();
+            int score = playerScores[inputs[i]];
+            playerHUDs[i].textUI.text = score.ToString();
         }
 
         if (CheckGameOver())
         {
             ShowGameOverPanel();
         }
+
     }
 }
