@@ -38,25 +38,29 @@ public class UI_NonStatic_Effect : MonoBehaviour
         public int shakeVibrato = 10;
         public float pingPongDistance = 30f;
 
+        //[Header("Press Scale Settings")]
+        public float minScale = 0.9f;
+        public float maxScale = 1.2f;
+        public int pressLoopCount = 2;   // số lần scale to nhỏ
+        public float pressDuration = 0.3f; // thời gian 1 lần to hoặc nhỏ
+
+        public float shakeStrengthB = 10f;
+        public int shakeVibratoB = 10;
+        public float pingPongDistanceB = 30f;
+
         public bool useTargetB = false;
         public RectTransform targetB;
         public AnimationType animationTypeB = AnimationType.None;
         public float durationB = 0.5f;
         public float delayB = 0f;
         public bool loopB = false;
-        public float shakeStrengthB = 10f;
-        public int shakeVibratoB = 10;
-        public float pingPongDistanceB = 30f;
+        
 
         [HideInInspector] public Tween currentTween;
         [HideInInspector] public Tween currentTweenB;
 
 
-        [Header("Press Scale Settings")]
-        public float minScale = 0.9f;
-        public float maxScale = 1.2f;
-        public int pressLoopCount = 2;   // số lần scale to nhỏ
-        public float pressDuration = 0.3f; // thời gian 1 lần to hoặc nhỏ
+        
 
     }
 

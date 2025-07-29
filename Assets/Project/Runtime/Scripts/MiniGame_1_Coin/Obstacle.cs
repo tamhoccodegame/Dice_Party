@@ -9,8 +9,8 @@ public class Obstacle : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            var player = other.GetComponent<PlayerBlinking>() ??
-                         other.GetComponentInParent<PlayerBlinking>();
+            var player = other.GetComponent<PlayerController_N>() ??
+                         other.GetComponentInParent<PlayerController_N>();
 
             if (player != null)
             {

@@ -48,19 +48,19 @@ public class PopUpAppearGroup_UI : MonoBehaviour
         public float moveDistance = 100f;
         public float fromAlpha = 0f;
 
-        [Header("Press Settings")]
+        //[Header("Press Settings")]
         public float ScaleUp = 1.2f;
         public float ScaleDown = 0.9f;
         public float UpDuration = 0.3f;
         public float DownDuration = 0.2f;
         public float SettleDuration = 0.3f;
 
-        [Header("DropBounce Settings")]
+        //[Header("DropBounce Settings")]
         public float DropHeight = 300f;
         public int BounceCount = 3;
         public float BounceDamping = 0.5f;
 
-        [Header("LaunchForward Settings")]
+        //[Header("LaunchForward Settings")]
         public bool useLaunchForward = false;
         public LaunchDirection launchDirection = LaunchDirection.FromFarFront;
         public float LaunchDistanceZ = 999f;
