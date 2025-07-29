@@ -1,63 +1,53 @@
 ﻿using System.Collections;
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 
 [RequireComponent(typeof(CharacterController))]
-public class MNGVongXoayController : PlayerController
+public class MNGDoanTauController : PlayerController
 {
     private CharacterController controller;
     private Animator animator;
 
-    public VisualEffect bloodEffect;
-
     public string currentAnim;
 
-    public PlayerInput input;
+    public PlayerInput playerInput;
     private Vector2 movementInput;
 
     private float verticalVelocity = 0f;
     public float gravity = -20f;
     public float jumpForce = 10f;
 
-    public float groundCheckDistance = 0.1f;
-    public LayerMask groundLayer;
     private bool isGrounded;
 
     public Transform groundCheck;
 
     public void Awake()
     {
-        bloodEffect.Stop();
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
-
-        if (VongXoayManager.instance != null)
-        {
-            //VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
-        }
     }
 
     private void Start()
     {
-        if (WizardMiniGameManager.instance != null && input != null)
+        if (WizardMiniGameManager.instance != null && playerInput != null)
         {
-            WizardMiniGameManager.instance.playerObjects.Add(input, gameObject);
+            WizardMiniGameManager.instance.playerObjects.Add(playerInput, gameObject);
         }
     }
 
     public override void SetInput(PlayerInput input)
     {
-        this.input = input;
+        this.playerInput = input;
     }
 
     void Update()
     {
-        if (input == null) return;
+        if (playerInput == null) return;
 
-        movementInput = input.actions["Move"].ReadValue<Vector2>();
+        movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
 
         // Ground check
@@ -66,17 +56,6 @@ public class MNGVongXoayController : PlayerController
         if (isGrounded && verticalVelocity < 0)
         {
             verticalVelocity = -2f; // giữ cho player dính mặt đất
-        }
-
-        // Jump khi bấm Trigger
-        if (input.actions["Trigger"].triggered && isGrounded)
-        {
-            verticalVelocity = jumpForce;
-            ChangeAnim("Jump");
-        }
-        else
-        {
-            verticalVelocity += gravity * Time.deltaTime;
         }
 
         move.y = verticalVelocity;
@@ -110,24 +89,18 @@ public class MNGVongXoayController : PlayerController
         animator.CrossFade(animName, blendTime);
     }
 
-    public void BloodEffect()
-    {
-        bloodEffect.Play();
-    }
-
     [ContextMenu("Die Simu")]
     public void Die()
     {
         if (VongXoayManager.instance.isGameOver) return;
 
         Debug.Log("DIEE");
-        BloodEffect();
 
-        int currentLives = WizardPartyData.instance.playerLives[input];
+        int currentLives = WizardPartyData.instance.playerLives[playerInput];
         int newLives = Mathf.Max(0, currentLives - 1);
         if (newLives > 0)
         {
-            WizardPartyData.instance.UpdatePlayerLive(input, newLives);
+            WizardPartyData.instance.UpdatePlayerLive(playerInput, newLives);
         }
         else
         {
@@ -149,6 +122,6 @@ public class MNGVongXoayController : PlayerController
 
     public override PlayerInput GetPlayerInput()
     {
-        return input;
+        return playerInput;
     }
 }

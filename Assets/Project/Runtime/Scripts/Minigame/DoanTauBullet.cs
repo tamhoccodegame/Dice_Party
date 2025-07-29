@@ -62,10 +62,12 @@ public class DoanTauBullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.TryGetComponent<PlayerController>(out var player))
+        if(other.TryGetComponent<PlayerBlinking>(out var player))
         {
+            player.OnHitByObstacle(other.ClosestPoint(transform.position));
             gun.readyToChooseTarget = true;
             DoanTauManager.instance.StartAllFakeGacha();
+            WizardMiniGameManager.instance.UpdateHUD();
             Destroy(gameObject);
         }
     }

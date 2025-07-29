@@ -25,6 +25,7 @@ public class GachaGun : MonoBehaviour
     public void Init(Dictionary<PlayerInput, Sprite> _playerAvatars)
     {
         playerAvatars = _playerAvatars;
+        avatarRenderer.sprite = playerAvatars.ElementAt(0).Value;
     }
 
     private void Start()

@@ -9,10 +9,9 @@ public class CameraFollow : MonoBehaviour
 
     public Vector3 camOffset;
     private Transform targetCam; // Vị trí camera cần đến
-    private float cameraLerpSpeed = 4f; // Tốc độ Lerp (tùy chỉnh)
 
     private bool isCameraMoving; // Không dùng Networked nữa
-    private int currentTargetId = -1;
+    public Transform currentTarget;
 
     private void Awake()
     {
@@ -21,23 +20,23 @@ public class CameraFollow : MonoBehaviour
 
     private void Update()
     {
-        if (targetCam == null) return;
-        if (!isCameraMoving)
-        {
-            Vector3 desiredPosition = targetCam.position + camOffset;
-            if (Vector3.Distance(transform.position, desiredPosition) > 0.3f)
-                transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * cameraLerpSpeed);
-        }
+        //if (targetCam == null) return;
+
+        Vector3 direction = (currentTarget.position - transform.position).normalized;
+
+        Quaternion newRotation = Quaternion.LookRotation(direction);
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 5 * Time.deltaTime);
     }
-    public void StartFollowTarget(int targetId)
+    public void StartFollowTarget(Transform targetId)
     {
-        if (targetCam != null && currentTargetId == targetId) return;
-        currentTargetId = targetId;
+        if (targetCam != null && currentTarget == targetId) return;
+        currentTarget = targetId;
 
         StartCoroutine(ChangeFollowTarget(targetId));
     }
 
-    IEnumerator ChangeFollowTarget(int targetId)
+    IEnumerator ChangeFollowTarget(Transform targetId)
     {
         SetCamIsMoving(true);
         //Vector3 oldTarget = transform.position;

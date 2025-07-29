@@ -1,10 +1,13 @@
 ﻿using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AvatarTurnManager : MonoBehaviour
 {
+    public static AvatarTurnManager instance;
     [Header("List Avatar UI (RectTransform)")]
     public List<RectTransform> avatars;
 
@@ -21,11 +24,27 @@ public class AvatarTurnManager : MonoBehaviour
 
     private int currentIndex = -1;         // Lượt hiện tại
 
+    public TextMeshProUGUI playerNameText;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     void Start()
     {
+        int index = 0;
         // Reset scale tất cả về bình thường
         foreach (var avatar in avatars)
+        {
+            Sprite avatarSprite = AvatarLoader.instance.GetAvatarSprite(index);
+            avatar.Find("Avatar").GetComponent<Image>().sprite = avatarSprite;
             avatar.localScale = Vector3.one * normalScale;
+            playerNameText.text = $"Player {index + 1}";
+            avatar.gameObject.SetActive(true);
+            index++;
+            if (index > PlayerManager.instance.players.Count - 1) break;
+        }
     }
 
     void Update()

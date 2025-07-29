@@ -93,13 +93,13 @@ public class Wizard : MonoBehaviour
         {
             dice.SetActive(true);
             StartCoroutine(RollDice());
-            MusicManager.instance.PlayMusic(music);
+            //MusicManager.instance.PlayMusic(music);
         }
     }
 
     IEnumerator RollDice()
     {
-        CinecameraManager.instance.TriggerCamera(cam);
+        //CinecameraManager.instance.TriggerCamera(cam);
         yield return new WaitForSeconds(2.5f);
         animator.CrossFade("RollDice", 0.25f);
         yield return new WaitForSeconds(0.4f);
@@ -111,7 +111,7 @@ public class Wizard : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
         StartCoroutine(MoveToNextNode());
         yield return new WaitForSeconds(0.5f);
-        CinecameraManager.instance.ResetCamera();
+        //CinecameraManager.instance.ResetCamera();
     }
 
     IEnumerator MoveToNextNode()

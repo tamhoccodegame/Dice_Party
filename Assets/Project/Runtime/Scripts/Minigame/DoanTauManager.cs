@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,8 +12,6 @@ public class DoanTauManager : WizardMiniGameManager
     public Dictionary<PlayerInput, Sprite> playerAvatars = new Dictionary<PlayerInput, Sprite>();
 
     public List<GachaGun> gachaGuns;
-
-    public float time;
 
     protected override void Awake()
     {
@@ -36,14 +35,12 @@ public class DoanTauManager : WizardMiniGameManager
         base.Awake();
     }
 
-    public void Update()
-    {
-        time -= Time.deltaTime;
-    }
 
     IEnumerator FireGunRepeat()
     {
         while (playerObjects.Count <= 0) yield return null;
+
+        while (!isGameStarted || isGameOver) yield return null;
 
         while (time > 0)
         {
@@ -90,7 +87,6 @@ public class DoanTauManager : WizardMiniGameManager
 
     public void StartAllFakeGacha()
     {
-
         foreach (var gun in gachaGuns)
         {
             gun.StartFakeGacha();
@@ -105,7 +101,7 @@ public class DoanTauManager : WizardMiniGameManager
 
     public override bool CheckGameOver()
     {
-        return base.CheckGameOver();
+        return playersCompleteGame.Count == PlayerManager.instance.players.Count || time <= 0;
     }
 
     public override void ShowGameOverPanel()

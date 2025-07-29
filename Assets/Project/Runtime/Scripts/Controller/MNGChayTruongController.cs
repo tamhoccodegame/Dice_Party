@@ -113,7 +113,7 @@ public class MNGChayTruongController : PlayerController
         if (isGoal) return;
         isGoal = true;
 
-        T_Coin_Manager.Instance.UpdateGoal(playerInput, gameObject);
+        WizardMiniGameManager.instance.playersCompleteGame.Add(playerInput);
     }
 
     public override PlayerInput GetPlayerInput()

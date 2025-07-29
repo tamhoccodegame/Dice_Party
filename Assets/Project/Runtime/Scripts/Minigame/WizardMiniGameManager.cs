@@ -20,8 +20,12 @@ public class WizardMiniGameManager : MonoBehaviour
     public bool isGameOver { get; set; } = false;
     public bool isGameStarted { get; set; } = false;
 
+    public int time;
+    public TextMeshProUGUI timeText;
+
     public PlayableDirector introCutscene;
     public AudioClip music;
+    public AudioClip winMusic;
 
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
@@ -47,6 +51,8 @@ public class WizardMiniGameManager : MonoBehaviour
     //Từng player tự đăng ký vô
     public Dictionary<PlayerInput, GameObject> playerObjects = new Dictionary<PlayerInput, GameObject>();
 
+    public List<PlayerInput> playersCompleteGame = new List<PlayerInput>();
+
     protected virtual void Awake()
     {
         instance = this;
@@ -59,6 +65,24 @@ public class WizardMiniGameManager : MonoBehaviour
         tutorialPanel.SetActive(true);
         HideTutorial();
         InitHUD();
+
+        if(time != -1)
+        {
+            InvokeRepeating(nameof(CountDown), 0f, 1f);
+        }
+    }
+
+    protected void CountDown()
+    {
+        if (time <= 0 || !isGameStarted || isGameOver) return;
+        time -= 1;
+        time = Mathf.Max(time, 0);
+        timeText.text = time.ToString();
+
+        if(CheckGameOver())
+        {
+            ShowGameOverPanel();
+        }
     }
 
     void InitHUD()
@@ -164,11 +188,49 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public virtual void SpawnRewardAvatar()
     {
-        
+        List<PlayerInput> inputs = PlayerManager.instance.players;
+
+        for (int i = 0; i < inputs.Count; i++)
+        {
+            var inputGo = playerObjects[inputs[i]];
+            inputGo.GetComponent<PlayerController>().enabled = false;
+            inputGo.GetComponent<CharacterController>().enabled = false;
+            inputGo.transform.position = rankPositions[i].position;
+            inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
+
+            int currentLives = WizardPartyData.instance.playerLives[inputs[i]];
+            gameOverSlots[i].gameObject.SetActive(true);
+            gameOverSlots[i].keyQtyText.text = currentLives.ToString();
+            if (playerInitLives[inputs[i]] > currentLives)
+            {
+                gameOverSlots[i].rankText.text = "-" + Mathf.Max(0, (playerInitLives[inputs[i]] - currentLives)).ToString();
+                inputGo.GetComponent<Animator>().Play($"Lose{i + 1}");
+                if (currentLives <= 0)
+                {
+                    PlayerManager.instance.RemovePlayer(inputs[i]);
+                }
+            }
+            else if (currentLives > 0)
+            {
+                inputGo.GetComponent<Animator>().Play($"Win{i + 1}");
+                gameOverSlots[i].rankText.text = "";
+            }
+        }
     }
 
     public virtual void UpdateHUD()
     {
-        
+        List<PlayerInput> inputs = PlayerManager.instance.players;
+
+        for (int i = 0; i < inputs.Count; i++)
+        {
+            int currentPlayerLive = WizardPartyData.instance.playerLives[inputs[i]];
+            playerHUDs[i].textUI.text = currentPlayerLive.ToString();
+        }
+
+        if (CheckGameOver())
+        {
+            ShowGameOverPanel();
+        }
     }
 }
