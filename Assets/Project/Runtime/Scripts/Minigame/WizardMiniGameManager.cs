@@ -48,7 +48,6 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public Dictionary<PlayerInput, int> playerInitLives = new Dictionary<PlayerInput, int>();
 
-    //Từng player tự đăng ký vô
     public Dictionary<PlayerInput, GameObject> playerObjects = new Dictionary<PlayerInput, GameObject>();
 
     public List<PlayerInput> playersCompleteGame = new List<PlayerInput>();
@@ -173,7 +172,7 @@ public class WizardMiniGameManager : MonoBehaviour
         yield return StartCoroutine(FadeBlackScreen(0, 1));
         yield return new WaitForSeconds(3f);
 
-        SceneManager.LoadScene("Map1");
+        SceneManager.LoadScene("TuanSceneMap");
     }
 
     public virtual bool CheckGameOver()
@@ -198,7 +197,7 @@ public class WizardMiniGameManager : MonoBehaviour
             inputGo.transform.position = rankPositions[i].position;
             inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
 
-            int currentLives = WizardPartyData.instance.playerLives[inputs[i]];
+            int currentLives = WizardPartyData.instance.playersKey[inputs[i]];
             gameOverSlots[i].gameObject.SetActive(true);
             gameOverSlots[i].keyQtyText.text = currentLives.ToString();
             if (playerInitLives[inputs[i]] > currentLives)
@@ -224,7 +223,7 @@ public class WizardMiniGameManager : MonoBehaviour
 
         for (int i = 0; i < inputs.Count; i++)
         {
-            int currentPlayerLive = WizardPartyData.instance.playerLives[inputs[i]];
+            int currentPlayerLive = WizardPartyData.instance.playersKey[inputs[i]];
             playerHUDs[i].textUI.text = currentPlayerLive.ToString();
         }
 

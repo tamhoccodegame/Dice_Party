@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class IdleState : BoardState
@@ -17,19 +18,9 @@ public class IdleState : BoardState
     {
     }
 
-    public override void FixedUpdateNetwork()
-    {
-    }
-
-    public override void HandleInput()
-    {
-    }
-
     public override void Update()
     {
-        if (!controller.isMyTurn) return;
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (controller.playerInput.actions["Trigger"].triggered)
         {
             controller.RollDice();
         }

@@ -18,14 +18,6 @@ public class ChooseDirectionState : BoardState
     {
     }
 
-    public override void FixedUpdateNetwork()
-    {
-    }
-
-    public override void HandleInput()
-    {
-    }
-
     public override void Update()
     {
     }

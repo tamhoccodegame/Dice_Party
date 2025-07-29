@@ -11,21 +11,12 @@ public class NodeState : BoardState
     public override void Enter()
     {
         controller.ChangeAnimation("Idle");
-        //controller.currentNode.ProcessNode(controller.Object.InputAuthority, controller.Object.Id);
+        controller.currentNode.ProcessNode(controller.playerInput, controller.transform);
     }
 
     public override void Exit()
     {
     }
-
-    public override void FixedUpdateNetwork()
-    {
-    }
-
-    public override void HandleInput()
-    {
-    }
-
     public override void Update()
     {
     }

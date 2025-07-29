@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
 {
+    public AudioClip music;
     public static TurnManager instance;
-    public List<NewBoardGameController> playerController;
+    public Dictionary<PlayerInput, NewBoardGameController> playerControllers = new Dictionary<PlayerInput, NewBoardGameController>();
     public int currentPlayerIndex { get; set; }
-     public bool isFirstTry { get; set; } = true;
+    public bool isFirstTry { get; set; } = false;
 
     [Header("BXH")]
     public Transform slotTemplate;
@@ -30,48 +32,43 @@ public class TurnManager : MonoBehaviour
     public void Awake()
     {
         instance = this;
+    }
 
+    private void Start()
+    {
         GetComponent<PlayerSpawner>().SpawnPlayer();
-        //MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
-        StartCoroutine(FadeBlackScreen(1, 0));
 
-        playerController = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.InstanceID).ToList();
+        MusicManager.instance.PlayMusic(music);
+        StartCoroutine(FadeBlackScreen(1, 0));
 
         if (isFirstTry)
         {
             if (introCutscene.gameObject.activeSelf) StartCoroutine(DelayPlayIntroCutscene());
             else
             {
-                
-                    //ShowChestGoldAndStartFirstTurn();
-                    if (isFirstTry)
-                    {
-                        StartCoroutine(DelayUpdatePlayerUI());
 
-                        
-                    }
+                //ShowChestGoldAndStartFirstTurn();
 
-                    UpdatePlayerDataUI();
+                StartCoroutine(DelayUpdatePlayerUI());
+
+
+
+                UpdatePlayerDataUI();
             }
         }
         else
         {
-           
-                StartFirstTurn();
+            StartFirstTurn();
 
-                if (isFirstTry)
-                {
-                    StartCoroutine(DelayUpdatePlayerUI());
+            StartCoroutine(DelayUpdatePlayerUI());
 
-                    //foreach (var player in NetworkManager.instance.GetAllPlayers())
-                    //{
-                    //    BoardGameData.instance.UpdateItem(player, new ElectricGun());
-                    //}
-                }
-
-                UpdatePlayerDataUI();
+            UpdatePlayerDataUI();
         }
+    }
 
+    public void UpdateController(PlayerInput playerInput, NewBoardGameController controller)
+    {
+        playerControllers[playerInput] = controller;
     }
 
     IEnumerator DelayPlayIntroCutscene()
@@ -90,14 +87,14 @@ public class TurnManager : MonoBehaviour
     {
         Destroy(obj.gameObject);
         FindFirstObjectByType<GlobalVolume>().StartFadeOut();
-        
-            ShowChestGoldAndStartFirstTurn();
-            if (isFirstTry)
-            {
-                StartCoroutine(DelayUpdatePlayerUI());
-            }
 
-            UpdatePlayerDataUI();
+        ShowChestGoldAndStartFirstTurn();
+        if (isFirstTry)
+        {
+            StartCoroutine(DelayUpdatePlayerUI());
+        }
+
+        UpdatePlayerDataUI();
     }
 
     void ShowChestGoldAndStartFirstTurn()
@@ -122,7 +119,7 @@ public class TurnManager : MonoBehaviour
     }
 
     #region PlayerBoardData
-    
+
     public void UpdatePlayerDataUI()
     {
         foreach (Transform child in slotContainer)
@@ -132,29 +129,23 @@ public class TurnManager : MonoBehaviour
         }
 
         #region UpdatePlayerBoardStatUI
-        //Debug.Log("playersBoardStat count: " + BoardGameData.instance.playersBoardStat.Count);
+        Dictionary<PlayerInput, PlayerBoardStat> dictCopy = WizardPartyData.instance.playersStat;
+        dictCopy.OrderByDescending(d => d.Value.cupQty);
 
-        //Dictionary<PlayerRef, BoardGameStat> dictCopy = BoardGameData.instance.playersBoardStat;
-        //dictCopy.OrderByDescending(d => d.Value.cupQty);
+        foreach (var kvp in dictCopy)
+        {
+            RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
+            slotRect.gameObject.SetActive(true);
 
-        //foreach (var kvp in dictCopy)
-        //{
-        //    RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
-        //    slotRect.gameObject.SetActive(true);
+            BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
 
-        //    BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
-
-        //    boardSlotRect.UpdateCup(kvp.Value.cupQty);
-        //    boardSlotRect.UpdateKey(kvp.Value.keyQty);
-        //    boardSlotRect.UpdateHealth(kvp.Value.health);
-
-        //    string playerName = BoardGameData.instance.GetName(kvp.Key);
-
-        //    if (string.IsNullOrEmpty(playerName))
-        //        boardSlotRect.UpdateName(kvp.Key.PlayerId.ToString());
-        //    else
-        //        boardSlotRect.UpdateName(playerName);
-        //}
+            boardSlotRect.UpdateCup(kvp.Value.cupQty);
+            boardSlotRect.UpdateKey(kvp.Value.keyQty);
+            boardSlotRect.UpdateHealth(kvp.Value.health);
+            
+            int index = PlayerManager.instance.players.IndexOf(kvp.Key);
+            boardSlotRect.UpdateName($"Player {index + 1}");
+        }
         #endregion
     }
 
@@ -165,33 +156,45 @@ public class TurnManager : MonoBehaviour
 
     void StartFirstTurn()
     {
-            currentPlayerIndex = 0;
-
-        playerController[currentPlayerIndex].StartTurn();
+        currentPlayerIndex = 0;
+        playerControllers.ElementAt(currentPlayerIndex).Value.enabled = true;
+        playerControllers.ElementAt(currentPlayerIndex).Value.StartTurn();
         UpdateTurnUI();
     }
 
     public bool CheckWin()
     {
         BoardGameData data = BoardGameData.instance;
-        
+
         return false;
     }
-  
+
     public void NextTurn()
     {
-            currentPlayerIndex = (currentPlayerIndex + 1) % playerController.Count;
-            if (currentPlayerIndex == 0)
-            {
-                LoadScene(isFirstTry ? "MNG3" : "MNG3");
-            }
-            //CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
-        
+        currentPlayerIndex = (currentPlayerIndex + 1) % playerControllers.Count;
+        if (currentPlayerIndex == 0)
+        {
+            LoadScene(WizardPartyData.instance.GetMinigame());
+        }
+        //CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
+
         if (currentPlayerIndex != 0)
         {
-            playerController[currentPlayerIndex].StartTurn();
+            playerControllers.ElementAt(currentPlayerIndex).Value.enabled = true;
+            playerControllers.ElementAt(currentPlayerIndex).Value.StartTurn();
             UpdateTurnUI();
         }
+    }
+
+    void LoadScene(string sceneName)
+    {
+        StartCoroutine(LoadSceneCoroutine(sceneName));
+    }
+
+    IEnumerator LoadSceneCoroutine(string sceneName)
+    {
+        yield return new WaitForSeconds(2f);
+        LevelLoader.instance.LoadScene(sceneName);
     }
 
     void UpdateTurnUI()
@@ -233,16 +236,6 @@ public class TurnManager : MonoBehaviour
         blackScreen.color = newColor;
     }
 
-    void LoadScene(string sceneName)
-    {
-        StartCoroutine(LoadSceneCoroutine(sceneName));
-    }
-
-    IEnumerator LoadSceneCoroutine(string sceneName)
-    {
-        yield return null;
-        LevelLoader.instance.LoadScene(sceneName);
-    }
     #endregion
 
 }

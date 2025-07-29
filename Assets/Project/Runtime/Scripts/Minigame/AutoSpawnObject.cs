@@ -8,6 +8,7 @@ public class AutoSpawnObject : MonoBehaviour
     public Transform spawnPosition;
 
     public float spawnInterval;
+    public float speed = 100f;
 
     public void Start()
     {
@@ -16,8 +17,14 @@ public class AutoSpawnObject : MonoBehaviour
 
     void SpawnObject()
     {
-        var go = Instantiate(objects[Random.Range(0, objects.Length)], spawnPosition.position, spawnPosition.rotation).GetComponent<Rigidbody>();
-        go.velocity = go.transform.forward * 80f;
+        GameObject obj = objects[Random.Range(0, objects.Length)];
+        var go = Instantiate(obj, spawnPosition.position, spawnPosition.rotation).GetComponent<Rigidbody>();
+        Vector3 newPos = obj.transform.position;
+        newPos.x = go.transform.position.x;
+        newPos.z = go.transform.position.z;
+        go.transform.position = newPos;
+
+        go.velocity = go.transform.forward * speed;
         Destroy(go.gameObject, 5f);
     }
 }

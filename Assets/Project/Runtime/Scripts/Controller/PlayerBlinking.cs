@@ -32,11 +32,11 @@ public class PlayerBlinking : MonoBehaviour
         }
 
         PlayerInput playerInput = GetComponent<PlayerController>().GetPlayerInput();
-        int currentLives = WizardPartyData.instance.playerLives[playerInput];
-        WizardPartyData.instance.UpdatePlayerLive(playerInput, currentLives - 1);
+        int currentLives = WizardPartyData.instance.playersKey[playerInput];
+        WizardPartyData.instance.UpdatePlayerKey(playerInput, currentLives - 1);
         if(currentLives - 1 <= 0)
         {
-            WizardPartyData.instance.UpdatePlayerLive(playerInput, 0);
+            WizardPartyData.instance.UpdatePlayerKey(playerInput, 0);
             WizardMiniGameManager.instance.playersCompleteGame.Add(playerInput);
             GetComponent<PlayerController>().enabled = false;
             GetComponent<Animator>().Play("Die");

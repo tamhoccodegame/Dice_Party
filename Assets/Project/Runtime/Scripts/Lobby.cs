@@ -35,8 +35,8 @@ public class Lobby : MonoBehaviour
     IEnumerator StartGame()
     {
         yield return new WaitForSeconds(1.5f);
-        SceneManager.LoadScene("Map1");
-        //SceneManager.LoadScene("TuanSceneMap");
+        //SceneManager.LoadScene("Map1");
+        SceneManager.LoadScene("TuanSceneMap");
 
     }
 

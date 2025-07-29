@@ -96,11 +96,11 @@ public class MNGDoanTauController : PlayerController
 
         Debug.Log("DIEE");
 
-        int currentLives = WizardPartyData.instance.playerLives[playerInput];
+        int currentLives = WizardPartyData.instance.playersKey[playerInput];
         int newLives = Mathf.Max(0, currentLives - 1);
         if (newLives > 0)
         {
-            WizardPartyData.instance.UpdatePlayerLive(playerInput, newLives);
+            WizardPartyData.instance.UpdatePlayerKey(playerInput, newLives);
         }
         else
         {

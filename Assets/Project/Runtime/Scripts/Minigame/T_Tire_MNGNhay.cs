@@ -40,8 +40,8 @@ public class T_Tire_MNGNhay : MonoBehaviour
         if(other.TryGetComponent<PlayerController>(out var controller))
         {
             PlayerInput playerInput = controller.GetPlayerInput();
-            int currentLives = WizardPartyData.instance.playerLives[playerInput];
-            WizardPartyData.instance.UpdatePlayerLive(playerInput, Mathf.Max(0, currentLives - 1));
+            int currentLives = WizardPartyData.instance.playersKey[playerInput];
+            WizardPartyData.instance.UpdatePlayerKey(playerInput, Mathf.Max(0, currentLives - 1));
             NhayLopManager.instance.UpdateHUD();
         }
     }

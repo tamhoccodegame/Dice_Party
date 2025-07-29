@@ -271,7 +271,7 @@ public class BoardCar : PlayerController
 
         yield return new WaitForSeconds(1f);
         dice.SetActive(false);
-        currentNode.ProcessNode(this);
+        //currentNode.ProcessNode(this);
         WizardPartyData.instance.UpdateCarNode(currentNode);
     }
 

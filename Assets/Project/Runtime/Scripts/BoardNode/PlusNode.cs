@@ -1,36 +1,23 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlusNode : BoardNode
 {
-    //public override void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    if (HasStateAuthority)
-    //    {
-    //        RPC_PlusEffect(playerRef, playerObject);
-    //    }
-    //}
+    //Hàm này tất cả client đều chạy
+    public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
+    {
+        StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
+    }
 
-    //[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    //void RPC_PlusEffect(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    StartCoroutine(ProcessCoroutine(playerRef, playerObject));
-    //}
-
-    //IEnumerator ProcessCoroutine(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    if (nodeEffect != null) nodeEffect.Play();
-
-    //    NewBoardGameController player = Runner.FindObject(playerObject).GetComponent<NewBoardGameController>();
-
-    //    player.RequestSetCurrentNode(Object.Id);
-
-    //    player.RequestSetStepLeft(4);
-
-
-    //    yield return new WaitForSecondsRealtime(0.5f);
-
-    //    player.RequestChangeState(NewBoardGameController.NetworkState.Moving);
-    //}
+    IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform)
+    {
+        NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
+        if(nodeEffect != null) 
+        nodeEffect.Play();
+        controller.SetStepLeft(3);
+        controller.ChangeState(controller.movingState);
+        yield return null;
+    }
 }

@@ -25,7 +25,7 @@ public class VongXoayManager : WizardMiniGameManager
         InvokeRepeating(nameof(CountDown), 0f, 1f);
         foreach (var player in PlayerManager.instance.players)
         {
-            int lives = WizardPartyData.instance.playerLives[player];
+            int lives = WizardPartyData.instance.playersKey[player];
             playerInitLives.Add(player, lives);
         }
         UpdateHUD();

@@ -17,7 +17,7 @@ public class NhayLopManager : WizardMiniGameManager
         base.Start();
         foreach (var player in PlayerManager.instance.players)
         {
-            int lives = WizardPartyData.instance.playerLives[player];
+            int lives = WizardPartyData.instance.playersKey[player];
             playerInitLives.Add(player, lives);
         }
         UpdateHUD();

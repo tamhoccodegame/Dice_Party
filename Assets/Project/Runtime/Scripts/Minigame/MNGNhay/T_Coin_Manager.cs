@@ -20,7 +20,7 @@ public class T_Coin_Manager : WizardMiniGameManager
         base.Start();
         foreach(var player in PlayerManager.instance.players)
         {
-            int lives = WizardPartyData.instance.playerLives[player];
+            int lives = WizardPartyData.instance.playersKey[player];
             playerInitLives.Add(player, lives);
         }
         UpdateHUD();
@@ -50,7 +50,7 @@ public class T_Coin_Manager : WizardMiniGameManager
 
     public override bool CheckGameOver()
     {
-        var playerLives = WizardPartyData.instance.playerLives;
+        var playerLives = WizardPartyData.instance.playersKey;
         return playersCompleteGame.Count == PlayerManager.instance.players.Count || playerLives.All(p => p.Value <= 0);
     }
 }

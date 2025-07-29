@@ -1,16 +1,12 @@
-﻿using JetBrains.Annotations;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
     public static CameraFollow instance;
 
-    public Vector3 camOffset;
-    private Transform targetCam; // Vị trí camera cần đến
-
-    private bool isCameraMoving; // Không dùng Networked nữa
+    public Vector3 camOffset; // offset để giữ khoảng cách camera
+    private bool isCameraMoving;
     public Transform currentTarget;
 
     private void Awake()
@@ -20,54 +16,45 @@ public class CameraFollow : MonoBehaviour
 
     private void Update()
     {
-        //if (targetCam == null) return;
-
-        Vector3 direction = (currentTarget.position - transform.position).normalized;
-
-        Quaternion newRotation = Quaternion.LookRotation(direction);
-
-        transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 5 * Time.deltaTime);
+        // Nếu đã có target và camera đang không trong trạng thái chuyển
+        if (currentTarget != null && !isCameraMoving)
+        {
+            Vector3 targetPos = currentTarget.position + camOffset;
+            transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * 5f);
+        }
     }
-    public void StartFollowTarget(Transform targetId)
+
+    public void StartFollowTarget(Transform target)
     {
-        if (targetCam != null && currentTarget == targetId) return;
-        currentTarget = targetId;
+        if (currentTarget == target) return;
 
-        StartCoroutine(ChangeFollowTarget(targetId));
+        currentTarget = target;
+        StartCoroutine(ChangeFollowTarget(target));
     }
 
-    IEnumerator ChangeFollowTarget(Transform targetId)
+    IEnumerator ChangeFollowTarget(Transform target)
     {
         SetCamIsMoving(true);
-        //Vector3 oldTarget = transform.position;
-        ////Vector3 newTarget = Runner.FindObject(targetId).transform.position + camOffset;
 
-        //float elapsedTime = 0f;
-        //float duration = 1.5f;
+        Vector3 startPos = transform.position;
+        Vector3 endPos = target.position + camOffset;
 
-        //while (elapsedTime < duration)
-        //{
-        //    transform.position = Vector3.Lerp(oldTarget, newTarget, elapsedTime / duration);
-        //    elapsedTime += Runner.DeltaTime;
-        //    yield return null;
-        //}
+        float duration = 1.2f;
+        float elapsed = 0f;
 
-        //NetworkId newTargetId = Runner.FindObject(targetId).Id;
-        //transform.position = newTarget;
+        while (elapsed < duration)
+        {
+            transform.position = Vector3.Lerp(startPos, endPos, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
 
-        //RPC_ChangeCameraPosition(newTargetId);
+        transform.position = endPos;
         SetCamIsMoving(false);
-        yield return null;
-
     }
 
     void SetCamIsMoving(bool enabled)
     {
         isCameraMoving = enabled;
-    }
-
-    void ChangeCameraPosition(int newTargetId)
-    {
-        //targetCam = Runner.FindObject(newTargetId).transform;
     }
 }

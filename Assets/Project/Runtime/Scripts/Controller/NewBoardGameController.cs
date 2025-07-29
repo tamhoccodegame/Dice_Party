@@ -1,14 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
-public class NewBoardGameController : MonoBehaviour
+public class NewBoardGameController : PlayerController
 {
     private Animator animator;
     private CharacterController _controller;
 
     private BoardState currentState;
+
+    public PlayerInput playerInput;
     public string currentAnim { get; set; }
 
     public IdleState idleState;
@@ -16,6 +19,9 @@ public class NewBoardGameController : MonoBehaviour
     public ChooseDirectionState chooseDirectionState;
     public ItemState itemState;
     public NodeState nodeState;
+
+    float verticalVelocity;
+    Vector3 moveDir;
 
     public enum NetworkState
     {
@@ -27,7 +33,6 @@ public class NewBoardGameController : MonoBehaviour
     }
 
     public int StepsLeft { get; set; }
-    public bool isMyTurn => true;//asdsa;
 
     public Transform feet;
     public BoardNode currentNode;
@@ -51,8 +56,11 @@ public class NewBoardGameController : MonoBehaviour
     public BoardItem currentItem;
     public Transform gunSpawnPoint;
 
+    private Rigidbody[] rigidbodies;
+
     public void Awake()
     {
+        rigidbodies = GetComponentsInChildren<Rigidbody>();  
         animator = GetComponent<Animator>();
         _controller = GetComponent<CharacterController>();
 
@@ -61,8 +69,38 @@ public class NewBoardGameController : MonoBehaviour
         chooseDirectionState = new ChooseDirectionState(this);
         itemState = new ItemState(this);
         nodeState = new NodeState(this);
+
+        ChangeState(idleState);
     }
 
+    private void Start()
+    {
+        string savedNode = WizardPartyData.instance.playersNode[playerInput];
+        if (savedNode != null)
+        {
+            BoardNode node = GameObject.Find(savedNode).GetComponent<BoardNode>();
+            _controller.enabled = false;
+            transform.position = node.transform.position;
+            currentNode = node;
+            _controller.enabled = true;
+        }
+        else
+        {
+            currentNode = PlayerSpawner.instance.spawnPosition[0].GetComponent<BoardNode>();
+        }
+
+        toMoveNode = currentNode.nextNodes[0];
+    }
+
+    public override PlayerInput GetPlayerInput()
+    {
+        return playerInput;
+    }
+
+    public override void SetInput(PlayerInput input)
+    {
+        playerInput = input;
+    }
 
     public void ChangeState(BoardState newState)
     {
@@ -98,42 +136,30 @@ public class NewBoardGameController : MonoBehaviour
     private void Update()
     {
         currentState?.Update();
+
+        verticalVelocity = -50f * Time.deltaTime;
+
+        Vector3 move = Vector3.zero;
+
+        if (moveDir.sqrMagnitude > 0.01f)
+        {
+            move = moveDir * 6f * Time.deltaTime;
+        }
+        else moveDir = Vector3.zero;
+
+            move.y += verticalVelocity;
+
+
+        _controller.Move(move); // tốc độ di chuyển
+
+        if (toMoveNode != null)
+        {
+            Vector3 direction = toMoveNode.transform.position - transform.position;
+            direction.y = 0;
+            Quaternion newRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 20 * Time.deltaTime);
+        }
     }
-
-    //public void Hurt(PlayerRef player, int ammount)
-    //{
-    //    StartCoroutine(HurtCoroutine(player, ammount));
-    //}
-
-    //public void Heal(PlayerRef player, int ammount)
-    //{
-    //    StartCoroutine(HealthCoroutine(player, ammount));
-    //}
-
-    //private IEnumerator HurtCoroutine(PlayerRef player, int ammount)
-    //{
-    //    string previousAnim = currentAnim;
-    //    Debug.Log("💢 Bị đau!");
-    //    RequestChangeAnimation("Hurt");
-    //    TurnManager.instance.RequestUpdateHealth(player, -ammount);
-    //    // hiệu ứng bị thương
-    //    yield return new WaitForSecondsRealtime(0.5f);
-
-    //    RequestChangeAnimation(previousAnim);
-    //}
-
-    //private IEnumerator HealthCoroutine(PlayerRef player, int ammount)
-    //{
-    //    string previousAnim = currentAnim;
-    //    Debug.Log("❤️ Hồi máu!");
-    //    RequestChangeAnimation("Heal");
-    //    TurnManager.instance.RequestUpdateHealth(player, ammount);
-    //    // hiệu ứng hồi máu
-    //    yield return new WaitForSecondsRealtime(1f);
-
-    //    RequestChangeAnimation(previousAnim);
-    //}
-
 
     #region Move
     public void RollDice()
@@ -143,7 +169,7 @@ public class NewBoardGameController : MonoBehaviour
 
     IEnumerator RollDiceCoroutine()
     {
-            StepsLeft = Random.Range(1, 10);
+        StepsLeft = Random.Range(1, 3);
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
@@ -165,15 +191,14 @@ public class NewBoardGameController : MonoBehaviour
     {
         if (StepsLeft <= 0 || toMoveNode == null) return false;
 
-        Vector3 dir = (toMoveNode.transform.position - feet.position).normalized;
-        dir.y = 0;
-
-        _controller.Move(dir); // tốc độ di chuyển
+        moveDir = (toMoveNode.transform.position - feet.position).normalized;
+        moveDir.y = 0;
 
         if (Vector3.Distance(feet.position, toMoveNode.transform.position) < 0.3f)
         {
+            moveDir = Vector3.zero;
             currentNode = toMoveNode;
-            //RPC_SetCurrentNode(currentNode.Object.Id);
+            WizardPartyData.instance.UpdatePlayerNode(playerInput, currentNode);
             StepsLeft--;
 
             if (StepsLeft > 0)
@@ -203,13 +228,16 @@ public class NewBoardGameController : MonoBehaviour
 
     public void StartTurn()
     {
+        _controller.enabled = true;
+        CameraFollow.instance.StartFollowTarget(transform);
         ShowDice();
     }
 
     // --- Hàm kết thúc lượt ---
     public void EndTurn()
     {
-        
+        TurnManager.instance.NextTurn();
+        this.enabled = false;
     }
 
 
@@ -252,7 +280,6 @@ public class NewBoardGameController : MonoBehaviour
         dice.SetActive(true);
     }
 
-    #region RPC
     private void HideDice()
     {
         StartCoroutine(HideDiceCoroutine());
@@ -269,11 +296,37 @@ public class NewBoardGameController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
     }
 
-
-    public void SetCurrentNode()
+    public void DisableRagdoll()
     {
-   
+        foreach (var rigid in rigidbodies)
+        {
+            rigid.isKinematic = true;
+        }
     }
-    #endregion
+
+    public void EnableRagdoll()
+    {
+        Vector3 spawnPosition = transform.position + new Vector3(0, 15, 0);
+        var clone = Instantiate(gameObject, spawnPosition, Quaternion.identity);
+        clone.GetComponent<PlayerController>().enabled = false;
+
+        animator.enabled = false;
+        _controller.enabled = false;
+        foreach(var rigid in rigidbodies)
+        {
+            rigid.isKinematic = false;
+        }
+
+        StartCoroutine(DelayDestroy(clone));
+    }
+
+    IEnumerator DelayDestroy(GameObject clone)
+    {
+        yield return new WaitForSeconds(5f);
+        clone.GetComponent<PlayerController>().enabled = true;
+        TurnManager.instance.UpdateController(playerInput, clone.GetComponent<NewBoardGameController>());
+        Destroy(gameObject);
+    }
+
 
 }

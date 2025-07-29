@@ -9,6 +9,7 @@ public class ChestGoldNode : BoardNode
     public Animator chest;
     private AudioSource audioSource;
 
+
     //public override void Spawned()
     //{
     //    if (!TurnManager.instance.isFirstTry)

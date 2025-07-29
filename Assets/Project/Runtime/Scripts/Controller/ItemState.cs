@@ -18,15 +18,6 @@ public class ItemState : BoardState
     {
     }
 
-    public override void FixedUpdateNetwork()
-    {
-        //controller.currentItem.Tick(controller);
-    }
-
-    public override void HandleInput()
-    {
-    }
-
     public override void Update()
     {
     }
