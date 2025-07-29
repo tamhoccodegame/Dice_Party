@@ -47,7 +47,7 @@ public class TYuanMovement : MonoBehaviour
 
     void Update()
     {
-        if (isDead) return;
+        if (!controller.enabled || isDead) return;
 
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
