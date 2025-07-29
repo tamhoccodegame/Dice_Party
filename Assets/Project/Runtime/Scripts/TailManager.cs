@@ -5,6 +5,7 @@ using UnityEngine;
 public class TailManager : MonoBehaviour
 {
     public List<Animator> tentacleAnimators;
+    public List<CrateRowManager> crateRows;
 
     public float startDelay = 2f;
     public float minDelay = 0.3f;
@@ -14,7 +15,7 @@ public class TailManager : MonoBehaviour
     public GameObject warningPrefab;
     void Start()
     {
-       
+
         StartCoroutine(LoopTentacleAttacks());
     }
 
@@ -26,34 +27,63 @@ public class TailManager : MonoBehaviour
 
         while (true)
         {
-            yield return TriggerRandomTentacleAttack();
+            yield return StartCoroutine(TriggerRandomTentacleAttack());
 
             yield return new WaitForSeconds(currentDelay);
-
             currentDelay = Mathf.Max(minDelay, currentDelay - speedUpRate);
         }
     }
     IEnumerator TriggerRandomTentacleAttack()
     {
 
-        if (tentacleAnimators.Count == 0)
+        if (tentacleAnimators.Count == 0 || crateRows.Count == 0)
             yield break;
 
-        int randomIndex = Random.Range(1, tentacleAnimators.Count);
-        Animator selectedTentacle = tentacleAnimators[randomIndex];
 
-        Vector3 warningPos = selectedTentacle.transform.position;
-        GameObject warning = Instantiate(warningPrefab, warningPos + Vector3.up * 8.5f, Quaternion.identity);
+        List<int> selectedIndices = new List<int>();
+        while (selectedIndices.Count < 3 && selectedIndices.Count < tentacleAnimators.Count)
+        {
+            int index = Random.Range(0, tentacleAnimators.Count);
+            if (!selectedIndices.Contains(index))
+            {
+                selectedIndices.Add(index);
+            }
+        }
+
+        List<GameObject> allWarnings = new List<GameObject>();
+
+
+        foreach (int index in selectedIndices)
+        {
+            CrateRowManager row = crateRows[index];
+            foreach (Transform crate in row.cratesInRow)
+            {
+                GameObject warning = Instantiate(warningPrefab, crate.position + Vector3.up * 5f, Quaternion.identity);
+                allWarnings.Add(warning);
+            }
+        }
 
         yield return new WaitForSeconds(warningDuration);
 
-        Destroy(warning);
 
-        selectedTentacle.CrossFade("Attack", 0.2f);
+        foreach (var w in allWarnings)
+        {
+            Destroy(w);
+        }
+
+
+
+        foreach (int index in selectedIndices)
+        {
+            tentacleAnimators[index].CrossFade("Attack", 0.2f);
+        }
 
         yield return new WaitForSeconds(7f);
 
-        selectedTentacle.CrossFade("IdleTails", 0.2f);
+
+        foreach (int index in selectedIndices)
+        {
+            tentacleAnimators[index].CrossFade("IdleTails", 0.2f);
+        }
     }
-    
 }
