@@ -19,9 +19,9 @@ public class TrapNode : BoardNode
         NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
         yield return new WaitForSeconds(0.8f); // Delay nhẹ cho mượt
         nodeEffect.gameObject.SetActive(true);
-        controller.EnableRagdoll();
-        yield return new WaitForSeconds(0.3f); // Delay nhẹ cho mượt
         EndTurn(playerInput);
+        yield return new WaitForSeconds(0.3f); // Delay nhẹ cho mượt
+        controller.EnableRagdoll();
     }
 }
 

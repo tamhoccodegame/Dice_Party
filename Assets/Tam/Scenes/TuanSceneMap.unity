@@ -17229,6 +17229,8 @@ MonoBehaviour:
   - MNG9
   - MiniGame_1
   - MNG3
+  isGoldChestOpened: 1
+  currentChestIndex: -1
   carNode: 
   wizardNode: 
 --- !u!1 &584003896 stripped
@@ -65119,6 +65121,26 @@ PrefabInstance:
       propertyPath: introCutscene
       value: 
       objectReference: {fileID: 1322554649}
+    - target: {fileID: 6896192157556263800, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
+      propertyPath: chestGolds.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6896192157556263800, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
+      propertyPath: chestGolds.Array.data[0]
+      value: 
+      objectReference: {fileID: 1028180843}
+    - target: {fileID: 6896192157556263800, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
+      propertyPath: chestGolds.Array.data[1]
+      value: 
+      objectReference: {fileID: 143396607}
+    - target: {fileID: 6896192157556263800, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
+      propertyPath: chestGolds.Array.data[2]
+      value: 
+      objectReference: {fileID: 1319338579}
+    - target: {fileID: 6896192157556263800, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
+      propertyPath: chestGolds.Array.data[3]
+      value: 
+      objectReference: {fileID: 2095646642}
     - target: {fileID: 8449733039213128226, guid: c7e2348d1e1b9a345b60588057a4c861, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -73021,13 +73043,73 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2279672469815417589, guid: 2e054375c7dcbff4fa3dc6d33bb209a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2003123442}
+    - targetCorrespondingSourceObject: {fileID: 7471178303849244225, guid: 2e054375c7dcbff4fa3dc6d33bb209a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2003123444}
   m_SourcePrefab: {fileID: 100100000, guid: 2e054375c7dcbff4fa3dc6d33bb209a5, type: 3}
 --- !u!4 &2003123440 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1506690079197069391, guid: 2e054375c7dcbff4fa3dc6d33bb209a5, type: 3}
   m_PrefabInstance: {fileID: 2003123439}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2003123441 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2279672469815417589, guid: 2e054375c7dcbff4fa3dc6d33bb209a5, type: 3}
+  m_PrefabInstance: {fileID: 2003123439}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &2003123442
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2003123441}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
+--- !u!1 &2003123443 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7471178303849244225, guid: 2e054375c7dcbff4fa3dc6d33bb209a5, type: 3}
+  m_PrefabInstance: {fileID: 2003123439}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &2003123444
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2003123443}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -1550514412580984892, guid: edf514b63e2140746bdb77d20988ac93, type: 3}
 --- !u!1001 &2006807105
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -77841,8 +77923,8 @@ SceneRoots:
   - {fileID: 1684391175}
   - {fileID: 1599604462}
   - {fileID: 1552573905}
-  - {fileID: 1074393410}
-  - {fileID: 1534203479}
-  - {fileID: 1826846637}
-  - {fileID: 1257735015}
   - {fileID: 1796465568}
+  - {fileID: 1257735015}
+  - {fileID: 1826846637}
+  - {fileID: 1534203479}
+  - {fileID: 1074393410}

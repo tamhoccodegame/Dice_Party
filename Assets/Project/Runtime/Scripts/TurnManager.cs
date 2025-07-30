@@ -26,8 +26,10 @@ public class TurnManager : MonoBehaviour
     public Image blackScreen;
     public float fadeDuration = 1f;
 
-    [Header("Demo")]
-    public Transform chestGold;
+    public Transform[] chestGolds;
+
+    bool isGoldChestOpened = true;
+
 
     public void Awake()
     {
@@ -41,27 +43,16 @@ public class TurnManager : MonoBehaviour
         MusicManager.instance.PlayMusic(music);
         StartCoroutine(FadeBlackScreen(1, 0));
 
+        isGoldChestOpened = WizardPartyData.instance.isGoldChestOpened;
+
         if (isFirstTry)
         {
             if (introCutscene.gameObject.activeSelf) StartCoroutine(DelayPlayIntroCutscene());
-            else
-            {
-
-                //ShowChestGoldAndStartFirstTurn();
-
-                StartCoroutine(DelayUpdatePlayerUI());
-
-
-
-                UpdatePlayerDataUI();
-            }
         }
         else
         {
             StartFirstTurn();
-
             StartCoroutine(DelayUpdatePlayerUI());
-
             UpdatePlayerDataUI();
         }
     }
@@ -89,10 +80,8 @@ public class TurnManager : MonoBehaviour
         FindFirstObjectByType<GlobalVolume>().StartFadeOut();
 
         ShowChestGoldAndStartFirstTurn();
-        if (isFirstTry)
-        {
-            StartCoroutine(DelayUpdatePlayerUI());
-        }
+        
+        StartCoroutine(DelayUpdatePlayerUI());
 
         UpdatePlayerDataUI();
     }
@@ -104,12 +93,29 @@ public class TurnManager : MonoBehaviour
 
     IEnumerator ShowChestGoldAndStartFirstTurnCoroutine()
     {
-        //CameraFollow.instance.RPC_StartFollowTarget(chestGold.GetComponent<NetworkObject>().Id);
+        int chestIndex = Random.Range(0, chestGolds.Length);
+        WizardPartyData.instance.currentChestIndex = chestIndex; // GHI NHỚ rương chính xác
+
+        // Các rương còn lại bay lên
+        for (int i = 0; i < chestGolds.Length; i++)
+        {
+            if (i == chestIndex) continue;
+            chestGolds[i].GetComponent<ChestGoldNode>().chest.Play("FlyDown");
+        }
+
+        // Camera chỉ follow đúng rương cần bay xuống
+        CameraFollow.instance.StartFollowTarget(chestGolds[chestIndex]);
+        Debug.Log("🎥 Camera follow ô chứa rương bay xuống: " + chestIndex);
+
+        yield return new WaitForSecondsRealtime(7f);
+
+        // Rương chính bay xuống
+        chestGolds[chestIndex].GetComponent<ChestGoldNode>().chest.Play("FlyUp");
+
         yield return new WaitForSecondsRealtime(3f);
-        chestGold.GetComponent<ChestGoldNode>().chest.Play("FlyDown");
-        yield return new WaitForSecondsRealtime(3f);
-        StartFirstTurn();
+        StartFirstTurn(); // ✅ Giờ đã an toàn gọi lại
     }
+
 
     IEnumerator DelayUpdatePlayerUI()
     {
@@ -160,11 +166,22 @@ public class TurnManager : MonoBehaviour
 
     void StartFirstTurn()
     {
+        if (isGoldChestOpened)
+        {
+            isGoldChestOpened = false;
+            WizardPartyData.instance.isGoldChestOpened = false;
+
+            ShowChestGoldAndStartFirstTurn(); // Gọi 1 lần duy nhất
+            return;
+        }
+
         currentPlayerIndex = 0;
-        playerControllers.ElementAt(currentPlayerIndex).Value.enabled = true;
-        playerControllers.ElementAt(currentPlayerIndex).Value.StartTurn();
+        var player = playerControllers.ElementAt(currentPlayerIndex).Value;
+        player.enabled = true;
+        player.StartTurn();
         UpdateTurnUI();
     }
+
 
     public bool CheckWin()
     {
@@ -181,7 +198,6 @@ public class TurnManager : MonoBehaviour
             LoadScene(WizardPartyData.instance.GetMinigame());
         }
         //CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
-
         if (currentPlayerIndex != 0)
         {
             playerControllers.ElementAt(currentPlayerIndex).Value.StartTurn();
@@ -235,7 +251,7 @@ public class TurnManager : MonoBehaviour
 
     IEnumerator LoadSceneCoroutine(string sceneName)
     {
-        yield return null;
+        yield return new WaitForSeconds(5f);
         LevelLoader.instance.LoadScene(sceneName);
     }
     #endregion

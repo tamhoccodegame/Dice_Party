@@ -165,11 +165,12 @@ public class NewBoardGameController : PlayerController
     public void RollDice()
     {
         StartCoroutine(RollDiceCoroutine());
+        HideDice();
     }
 
     IEnumerator RollDiceCoroutine()
     {
-        StepsLeft = Random.Range(1, 3);
+        StepsLeft = 2;
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
@@ -310,6 +311,7 @@ public class NewBoardGameController : PlayerController
         ChangeState(idleState);
         var clone = Instantiate(gameObject, spawnPosition, Quaternion.identity);
         clone.GetComponent<PlayerController>().enabled = false;
+        TurnManager.instance.UpdateController(playerInput, clone.GetComponent<NewBoardGameController>());
 
         animator.enabled = false;
         _controller.enabled = false;
@@ -323,9 +325,8 @@ public class NewBoardGameController : PlayerController
 
     IEnumerator DelayDestroy(GameObject clone)
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(2.5f);
         clone.GetComponent<PlayerController>().enabled = true;
-        TurnManager.instance.UpdateController(playerInput, clone.GetComponent<NewBoardGameController>());
         Destroy(gameObject);
     }
 

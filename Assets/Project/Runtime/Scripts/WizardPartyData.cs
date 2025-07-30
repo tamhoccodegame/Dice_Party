@@ -15,6 +15,9 @@ public class WizardPartyData : MonoBehaviour
     public List<string> minigames;
     public Dictionary<PlayerInput, PlayerBoardStat> playersStat = new Dictionary<PlayerInput, PlayerBoardStat>();
 
+    public bool isGoldChestOpened = true;
+    public int currentChestIndex = -1;
+
     private void Awake()
     {
         if(instance == null)
@@ -29,7 +32,6 @@ public class WizardPartyData : MonoBehaviour
 
         foreach (var player in PlayerManager.instance.players)
         {
-            playersKey.Add(player, 0);
             playersNode.Add(player, null);
             playersStat.Add(player, new PlayerBoardStat { cupQty = 0, keyQty = 0, health = 30 }); 
         }
@@ -43,8 +45,6 @@ public class WizardPartyData : MonoBehaviour
     public string carNode;
 
     public string wizardNode;
-
-    public Dictionary<PlayerInput, int> playersKey = new Dictionary<PlayerInput, int>();
 
     public Dictionary<PlayerInput, string> playersNode = new Dictionary<PlayerInput, string>();
 
@@ -63,9 +63,17 @@ public class WizardPartyData : MonoBehaviour
         wizardNode = node.name;
     }
 
-    public void UpdatePlayerKey(PlayerInput input, int key)
+    public void UpdatePlayerHealth(PlayerInput input, int qty)
     {
-        playersKey[input] = key;
+        playersStat[input].health += qty;
+    }
+    public void UpdatePlayerCup(PlayerInput input, int qty)
+    {
+        playersStat[input].cupQty += qty;
+    }
+    public void UpdatePlayerKey(PlayerInput input, int qty)
+    {
+        playersStat[input].keyQty += qty;
     }
 
     public string GetMinigame()

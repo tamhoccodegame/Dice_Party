@@ -82,6 +82,15 @@ public class WizardMiniGameManager : MonoBehaviour
             }
     }
 
+    public void UpdatePlayerCompletedGame(PlayerInput input)
+    {
+        playersCompleteGame.Add(input);
+        if (CheckGameOver())
+        {
+            ShowGameOverPanel();
+        }
+    }
+
     protected void CountDown()
     {
         if (time <= 0 || !isGameStarted || isGameOver) return;

@@ -23,7 +23,7 @@ public class KeyNode : BoardNode
 
         for (int i = 0; i < keyQty; i++)
         {
-            Vector3 randomOffset = Random.insideUnitSphere * 0.3f;
+            Vector3 randomOffset = Random.insideUnitSphere * 1f;
             randomOffset.y = Mathf.Abs(randomOffset.y);
 
             GameObject key = Instantiate(
@@ -36,11 +36,13 @@ public class KeyNode : BoardNode
             Rigidbody rb = key.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                Vector2 circle = Random.insideUnitCircle.normalized;
-                float y = Random.Range(1f, 2f); // Chỉ từ giữa tới trên
-                Vector3 randomDir = new Vector3(circle.x, y, circle.y).normalized;
+                Vector3 randomDir = new Vector3(
+                    Random.Range(-1f, 1f),
+                    Random.Range(0.4f, 1.2f),
+                    Random.Range(-1f, 1f)
+                ).normalized;
 
-                float explosionForce = 50f;
+                float explosionForce = 30f;
                 rb.AddForce(randomDir * explosionForce, ForceMode.Impulse);
             }
 
