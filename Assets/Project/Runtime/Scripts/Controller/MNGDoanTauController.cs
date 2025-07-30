@@ -32,10 +32,7 @@ public class MNGDoanTauController : PlayerController
 
     private void Start()
     {
-        if (WizardMiniGameManager.instance != null && playerInput != null)
-        {
-            WizardMiniGameManager.instance.playerObjects.Add(playerInput, gameObject);
-        }
+        
     }
 
     public override void SetInput(PlayerInput input)

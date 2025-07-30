@@ -100,17 +100,17 @@ public class TurnManager : MonoBehaviour
         for (int i = 0; i < chestGolds.Length; i++)
         {
             if (i == chestIndex) continue;
-            chestGolds[i].GetComponent<ChestGoldNode>().chest.Play("FlyDown");
+            chestGolds[i].GetComponent<ChestGoldNode>().chest.Play("FlyUp");
         }
 
         // Camera chỉ follow đúng rương cần bay xuống
         CameraFollow.instance.StartFollowTarget(chestGolds[chestIndex]);
         Debug.Log("🎥 Camera follow ô chứa rương bay xuống: " + chestIndex);
 
-        yield return new WaitForSecondsRealtime(7f);
+        yield return new WaitForSecondsRealtime(5f);
 
         // Rương chính bay xuống
-        chestGolds[chestIndex].GetComponent<ChestGoldNode>().chest.Play("FlyUp");
+        chestGolds[chestIndex].GetComponent<ChestGoldNode>().chest.Play("FlyDown");
 
         yield return new WaitForSecondsRealtime(3f);
         StartFirstTurn(); // ✅ Giờ đã an toàn gọi lại
@@ -174,8 +174,16 @@ public class TurnManager : MonoBehaviour
             ShowChestGoldAndStartFirstTurn(); // Gọi 1 lần duy nhất
             return;
         }
+        else
+        {
+            int currentChestIndex = WizardPartyData.instance.currentChestIndex;
+            if (currentChestIndex != -1)
+            {
+                chestGolds[currentChestIndex].GetComponent<ChestGoldNode>().chest.Play("FlyDown");
+            }
+        }
 
-        currentPlayerIndex = 0;
+            currentPlayerIndex = 0;
         var player = playerControllers.ElementAt(currentPlayerIndex).Value;
         player.enabled = true;
         player.StartTurn();

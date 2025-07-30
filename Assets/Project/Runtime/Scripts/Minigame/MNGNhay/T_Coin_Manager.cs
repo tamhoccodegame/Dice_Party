@@ -38,12 +38,11 @@ public class T_Coin_Manager : WizardMiniGameManager
 
     public override void ShowGameOverPanel()
     {
-        MusicManager.instance.PlayMusic(winMusic);
         base.ShowGameOverPanel();
     }
 
     public override bool CheckGameOver()
     {
-        return playersCompleteGame.Count == PlayerManager.instance.players.Count || playerScores.All(p => p.Value <= 0);
+        return (playersCompleteGame.Count == PlayerManager.instance.players.Count) || playerScores.All(p => p.Value <= 0);
     }
 }

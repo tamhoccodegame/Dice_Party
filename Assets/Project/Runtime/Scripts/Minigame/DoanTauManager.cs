@@ -32,6 +32,7 @@ public class DoanTauManager : WizardMiniGameManager
             gun.Init(playerAvatars);
         }
 
+
         base.Awake();
     }
 

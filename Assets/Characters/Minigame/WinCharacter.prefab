@@ -3959,12 +3959,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2935424376565863942}
   - component: {fileID: 9105315542713420924}
-  - component: {fileID: -5833059894958035310}
   - component: {fileID: 8355820250530106322}
   - component: {fileID: -8644249349779267298}
   - component: {fileID: 6520835551716081343}
   - component: {fileID: 4946760513217065626}
-  - component: {fileID: 2364766849608134301}
   m_Layer: 3
   m_Name: WinCharacter
   m_TagString: Untagged
@@ -4018,27 +4016,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &-5833059894958035310
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2591654762118859964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SortKey: 3535843280
-  ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: -8644249349779267298}
-  - {fileID: 6520835551716081343}
-  - {fileID: 2364766849608134301}
-  ForceRemoteRenderTimeframe: 0
 --- !u!143 &8355820250530106322
 CharacterController:
   m_ObjectHideFlags: 0
@@ -4134,6 +4111,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bloodEffect: {fileID: 2703216707630584684}
   currentAnim: 
+  input: {fileID: 0}
+  gravity: -20
+  jumpForce: 10
+  groundCheckDistance: 0.1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheck: {fileID: 0}
 --- !u!114 &4946760513217065626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4146,25 +4131,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15d131fc6d6be73429af16675d2b94d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2364766849608134301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2591654762118859964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 378411a89480da345945c2f888327a2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stateAuthorityChangeErrorCorrectionDelta: 0
-  gravity: -100
-  jumpImpulse: 25
-  acceleration: 100
-  braking: 100
-  maxSpeed: 5
-  rotationSpeed: 20
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0

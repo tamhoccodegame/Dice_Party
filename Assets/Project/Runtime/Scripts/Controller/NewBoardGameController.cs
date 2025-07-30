@@ -229,9 +229,18 @@ public class NewBoardGameController : PlayerController
 
     public void StartTurn()
     {
-        _controller.enabled = true;
+        StartCoroutine(ShowTurnAvatarUI());
         CameraFollow.instance.StartFollowTarget(transform);
+    }
+
+    IEnumerator ShowTurnAvatarUI()
+    {
+        AvatarTurnManager.instance.gameObject.SetActive(true);
+        AvatarTurnManager.instance.HighlightTurn(PlayerManager.instance.players.IndexOf(playerInput));
+        yield return new WaitForSeconds(3f);
+        _controller.enabled = true;
         ShowDice();
+        AvatarTurnManager.instance.gameObject.SetActive(false);
     }
 
     // --- Hàm kết thúc lượt ---
@@ -254,7 +263,6 @@ public class NewBoardGameController : PlayerController
 
             ArrowPointer arrow = Instantiate(arrowDirectionPrefab, midPoint, Quaternion.identity).GetComponent<ArrowPointer>();
             arrow.transform.rotation = Quaternion.LookRotation((next.transform.position - currentNode.transform.position), Vector3.up);
-            //arrow.Setup(this, i);
             spawnedArrows.Add(arrow.gameObject);
         }
     }

@@ -18,6 +18,8 @@ public class WizardPartyData : MonoBehaviour
     public bool isGoldChestOpened = true;
     public int currentChestIndex = -1;
 
+    public PlayerInput winner;
+
     private void Awake()
     {
         if(instance == null)
@@ -70,6 +72,8 @@ public class WizardPartyData : MonoBehaviour
     public void UpdatePlayerCup(PlayerInput input, int qty)
     {
         playersStat[input].cupQty += qty;
+        winner = input;
+        LevelLoader.instance.LoadScene("Win");
     }
     public void UpdatePlayerKey(PlayerInput input, int qty)
     {

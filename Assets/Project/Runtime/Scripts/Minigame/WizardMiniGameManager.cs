@@ -80,6 +80,8 @@ public class WizardMiniGameManager : MonoBehaviour
             {
                 playerScores.Add(player, 1000); //Mỗi player khởi đầu 1k điểm
             }
+
+        UpdateHUD();
     }
 
     public void UpdatePlayerCompletedGame(PlayerInput input)
@@ -161,8 +163,12 @@ public class WizardMiniGameManager : MonoBehaviour
             introCutscene.Play();
             introCutscene.stopped += StartGame;
         }
+        else
+        {
+            isGameStarted = true;
+        }
 
-        yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
     }
 
@@ -202,6 +208,7 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public virtual void ShowGameOverPanel()
     {
+        MusicManager.instance.PlayMusic(winMusic);
         StartCoroutine(ReturnToBoard());
     }
 

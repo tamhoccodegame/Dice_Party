@@ -32,6 +32,7 @@ public class ItemSpawner : MonoBehaviour
 
     void StartSpawnBatch()
     {
+        if (!WizardMiniGameManager.instance.isGameStarted || WizardMiniGameManager.instance.isGameOver) return;
         StartCoroutine(SpawnBatchCoroutine());
     }
 
