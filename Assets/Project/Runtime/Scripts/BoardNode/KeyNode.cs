@@ -52,6 +52,7 @@ public class KeyNode : BoardNode
             mover.Init(playerTransform, () =>
             {
                 WizardPartyData.instance.UpdatePlayerKey(playerInput, 1);
+                TurnManager.instance.UpdatePlayerDataUI();
                 collected.Add(true);
             });
         }

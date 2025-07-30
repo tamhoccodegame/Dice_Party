@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static FallingItem;
 
 public class ItemCollector : MonoBehaviour
@@ -19,6 +20,8 @@ public class ItemCollector : MonoBehaviour
     public float randomRotationAngle = 15f;  // Độ lệch ngẫu nhiên của từng item
 
     private List<GameObject> collectedItems = new List<GameObject>();
+
+    public PlayerInput playerInput;
 
     //public void AddItem(GameObject item, Vector3 hitPoint)
     //{
@@ -39,8 +42,7 @@ public class ItemCollector : MonoBehaviour
 
     private void Start()
     {
-
-        itemCountTMP.text = "Collected items: 0";
+        //itemCountTMP.text = "Collected items: 0";
     }
 
     [Header("Bomb Settings")]
@@ -48,6 +50,8 @@ public class ItemCollector : MonoBehaviour
     public GameObject bombVFX;
     public void AddItem(GameObject item, Vector3 hitPoint, bool isGroundHit = false)
     {
+        
+
         var fallingItem = item.GetComponent<FallingItem>();
         Debug.Log($"[AddItem] Type: {fallingItem.itemType}, GroundHit: {isGroundHit}");
         if (fallingItem.itemType == ItemType.Bomb)
@@ -63,6 +67,7 @@ public class ItemCollector : MonoBehaviour
 
             if (!isGroundHit) // Chỉ trừ điểm nếu bomb trúng ly
             {
+                WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, -3);
                 Debug.Log("⚠️ Bomb hit CUP! Trừ điểm!");
                 for (int i = 0; i < penaltyCount && collectedItems.Count > 0; i++)
                 {
@@ -72,10 +77,13 @@ public class ItemCollector : MonoBehaviour
                 }
                 UpdateCountUI();
             }
+            
 
             Destroy(item);
             return;
         }
+
+        WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, 1);
 
         // Item thường
         if (vfxPrefab != null)

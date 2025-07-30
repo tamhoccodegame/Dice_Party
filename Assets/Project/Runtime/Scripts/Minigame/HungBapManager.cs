@@ -16,7 +16,7 @@ public class HungBapManager : WizardMiniGameManager
 
     public override bool CheckGameOver()
     {
-        return base.CheckGameOver();
+        return time <= 0;
     }
 
     public override void ShowGameOverPanel()

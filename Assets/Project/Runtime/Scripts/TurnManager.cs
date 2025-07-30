@@ -39,7 +39,7 @@ public class TurnManager : MonoBehaviour
     private void Start()
     {
         GetComponent<PlayerSpawner>().SpawnPlayer();
-
+        AvatarTurnManager.instance.gameObject.SetActive(false);
         MusicManager.instance.PlayMusic(music);
         StartCoroutine(FadeBlackScreen(1, 0));
 
@@ -138,24 +138,17 @@ public class TurnManager : MonoBehaviour
         Dictionary<PlayerInput, PlayerBoardStat> dictCopy = WizardPartyData.instance.playersStat;
         dictCopy.OrderByDescending(d => d.Value.cupQty);
 
-        //foreach (var kvp in dictCopy)
-        //{
-        //    RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
-        //    slotRect.gameObject.SetActive(true);
+        foreach (var kvp in dictCopy)
+        {
+            RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
+            slotRect.gameObject.SetActive(true);
 
-        //    BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
+            BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
 
-        //    boardSlotRect.UpdateCup(kvp.Value.cupQty);
-        //    boardSlotRect.UpdateKey(kvp.Value.keyQty);
-        //    boardSlotRect.UpdateHealth(kvp.Value.health);
-
-        //    string playerName = BoardGameData.instance.GetName(kvp.Key);
-
-        //    if (string.IsNullOrEmpty(playerName))
-        //        boardSlotRect.UpdateName(kvp.Key.PlayerId.ToString());
-        //    else
-        //        boardSlotRect.UpdateName(playerName);
-        //}
+            boardSlotRect.UpdateCup(kvp.Value.cupQty);
+            boardSlotRect.UpdateKey(kvp.Value.keyQty);
+            boardSlotRect.UpdateHealth(kvp.Value.health);
+        }
         #endregion
     }
 

@@ -93,6 +93,17 @@ public class WizardMiniGameManager : MonoBehaviour
         }
     }
 
+    public void UpdatePlayerScore(PlayerInput input, int ammount)
+    {
+        playerScores[input] += ammount;
+        UpdateHUD();
+
+        if (CheckGameOver())
+        {
+            ShowGameOverPanel();
+        }
+    }
+
     protected void CountDown()
     {
         if (time <= 0 || !isGameStarted || isGameOver) return;

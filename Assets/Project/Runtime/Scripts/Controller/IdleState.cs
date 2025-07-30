@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class IdleState : BoardState
 {
+    bool isRoll = false;
     public IdleState(NewBoardGameController controller) : base(controller)
     {
     }
@@ -20,8 +21,9 @@ public class IdleState : BoardState
 
     public override void Update()
     {
-        if (controller.playerInput.actions["Trigger"].triggered)
+        if (controller.playerInput.actions["Trigger"].triggered && !isRoll)
         {
+            isRoll = true;
             controller.RollDice();
         }
     }

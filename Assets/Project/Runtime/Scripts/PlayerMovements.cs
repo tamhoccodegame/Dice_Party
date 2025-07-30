@@ -1,12 +1,14 @@
-﻿using UnityEngine;
+﻿using System.Collections.Specialized;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class PlayerMovements : MonoBehaviour
+public class PlayerMovements : PlayerController
 {
     [Header("Movement Settings")]
     public float walkSpeed = 2f;
     public float runSpeed = 5f;
     public float jumpHeight = 1.2f;
-    public float gravity = -30f;
+    public float gravity = 0f;
     public float accelerationTime = 0.05f;
     public float rotationSpeed = 15f;
 
@@ -39,6 +41,8 @@ public class PlayerMovements : MonoBehaviour
     private float coyoteTimer;
     private float jumpBufferTimer;
 
+    public PlayerInput playerInput;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -63,14 +67,14 @@ public class PlayerMovements : MonoBehaviour
 
     void CacheInputs()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            jumpBufferTimer = jumpBufferTime;
-        }
-        else
-        {
-            jumpBufferTimer -= Time.deltaTime;
-        }
+        //if (playerInput.actions["Trigger"].triggered)
+        //{
+        //    jumpBufferTimer = jumpBufferTime;
+        //}
+        //else
+        //{
+        //    jumpBufferTimer -= Time.deltaTime;
+        //}
     }
 
     void UpdateGroundCheck()
@@ -120,11 +124,9 @@ public class PlayerMovements : MonoBehaviour
 
     void HandleMovement()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        bool isRunning = Input.GetKey(KeyCode.LeftShift);
+         Vector2 moveInput = playerInput.actions["Move"].ReadValue<Vector2>();
 
-        Vector3 inputDir = new Vector3(horizontal, 0f, vertical).normalized;
+        Vector3 inputDir = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
 
         Vector3 camForward = cam.forward;
         Vector3 camRight = cam.right;
@@ -136,7 +138,7 @@ public class PlayerMovements : MonoBehaviour
         Vector3 moveDir = camForward * inputDir.z + camRight * inputDir.x;
         moveDir.Normalize();
 
-        float targetSpeed = (isRunning && inputDir != Vector3.zero) ? runSpeed : walkSpeed;
+        float targetSpeed = runSpeed;
         Vector3 targetVelocity = moveDir * targetSpeed;
 
         horizontalVelocity = Vector3.SmoothDamp(horizontalVelocity, targetVelocity, ref velocitySmooth, accelerationTime);
@@ -147,10 +149,9 @@ public class PlayerMovements : MonoBehaviour
 
     void HandleRotation()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        Vector2 moveInput = playerInput.actions["Move"].ReadValue<Vector2>();
 
-        Vector3 inputDir = new Vector3(horizontal, 0f, vertical).normalized;
+        Vector3 inputDir = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
 
         if (inputDir.magnitude >= 0.1f)
         {
@@ -187,4 +188,14 @@ public class PlayerMovements : MonoBehaviour
         }
     }
 
+    public override PlayerInput GetPlayerInput()
+    {
+        return playerInput;
+    }
+
+    public override void SetInput(PlayerInput input)
+    {
+        playerInput = input;
+        GetComponentInChildren<ItemCollector>().playerInput = input;
+    }
 }

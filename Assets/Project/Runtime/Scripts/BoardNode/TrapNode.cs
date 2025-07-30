@@ -18,9 +18,9 @@ public class TrapNode : BoardNode
         theDeath.Play("Attack");
         NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
         yield return new WaitForSeconds(0.8f); // Delay nhẹ cho mượt
+        WizardPartyData.instance.UpdatePlayerHealth(playerInput, -10);
+        TurnManager.instance.UpdatePlayerDataUI();
         nodeEffect.gameObject.SetActive(true);
-        EndTurn(playerInput);
-        yield return new WaitForSeconds(0.3f); // Delay nhẹ cho mượt
         controller.EnableRagdoll();
     }
 }

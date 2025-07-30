@@ -137,7 +137,7 @@ public class NewBoardGameController : PlayerController
     {
         currentState?.Update();
 
-        verticalVelocity = -50f * Time.deltaTime;
+        verticalVelocity = -5f * Time.deltaTime;
 
         Vector3 move = Vector3.zero;
 
@@ -315,14 +315,18 @@ public class NewBoardGameController : PlayerController
 
     public void EnableRagdoll()
     {
-        Vector3 spawnPosition = transform.position + new Vector3(0, 15, 0);
+        Vector3 spawnPosition = transform.position;
         ChangeState(idleState);
         var clone = Instantiate(gameObject, spawnPosition, Quaternion.identity);
-        clone.GetComponent<PlayerController>().enabled = false;
-        TurnManager.instance.UpdateController(playerInput, clone.GetComponent<NewBoardGameController>());
+        clone.GetComponent<CharacterController>().enabled = false;
+        clone.GetComponent<NewBoardGameController>().enabled = false;
+        clone.GetComponent<Animator>().enabled = false;
 
-        animator.enabled = false;
+        clone.transform.position += new Vector3(0, 25, 0);
+
+
         _controller.enabled = false;
+        animator.enabled = false;
         foreach(var rigid in rigidbodies)
         {
             rigid.isKinematic = false;
@@ -333,8 +337,14 @@ public class NewBoardGameController : PlayerController
 
     IEnumerator DelayDestroy(GameObject clone)
     {
+        TurnManager.instance.UpdateController(playerInput, clone.GetComponent<NewBoardGameController>());
         yield return new WaitForSeconds(2.5f);
-        clone.GetComponent<PlayerController>().enabled = true;
+        clone.GetComponent<NewBoardGameController>().enabled = true;
+        clone.GetComponent<CharacterController>().enabled = true;
+        clone.GetComponent<Animator>().enabled = true;
+        yield return new WaitForSeconds(1.5f);
+        clone.GetComponent<NewBoardGameController>().enabled = false;
+        TurnManager.instance.NextTurn();
         Destroy(gameObject);
     }
 
