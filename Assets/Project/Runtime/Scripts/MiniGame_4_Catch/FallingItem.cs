@@ -113,7 +113,8 @@ public class FallingItem : MonoBehaviour
 
         if (collision.collider.CompareTag("Cup"))
         {
-            var cup = collision.collider.GetComponentInParent<ItemCollector>();
+            var cup = collision.collider.GetComponent<ItemCollector>();
+
             if (cup != null)// && visualInCupPrefab != null
             {
                 Vector3 hitPoint = collision.contacts[0].point;

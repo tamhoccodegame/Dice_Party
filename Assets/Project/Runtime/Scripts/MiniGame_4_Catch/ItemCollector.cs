@@ -43,6 +43,7 @@ public class ItemCollector : MonoBehaviour
     private void Start()
     {
         //itemCountTMP.text = "Collected items: 0";
+        playerInput = GetComponentInParent<PlayerController>().GetPlayerInput();
     }
 
     [Header("Bomb Settings")]
@@ -50,8 +51,6 @@ public class ItemCollector : MonoBehaviour
     public GameObject bombVFX;
     public void AddItem(GameObject item, Vector3 hitPoint, bool isGroundHit = false)
     {
-        
-
         var fallingItem = item.GetComponent<FallingItem>();
         Debug.Log($"[AddItem] Type: {fallingItem.itemType}, GroundHit: {isGroundHit}");
         if (fallingItem.itemType == ItemType.Bomb)

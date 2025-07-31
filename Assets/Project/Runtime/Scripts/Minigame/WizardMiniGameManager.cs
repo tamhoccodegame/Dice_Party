@@ -225,6 +225,8 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public virtual void SpawnRewardAvatar()
     {
+        FindFirstObjectByType<Light>().shadows = LightShadows.None;
+
         playerScores = playerScores
                        .OrderByDescending(c => c.Value)
                        .ToDictionary(c => c.Key, c => c.Value);

@@ -32,7 +32,7 @@ public class MNGDoanTauController : PlayerController
 
     private void Start()
     {
-        
+
     }
 
     public override void SetInput(PlayerInput input)
@@ -68,14 +68,11 @@ public class MNGDoanTauController : PlayerController
             transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 5 * Time.deltaTime);
         }
 
-        // Animation
-        if (isGrounded)
-        {
-            if (horizontalMove.magnitude > 0.1f)
-                ChangeAnim("Run");
-            else
-                ChangeAnim("Idle");
-        }
+
+        if (movementInput.magnitude > 0.1f)
+            ChangeAnim("Run");
+        else
+            ChangeAnim("Idle");
     }
 
     public void ChangeAnim(string animName, float blendTime = 0.25f)
@@ -86,7 +83,7 @@ public class MNGDoanTauController : PlayerController
         animator.CrossFade(animName, blendTime);
     }
 
- 
+
     void DisableInput()
     {
         this.enabled = false;
