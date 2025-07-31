@@ -30,7 +30,6 @@ public class OptionSelector : MonoBehaviour
     private int currentIndex = 0;
 
     public bool isActive;
-    bool cacheActiveState = false;
     public MultiplayerEventSystem eventSystem;
 
     private Vector2 navigateValue;

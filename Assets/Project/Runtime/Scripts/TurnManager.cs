@@ -138,6 +138,8 @@ public class TurnManager : MonoBehaviour
         Dictionary<PlayerInput, PlayerBoardStat> dictCopy = WizardPartyData.instance.playersStat;
         dictCopy.OrderByDescending(d => d.Value.cupQty);
 
+        int index = 1;
+
         foreach (var kvp in dictCopy)
         {
             RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
@@ -145,9 +147,12 @@ public class TurnManager : MonoBehaviour
 
             BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
 
+            boardSlotRect.UpdateName($"Player {index}");
             boardSlotRect.UpdateCup(kvp.Value.cupQty);
             boardSlotRect.UpdateKey(kvp.Value.keyQty);
             boardSlotRect.UpdateHealth(kvp.Value.health);
+
+            index++;
         }
         #endregion
     }

@@ -30,6 +30,10 @@ public class Lobby : MonoBehaviour
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        foreach(var playerInput in PlayerManager.instance.players)
+        {
+            UpdatePlayerUI(playerInput);
+        }
     }
 
     IEnumerator StartGame()
@@ -62,14 +66,19 @@ public class Lobby : MonoBehaviour
 
     private void OnPlayerJoined(PlayerInput playerInput)
     {
+        UpdatePlayerUI(playerInput);
+    }
+
+    void UpdatePlayerUI(PlayerInput playerInput)
+    {
+        if(!PlayerManager.instance.players.Contains(playerInput))
         PlayerManager.instance.AddPlayer(playerInput);
-        playerInput.transform.SetParent(PlayerManager.instance.transform);
 
         playerInput.uiInputModule = playerSlots[playerCount].GetComponent<PlayerSlotUI>()
                                     .inputSystemUIInputModule;
 
 
-        Debug.Log(playerSlots[playerCount].GetComponent<PlayerSlotUI>().name);  
+        Debug.Log(playerSlots[playerCount].GetComponent<PlayerSlotUI>().name);
 
         //playerInput.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = $"Player {playerCount + 1}";
 
