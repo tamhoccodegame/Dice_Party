@@ -15,6 +15,7 @@ public class RollerConfigurableJoint : MonoBehaviour
     private Vector3 localPos;
     private Quaternion baseOrientation;
 
+    public float heightOffset = 0f; // offset thêm vào, mặc định = 0
     void Awake()
     {
         // Lấy size từ BoxCollider của Board
@@ -30,7 +31,7 @@ public class RollerConfigurableJoint : MonoBehaviour
         baseOrientation = transform.localRotation;
 
         // Cố định Y theo radius
-        localPos.y = rollerRadius;
+        localPos.y = rollerRadius + heightOffset;
     }
 
     void Update()
@@ -74,7 +75,8 @@ public class RollerConfigurableJoint : MonoBehaviour
 
         // Dính chặt lên plane của Board
         Plane boardPlane = new Plane(boardTransform.up, boardTransform.position);
-        worldPos = boardPlane.ClosestPointOnPlane(worldPos) + boardTransform.up * rollerRadius;
+        worldPos = boardPlane.ClosestPointOnPlane(worldPos) + boardTransform.up * (rollerRadius + heightOffset);
+
         transform.position = worldPos;
 
         // Align Up theo Board, giữ orientation gốc
