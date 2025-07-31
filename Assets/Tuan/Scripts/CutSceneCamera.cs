@@ -6,7 +6,6 @@ using UnityEngine.Playables;
 public class CutSceneCamera : MonoBehaviour
 {
     public PlayableDirector timeline;
-    public PlayableDirector countdownDirector;
     public GameObject countdownCanvas;
     public Transform cameraTransform;
     private Vector3 originalPos;
@@ -27,6 +26,5 @@ public class CutSceneCamera : MonoBehaviour
         cameraTransform.position = originalPos;
         cameraTransform.rotation = originalRot;
         countdownCanvas.SetActive(true);
-        countdownDirector.Play();
     }
 }

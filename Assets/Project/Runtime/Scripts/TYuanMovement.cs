@@ -25,6 +25,8 @@ public class TYuanMovement : MonoBehaviour
     private Vector3 velocitySmooth;
     private bool canTakeDamage = false;
 
+    public AudioSource audioSource;
+    public AudioClip audioClip;
 
     public int maxHealth = 3;
     private int currentHealth;
@@ -99,6 +101,7 @@ public class TYuanMovement : MonoBehaviour
         if (other.CompareTag("Water"))
         {
             SpawnSplashEffect();
+            audioSource.PlayOneShot(audioClip, 1f);
             TakeDamage(1);
 
             if (currentHealth > 0)
@@ -192,7 +195,8 @@ public class TYuanMovement : MonoBehaviour
     {
         if (splashEffectPrefab != null)
         {
-            GameObject splash = Instantiate(splashEffectPrefab, transform.position, Quaternion.identity);
+            Vector3 spawnPos = groundCheck.position + Vector3.up * 2f;
+            GameObject splash = Instantiate(splashEffectPrefab, spawnPos, Quaternion.identity);
             Destroy(splash, 2f);
         }
     }

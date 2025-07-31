@@ -2,16 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[System.Serializable]
+public class TentacleState
+{
+    public Animator animator;
+    [HideInInspector] public bool isCoolingDown = false;
+}
 public class TailManager : MonoBehaviour
 {
-    public List<Animator> tentacleAnimators;
+    public List<TentacleState> tentacles;
     public List<CrateRowManager> crateRows;
 
-    public float startDelay = 2f;
-    public float minDelay = 0.3f;
-    public float speedUpRate = 0.05f;
+    public float startDelay = 1f;
+    public float minDelay = 0.5f;
+    public float speedUpRate = 0.1f;
     public float battleStartDelay = 3f;
-    public float warningDuration = 0.8f;
+    public float warningDuration = 0.5f;
+    public float pauseAfter3Attacks = 3f;
     public GameObject warningPrefab;
     void Start()
     {
@@ -23,67 +31,66 @@ public class TailManager : MonoBehaviour
     {
         yield return new WaitForSeconds(battleStartDelay);
 
+        int attackCounter = 0;
         float currentDelay = startDelay;
-
         while (true)
         {
-            yield return StartCoroutine(TriggerRandomTentacleAttack());
-
+            StartCoroutine(TriggerRandomTentacleAttack());
             yield return new WaitForSeconds(currentDelay);
+
+            attackCounter++;
             currentDelay = Mathf.Max(minDelay, currentDelay - speedUpRate);
+
+            if (attackCounter >= 3)
+            {
+                yield return new WaitForSeconds(pauseAfter3Attacks);
+                attackCounter = 0;
+            }
         }
     }
+    int lastIndex = -1;
     IEnumerator TriggerRandomTentacleAttack()
     {
-
-        if (tentacleAnimators.Count == 0 || crateRows.Count == 0)
+        if (tentacles.Count == 0 || crateRows.Count == 0)
             yield break;
 
 
-        List<int> selectedIndices = new List<int>();
-        while (selectedIndices.Count < 3 && selectedIndices.Count < tentacleAnimators.Count)
+        List<int> availableIndices = new List<int>();
+        for (int i = 0; i < tentacles.Count; i++)
         {
-            int index = Random.Range(0, tentacleAnimators.Count);
-            if (!selectedIndices.Contains(index))
-            {
-                selectedIndices.Add(index);
-            }
+            if (!tentacles[i].isCoolingDown)
+                availableIndices.Add(i);
         }
 
-        List<GameObject> allWarnings = new List<GameObject>();
+        if (availableIndices.Count == 0)
+            yield break;
+        int randomIndex = availableIndices[Random.Range(0, availableIndices.Count)];
 
+        var tentacle = tentacles[randomIndex];
+        var row = crateRows[randomIndex];
+        tentacle.isCoolingDown = true;
 
-        foreach (int index in selectedIndices)
+        List<GameObject> warnings = new List<GameObject>();
+        foreach (Transform crate in row.cratesInRow)
         {
-            CrateRowManager row = crateRows[index];
-            foreach (Transform crate in row.cratesInRow)
-            {
-                GameObject warning = Instantiate(warningPrefab, crate.position + Vector3.up * 5f, Quaternion.identity);
-                allWarnings.Add(warning);
-            }
+            GameObject warning = Instantiate(warningPrefab, crate.position + Vector3.up * 5f, Quaternion.identity);
+            warnings.Add(warning);
         }
 
         yield return new WaitForSeconds(warningDuration);
 
 
-        foreach (var w in allWarnings)
+        foreach (var w in warnings)
         {
             Destroy(w);
         }
 
-
-
-        foreach (int index in selectedIndices)
-        {
-            tentacleAnimators[index].CrossFade("Attack", 0.2f);
-        }
+        tentacle.animator.CrossFade("Attack", 0.2f);
 
         yield return new WaitForSeconds(7f);
 
+        tentacle.animator.CrossFade("IdleTails", 0.2f);
 
-        foreach (int index in selectedIndices)
-        {
-            tentacleAnimators[index].CrossFade("IdleTails", 0.2f);
-        }
+        tentacle.isCoolingDown = false;
     }
 }
