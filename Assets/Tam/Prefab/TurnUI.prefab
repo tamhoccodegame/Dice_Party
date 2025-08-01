@@ -571,7 +571,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 83, y: 0.0000073203}
+  m_AnchoredPosition: {x: 83, y: 0}
   m_SizeDelta: {x: 500, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2643246578917225836
@@ -727,8 +727,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6310130755333559183}
-  - {fileID: 5630043662561706822}
   - {fileID: 5862897317610906240}
+  - {fileID: 5630043662561706822}
   m_Father: {fileID: 1354064571253127421}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 3}
   m_AnchorMin: {x: 0.5, y: 0}
@@ -1820,6 +1820,14 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls: []
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!114 &2711360951806401182
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1844,6 +1852,7 @@ MonoBehaviour:
   popDuration: 0.2
   pressEase: 5
   popEase: 27
+  playerNameText: {fileID: 0}
 --- !u!1 &7904410728776227326
 GameObject:
   m_ObjectHideFlags: 0

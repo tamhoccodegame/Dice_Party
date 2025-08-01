@@ -207,6 +207,7 @@ public class TurnManager : MonoBehaviour
         //CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
         if (currentPlayerIndex != 0)
         {
+            playerControllers.ElementAt(currentPlayerIndex).Value.enabled = true;
             playerControllers.ElementAt(currentPlayerIndex).Value.StartTurn();
             UpdateTurnUI();
         }

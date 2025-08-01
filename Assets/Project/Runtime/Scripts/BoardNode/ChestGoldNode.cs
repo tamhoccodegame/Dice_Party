@@ -18,7 +18,8 @@ public class ChestGoldNode : BoardNode
 
     public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
     {
-        StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
+        if(processCoroutine == null)
+        processCoroutine = StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
     }
 
     IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform)
@@ -45,12 +46,23 @@ public class ChestGoldNode : BoardNode
         yield return new WaitForSecondsRealtime(4f);
         chest.Play("Close");
         WizardPartyData.instance.UpdatePlayerCup(playerInput, 1);
+        TurnManager.instance.UpdatePlayerDataUI();
+
         yield return new WaitForSecondsRealtime(1.5f);
         chest.Play("FlyUp");
 
         yield return new WaitForSecondsRealtime(1f);
         this.controller.enabled = true;
         WizardPartyData.instance.isGoldChestOpened = true;
-        EndTurn(playerInput);
+
+        if(controller.StepsLeft > 0)
+        {
+            controller.ChangeState(controller.movingState);
+        }
+        else
+        {
+            EndTurn(playerInput);
+        }
+        processCoroutine = null;
     }
 }

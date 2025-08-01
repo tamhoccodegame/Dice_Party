@@ -225,12 +225,11 @@ public class NewBoardGameController : PlayerController
                     index++;
                 }
 
-                Debug.Log(index);
 
                 if (index == WizardPartyData.instance.currentChestIndex)
                 {
                     ChangeState(nodeState);
-                    return false;
+                    return true;
                 }
             }
 

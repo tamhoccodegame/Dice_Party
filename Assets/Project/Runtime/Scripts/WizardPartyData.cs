@@ -75,9 +75,23 @@ public class WizardPartyData : MonoBehaviour
     public void UpdatePlayerCup(PlayerInput input, int qty)
     {
         playersStat[input].cupQty += qty;
-        winner = input;
-        LevelLoader.instance.LoadScene("Win");
+        CheckWin();
     }
+
+    public void CheckWin()
+    {
+        foreach(var player in playersStat)
+        {
+            if(player.Value.cupQty >= 2)
+            {
+                Debug.Log(player.Value.cupQty);
+                winner = player.Key;
+                LevelLoader.instance.LoadScene("Win");
+                return;
+            }
+        }
+    }
+
     public void UpdatePlayerKey(PlayerInput input, int qty)
     {
         playersStat[input].keyQty += qty;
