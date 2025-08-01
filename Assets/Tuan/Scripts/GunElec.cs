@@ -5,56 +5,62 @@ using UnityEngine.VFX;
 
 public class GunElec : MonoBehaviour
 {
-    public GameObject gunPrefab;         
+    [SerializeField] float rotateSpeed = 90f;
+
+    public GameObject gunPrefab;
     public Transform gunHoldPoint;
     public GameObject player;
-
-    private GameObject currentGun;
+    public CharacterController controller;
     private VisualEffect shootVFX;
-
+    private GameObject currentGun;
     private bool isUsingGun = false;
 
+    
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F) && !isUsingGun)
-        {
-            EquipGun();
-        }
 
-        if (isUsingGun && currentGun != null)
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            RotateGunToMouse();
-
-            if (Input.GetMouseButtonDown(0))
+            if (!isUsingGun)
             {
-                shootVFX?.SendEvent("OnPlay");
+                currentGun = Instantiate(gunPrefab, gunHoldPoint.position, gunHoldPoint.rotation, gunHoldPoint);
+                currentGun.transform.localRotation = Quaternion.Euler(180, 90, 0);
+                isUsingGun = true;
+
+                shootVFX = currentGun.GetComponentInChildren<VisualEffect>();
+                if (shootVFX != null)
+                {
+                    shootVFX.Stop();
+                }
+
+                if (controller != null )
+                    controller.enabled = false;
+            }
+
+        }
+        if (isUsingGun)
+        {
+            RotatePlayerToMouse();
+        }
+        if (isUsingGun && Input.GetMouseButtonDown(0))
+        {
+            if (shootVFX != null)
+            {
+                shootVFX.Play();
             }
         }
     }
-
-    void EquipGun()
+    void RotatePlayerToMouse()
     {
-        currentGun = Instantiate(gunPrefab, gunHoldPoint.position, Quaternion.Euler(0,0,0), gunHoldPoint);
-        shootVFX = currentGun.GetComponentInChildren<VisualEffect>();
-        isUsingGun = true;
-    }
+        float rotateInput = 0f;
+        if (Input.GetKey(KeyCode.LeftArrow))
+            rotateInput = -1f;
+        else if (Input.GetKey(KeyCode.RightArrow))
+            rotateInput = 1f;
 
-    void RotateGunToMouse()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Plane groundPlane = new Plane(Vector3.up, currentGun.transform.position);
-
-        if (groundPlane.Raycast(ray, out float enter))
+        if (rotateInput != 0f)
         {
-            Vector3 hitPoint = ray.GetPoint(enter);
-            Vector3 lookDir = hitPoint - currentGun.transform.position;
-            lookDir.y = 0f;
-
-            if (lookDir.sqrMagnitude > 0.01f)
-            {
-                Quaternion rotation = Quaternion.LookRotation(lookDir);
-                currentGun.transform.rotation = rotation;
-            }
+            player.transform.Rotate(Vector3.up, rotateSpeed * rotateInput * Time.deltaTime);
         }
     }
 }
