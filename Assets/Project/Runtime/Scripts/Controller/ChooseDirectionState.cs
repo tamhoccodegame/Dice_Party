@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class ChooseDirectionState : BoardState
 {
+    private Vector2 moveInput;
+
+    float inputCooldown = 0.25f;
+    float inputTimer;
+
     public ChooseDirectionState(NewBoardGameController controller) : base(controller)
     {
     }
@@ -20,13 +25,27 @@ public class ChooseDirectionState : BoardState
 
     public override void Update()
     {
-        if (controller.playerInput.actions["PrimaryButton"].triggered)
+        moveInput = controller.playerInput.actions["Move"].ReadValue<Vector2>();
+
+        inputTimer -= Time.deltaTime;
+
+        if(inputTimer <= 0)
         {
-            controller.ChooseDirection(0);
+            if (moveInput.x > 0.5)
+            {
+                controller.NextHoverArrow();
+                inputTimer = inputCooldown;
+            }
+            else if (moveInput.x < -0.5f)
+            {
+                controller.PrevHoverArrow();
+                inputTimer = inputCooldown;
+            }
         }
-        else if (controller.playerInput.actions["SecondaryButton"].triggered)
+
+        if (controller.playerInput.actions["Trigger"].triggered)
         {
-            controller.ChooseDirection(1);
+            controller.ChooseDirection();
         }
 
     }

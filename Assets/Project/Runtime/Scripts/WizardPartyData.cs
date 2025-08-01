@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +18,8 @@ public class WizardPartyData : MonoBehaviour
 
     public bool isGoldChestOpened = true;
     public int currentChestIndex = -1;
+
+    public bool isFirstTry = true;
 
     public PlayerInput winner;
 

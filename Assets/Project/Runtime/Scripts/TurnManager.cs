@@ -13,7 +13,7 @@ public class TurnManager : MonoBehaviour
     public static TurnManager instance;
     public Dictionary<PlayerInput, NewBoardGameController> playerControllers = new Dictionary<PlayerInput, NewBoardGameController>();
     public int currentPlayerIndex { get; set; }
-    public bool isFirstTry { get; set; } = false;
+    public bool isFirstTry { get; set; } = true;
 
     [Header("BXH")]
     public Transform slotTemplate;
@@ -45,8 +45,12 @@ public class TurnManager : MonoBehaviour
 
         isGoldChestOpened = WizardPartyData.instance.isGoldChestOpened;
 
+        isFirstTry = WizardPartyData.instance.isFirstTry;
+
         if (isFirstTry)
         {
+            isFirstTry = false;
+            WizardPartyData.instance.isFirstTry = false;
             if (introCutscene.gameObject.activeSelf) StartCoroutine(DelayPlayIntroCutscene());
         }
         else
@@ -77,12 +81,9 @@ public class TurnManager : MonoBehaviour
     private void IntroCutscene_stopped(PlayableDirector obj)
     {
         Destroy(obj.gameObject);
-        FindFirstObjectByType<GlobalVolume>().StartFadeOut();
 
-        ShowChestGoldAndStartFirstTurn();
-        
+        StartFirstTurn();
         StartCoroutine(DelayUpdatePlayerUI());
-
         UpdatePlayerDataUI();
     }
 

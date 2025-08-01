@@ -24,6 +24,8 @@ public class ChestGoldNode : BoardNode
     IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform)
     {
         if (nodeEffect != null) nodeEffect.Play();
+        NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
+        this.controller = controller.GetComponent<CharacterController>(); 
         yield return new WaitForSecondsRealtime(0.5f);
 
         float elapsedTime = 0;
@@ -31,9 +33,9 @@ public class ChestGoldNode : BoardNode
 
         while (elapsedTime < duration)
         {
-            Vector3 direction = (chest.transform.position - controller.transform.position).normalized;
+            Vector3 direction = (chest.transform.position - this.controller.transform.position).normalized;
             Quaternion newRotation = Quaternion.LookRotation(direction);
-            playerTransform.rotation = Quaternion.Slerp(controller.transform.rotation, newRotation, 5 * Time.deltaTime);
+            playerTransform.rotation = Quaternion.Slerp(this.controller.transform.rotation, newRotation, 15 * Time.deltaTime);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -47,7 +49,7 @@ public class ChestGoldNode : BoardNode
         chest.Play("FlyUp");
 
         yield return new WaitForSecondsRealtime(1f);
-        controller.enabled = true;
+        this.controller.enabled = true;
         WizardPartyData.instance.isGoldChestOpened = true;
         EndTurn(playerInput);
     }

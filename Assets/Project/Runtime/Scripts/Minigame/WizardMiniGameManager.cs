@@ -168,6 +168,7 @@ public class WizardMiniGameManager : MonoBehaviour
         tutorialPanel.SetActive(false);
 
         yield return new WaitForSeconds(2.5f);
+        yield return StartCoroutine(FadeBlackScreen(1, 0));
 
         if (introCutscene != null && introCutscene.gameObject.activeSelf)
         {
@@ -178,9 +179,6 @@ public class WizardMiniGameManager : MonoBehaviour
         {
             isGameStarted = true;
         }
-
-            yield return new WaitForSeconds(1f);
-        yield return StartCoroutine(FadeBlackScreen(1, 0));
     }
 
     protected virtual void TriggerAfterTutorial()

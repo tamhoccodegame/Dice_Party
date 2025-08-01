@@ -48,6 +48,8 @@ public class NewBoardGameController : PlayerController
     // --- Quản lý các mũi tên chọn hướng ---
     [Header("ArrowDirection")]
     public GameObject arrowDirectionPrefab;   // prefab của mũi tên chỉ hướng
+    public int currentHoverArrowIndex;
+    public ArrowPointer hoverArrow;
     public List<GameObject> spawnedArrows = new List<GameObject>(); // danh sách các mũi tên đã spawn ra
 
     [Header("Effect")]
@@ -60,7 +62,7 @@ public class NewBoardGameController : PlayerController
 
     public void Awake()
     {
-        rigidbodies = GetComponentsInChildren<Rigidbody>();  
+        rigidbodies = GetComponentsInChildren<Rigidbody>();
         animator = GetComponent<Animator>();
         _controller = GetComponent<CharacterController>();
 
@@ -147,7 +149,7 @@ public class NewBoardGameController : PlayerController
         }
         else moveDir = Vector3.zero;
 
-            move.y += verticalVelocity;
+        move.y += verticalVelocity;
 
 
         _controller.Move(move); // tốc độ di chuyển
@@ -170,7 +172,8 @@ public class NewBoardGameController : PlayerController
 
     IEnumerator RollDiceCoroutine()
     {
-        StepsLeft = 2;
+        //StepsLeft = Random.Range(1, 9);
+        StepsLeft = 99;
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
@@ -187,6 +190,12 @@ public class NewBoardGameController : PlayerController
         StepsLeft = step;
     }
 
+    public void SetCurrentNode(BoardNode node)
+    {
+        currentNode = node;
+        toMoveNode = currentNode.nextNodes[0];
+    }
+
     // Di chuyển từng bước
     public bool MoveStep()
     {
@@ -201,6 +210,29 @@ public class NewBoardGameController : PlayerController
             currentNode = toMoveNode;
             WizardPartyData.instance.UpdatePlayerNode(playerInput, currentNode);
             StepsLeft--;
+
+            if(currentNode is ChestGoldNode chest)
+            {
+                TurnManager tm = TurnManager.instance;
+
+                int index = 0;
+                for(int i = 0; i < tm.chestGolds.Length; i++)
+                {
+                    if(tm.chestGolds[i] == chest.transform)
+                    {
+                        break;
+                    }
+                    index++;
+                }
+
+                Debug.Log(index);
+
+                if (index == WizardPartyData.instance.currentChestIndex)
+                {
+                    ChangeState(nodeState);
+                    return false;
+                }
+            }
 
             if (StepsLeft > 0)
             {
@@ -262,8 +294,18 @@ public class NewBoardGameController : PlayerController
             midPoint.y = arrowDirectionPrefab.transform.position.y;
 
             ArrowPointer arrow = Instantiate(arrowDirectionPrefab, midPoint, Quaternion.identity).GetComponent<ArrowPointer>();
+            if (i == 0)
+            {
+                currentHoverArrowIndex = 0;
+                hoverArrow = arrow;
+                arrow.Hover();
+            }
+            else
+                arrow.UnHover();
+
             arrow.transform.rotation = Quaternion.LookRotation((next.transform.position - currentNode.transform.position), Vector3.up);
             spawnedArrows.Add(arrow.gameObject);
+
         }
     }
 
@@ -278,9 +320,33 @@ public class NewBoardGameController : PlayerController
     }
 
 
-    public void ChooseDirection(int index)
+    public void NextHoverArrow()
     {
-        toMoveNode = currentNode.nextNodes[index];
+        currentHoverArrowIndex = (currentHoverArrowIndex + 1) % spawnedArrows.Count;
+
+        if (hoverArrow != null)
+            hoverArrow.UnHover();
+
+        hoverArrow = spawnedArrows[currentHoverArrowIndex].GetComponent<ArrowPointer>();
+        hoverArrow.Hover();
+    }
+
+    public void PrevHoverArrow()
+    {
+        currentHoverArrowIndex -= 1;
+        if(currentHoverArrowIndex < 0) currentHoverArrowIndex = spawnedArrows.Count - 1;
+
+        if (hoverArrow != null)
+            hoverArrow.UnHover();
+
+        hoverArrow = spawnedArrows[currentHoverArrowIndex].GetComponent<ArrowPointer>();
+        hoverArrow.Hover();
+    }
+
+    public void ChooseDirection()
+    {
+        ClearArrow();
+        toMoveNode = currentNode.nextNodes[currentHoverArrowIndex];
         ChangeState(movingState);
     }
 
@@ -327,7 +393,7 @@ public class NewBoardGameController : PlayerController
 
         _controller.enabled = false;
         animator.enabled = false;
-        foreach(var rigid in rigidbodies)
+        foreach (var rigid in rigidbodies)
         {
             rigid.isKinematic = false;
         }
