@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class BoardNode : MonoBehaviour
 {
@@ -20,28 +21,20 @@ public class BoardNode : MonoBehaviour
     {
 
     }
-
-    public virtual void ProcessNode(BoardCar player)
+    public virtual void ProcessNode(PlayerInput playerInput, Transform playerTransform)
     {
-        player.SetCanMove(true);
+        EndTurn(playerInput);
     }
 
-    //public virtual void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    EndTurn(playerRef);
-    //}
+    protected void EndTurn(PlayerInput playerInput)
+    {
+        NewBoardGameController[] players = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.None);
 
-    //protected void EndTurn(PlayerRef player)
-    //{
-    //    NewBoardGameController[] players = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.None);
-
-    //    foreach (var p in players)
-    //    {
-    //        if (p.Object.InputAuthority == player)
-    //        {
-    //            p.EndTurn();
-    //        }
-    //        else continue;
-    //    }
-    //}
+        foreach (var p in players)
+        {
+            if(p.playerInput == playerInput)
+            p.EndTurn();
+            else continue;
+        }
+    }
 }

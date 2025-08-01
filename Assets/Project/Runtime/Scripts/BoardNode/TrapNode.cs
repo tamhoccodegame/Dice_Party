@@ -1,37 +1,27 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class TrapNode : BoardNode
 {
     public Animator theDeath;
 
-    //public override void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    if (HasStateAuthority)
-    //    {
-    //        RPC_TrapEffect(playerRef, playerObject);
-    //    }
-    //}
+    //Hàm này tất cả client đều chạy
+    public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
+    {
+        StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
+    }
 
-
-    //[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    //void RPC_TrapEffect(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    StartCoroutine(ProcessCoroutine(playerRef, playerObject));
-    //}
-
-    //IEnumerator ProcessCoroutine(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    //Animator animator = Runner.FindObject(playerObject).GetComponent<Animator>();
-    //    if (nodeEffect != null) nodeEffect.Play();
-    //    theDeath.Play("Attack");
-    //    yield return new WaitForSecondsRealtime(1.5f);
-    //    TurnManager.instance.RequestUpdateHealth(playerRef, -20);
-
-    //    yield return new WaitForSecondsRealtime(1f);
-
-    //    EndTurn(playerRef);
-    //}
+    IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform)
+    {
+        theDeath.Play("Attack");
+        NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
+        yield return new WaitForSeconds(0.8f); // Delay nhẹ cho mượt
+        WizardPartyData.instance.UpdatePlayerHealth(playerInput, -10);
+        TurnManager.instance.UpdatePlayerDataUI();
+        nodeEffect.gameObject.SetActive(true);
+        controller.EnableRagdoll();
+    }
 }
 

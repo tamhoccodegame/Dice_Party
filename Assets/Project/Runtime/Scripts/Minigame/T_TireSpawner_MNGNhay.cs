@@ -1,62 +1,62 @@
-using PlasticGui.WebApi.Responses;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+//using PlasticGui.WebApi.Responses;
+//using System.Collections;
+//using System.Collections.Generic;
+//using System.Linq;
+//using UnityEngine;
 
-public class T_TireSpawner_MNGNhay : MonoBehaviour
-{
-    public GameObject tirePrefab;
-    public Transform leftSpawnPosition;
-    public Transform rightSpawnPosition;
+//public class T_TireSpawner_MNGNhay : MonoBehaviour
+//{
+//    public GameObject tirePrefab;
+//    public Transform leftSpawnPosition;
+//    public Transform rightSpawnPosition;
 
-    public Dictionary<float, float> sizeAndSpeed = new Dictionary<float, float>
-    {
-        { 9f, 350f },
-        { 8f, 340f },
-        { 7f, 330f },
-        { 6f, 320f }
-    };
+//    public Dictionary<float, float> sizeAndSpeed = new Dictionary<float, float>
+//    {
+//        { 9f, 350f },
+//        { 8f, 340f },
+//        { 7f, 330f },
+//        { 6f, 320f }
+//    };
 
-    public List<GameObject> activeObjects = new List<GameObject>();
+//    public List<GameObject> activeObjects = new List<GameObject>();
 
-    public float spawnInterval = 3f;
+//    public float spawnInterval = 3f;
 
-    public float timeToChangeSpawnInterval = 6f;
-    public float lasTimeChangeInterval;
+//    public float timeToChangeSpawnInterval = 6f;
+//    public float lasTimeChangeInterval;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        InvokeRepeating(nameof(SpawnTire), 0f, spawnInterval);
-    }
+//    // Start is called before the first frame update
+//    void Start()
+//    {
+//        InvokeRepeating(nameof(SpawnTire), 0f, spawnInterval);
+//    }
 
-    void SpawnTire()
-    {
-        if (activeObjects.Count >= 5) return;
-        int index = Random.Range(0, sizeAndSpeed.Count);
-        float newSize = sizeAndSpeed.ElementAt(index).Key;
-        float newSpeed = sizeAndSpeed.ElementAt(index).Value;
-        int randomIndex = Random.Range(0, 2);
-        Vector3 spawnPosition = randomIndex == 0 ? leftSpawnPosition.position : rightSpawnPosition.position;
+//    void SpawnTire()
+//    {
+//        if (activeObjects.Count >= 5) return;
+//        int index = Random.Range(0, sizeAndSpeed.Count);
+//        float newSize = sizeAndSpeed.ElementAt(index).Key;
+//        float newSpeed = sizeAndSpeed.ElementAt(index).Value;
+//        int randomIndex = Random.Range(0, 2);
+//        Vector3 spawnPosition = randomIndex == 0 ? leftSpawnPosition.position : rightSpawnPosition.position;
 
-        var go = Instantiate(tirePrefab, spawnPosition, Quaternion.identity);
-        go.transform.localScale = new Vector3(newSize, newSize, newSize);
+//        var go = Instantiate(tirePrefab, spawnPosition, Quaternion.identity);
+//        go.transform.localScale = new Vector3(newSize, newSize, newSize);
 
-        go.GetComponent<T_Tire_MNGNhay>().rollSpeed = newSpeed;
-        go.GetComponent<T_Tire_MNGNhay>().Init(randomIndex == 0 ? 1 : -1, () => activeObjects.Remove(go));
-        activeObjects.Add(go);
-    }
+//        go.GetComponent<T_Tire_MNGNhay>().rollSpeed = newSpeed;
+//        go.GetComponent<T_Tire_MNGNhay>().Init(randomIndex == 0 ? 1 : -1, () => activeObjects.Remove(go));
+//        activeObjects.Add(go);
+//    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(Time.time - lasTimeChangeInterval >= timeToChangeSpawnInterval)
-        {
-            lasTimeChangeInterval = Time.time;
-            spawnInterval = Random.Range(2f, 5f);
-            CancelInvoke();
-            InvokeRepeating(nameof(SpawnTire), 2f, spawnInterval);
-        }
-    }
-}
+//    // Update is called once per frame
+//    void Update()
+//    {
+//        if(Time.time - lasTimeChangeInterval >= timeToChangeSpawnInterval)
+//        {
+//            lasTimeChangeInterval = Time.time;
+//            spawnInterval = Random.Range(2f, 5f);
+//            CancelInvoke();
+//            InvokeRepeating(nameof(SpawnTire), 2f, spawnInterval);
+//        }
+//    }
+//}

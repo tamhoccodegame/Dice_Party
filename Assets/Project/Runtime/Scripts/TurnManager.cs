@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
 {
+    public AudioClip music;
     public static TurnManager instance;
-    public List<NewBoardGameController> playerController;
+    public Dictionary<PlayerInput, NewBoardGameController> playerControllers = new Dictionary<PlayerInput, NewBoardGameController>();
     public int currentPlayerIndex { get; set; }
-     public bool isFirstTry { get; set; } = true;
+    public bool isFirstTry { get; set; } = false;
 
     [Header("BXH")]
     public Transform slotTemplate;
@@ -24,54 +26,40 @@ public class TurnManager : MonoBehaviour
     public Image blackScreen;
     public float fadeDuration = 1f;
 
-    [Header("Demo")]
-    public Transform chestGold;
+    public Transform[] chestGolds;
+
+    bool isGoldChestOpened = true;
+
 
     public void Awake()
     {
         instance = this;
+    }
 
+    private void Start()
+    {
         GetComponent<PlayerSpawner>().SpawnPlayer();
-        //MusicManager.instance.PlayMusic(MusicManager.MusicType.Board);
+        AvatarTurnManager.instance.gameObject.SetActive(false);
+        MusicManager.instance.PlayMusic(music);
         StartCoroutine(FadeBlackScreen(1, 0));
 
-        playerController = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.InstanceID).ToList();
+        isGoldChestOpened = WizardPartyData.instance.isGoldChestOpened;
 
         if (isFirstTry)
         {
             if (introCutscene.gameObject.activeSelf) StartCoroutine(DelayPlayIntroCutscene());
-            else
-            {
-                
-                    //ShowChestGoldAndStartFirstTurn();
-                    if (isFirstTry)
-                    {
-                        StartCoroutine(DelayUpdatePlayerUI());
-
-                        
-                    }
-
-                    UpdatePlayerDataUI();
-            }
         }
         else
         {
-           
-                StartFirstTurn();
-
-                if (isFirstTry)
-                {
-                    StartCoroutine(DelayUpdatePlayerUI());
-
-                    //foreach (var player in NetworkManager.instance.GetAllPlayers())
-                    //{
-                    //    BoardGameData.instance.UpdateItem(player, new ElectricGun());
-                    //}
-                }
-
-                UpdatePlayerDataUI();
+            StartFirstTurn();
+            StartCoroutine(DelayUpdatePlayerUI());
+            UpdatePlayerDataUI();
         }
+    }
 
+    public void UpdateController(PlayerInput playerInput, NewBoardGameController controller)
+    {
+        playerControllers[playerInput] = controller;
     }
 
     IEnumerator DelayPlayIntroCutscene()
@@ -90,14 +78,12 @@ public class TurnManager : MonoBehaviour
     {
         Destroy(obj.gameObject);
         FindFirstObjectByType<GlobalVolume>().StartFadeOut();
-        
-            ShowChestGoldAndStartFirstTurn();
-            if (isFirstTry)
-            {
-                StartCoroutine(DelayUpdatePlayerUI());
-            }
 
-            UpdatePlayerDataUI();
+        ShowChestGoldAndStartFirstTurn();
+        
+        StartCoroutine(DelayUpdatePlayerUI());
+
+        UpdatePlayerDataUI();
     }
 
     void ShowChestGoldAndStartFirstTurn()
@@ -107,12 +93,29 @@ public class TurnManager : MonoBehaviour
 
     IEnumerator ShowChestGoldAndStartFirstTurnCoroutine()
     {
-        //CameraFollow.instance.RPC_StartFollowTarget(chestGold.GetComponent<NetworkObject>().Id);
+        int chestIndex = Random.Range(0, chestGolds.Length);
+        WizardPartyData.instance.currentChestIndex = chestIndex; // GHI NHỚ rương chính xác
+
+        // Các rương còn lại bay lên
+        for (int i = 0; i < chestGolds.Length; i++)
+        {
+            if (i == chestIndex) continue;
+            chestGolds[i].GetComponent<ChestGoldNode>().chest.Play("FlyUp");
+        }
+
+        // Camera chỉ follow đúng rương cần bay xuống
+        CameraFollow.instance.StartFollowTarget(chestGolds[chestIndex]);
+        Debug.Log("🎥 Camera follow ô chứa rương bay xuống: " + chestIndex);
+
+        yield return new WaitForSecondsRealtime(5f);
+
+        // Rương chính bay xuống
+        chestGolds[chestIndex].GetComponent<ChestGoldNode>().chest.Play("FlyDown");
+
         yield return new WaitForSecondsRealtime(3f);
-        chestGold.GetComponent<ChestGoldNode>().chest.Play("FlyDown");
-        yield return new WaitForSecondsRealtime(3f);
-        StartFirstTurn();
+        StartFirstTurn(); // ✅ Giờ đã an toàn gọi lại
     }
+
 
     IEnumerator DelayUpdatePlayerUI()
     {
@@ -122,7 +125,7 @@ public class TurnManager : MonoBehaviour
     }
 
     #region PlayerBoardData
-    
+
     public void UpdatePlayerDataUI()
     {
         foreach (Transform child in slotContainer)
@@ -132,29 +135,25 @@ public class TurnManager : MonoBehaviour
         }
 
         #region UpdatePlayerBoardStatUI
-        //Debug.Log("playersBoardStat count: " + BoardGameData.instance.playersBoardStat.Count);
+        Dictionary<PlayerInput, PlayerBoardStat> dictCopy = WizardPartyData.instance.playersStat;
+        dictCopy.OrderByDescending(d => d.Value.cupQty);
 
-        //Dictionary<PlayerRef, BoardGameStat> dictCopy = BoardGameData.instance.playersBoardStat;
-        //dictCopy.OrderByDescending(d => d.Value.cupQty);
+        int index = 1;
 
-        //foreach (var kvp in dictCopy)
-        //{
-        //    RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
-        //    slotRect.gameObject.SetActive(true);
+        foreach (var kvp in dictCopy)
+        {
+            RectTransform slotRect = Instantiate(slotTemplate, slotContainer).GetComponent<RectTransform>();
+            slotRect.gameObject.SetActive(true);
 
-        //    BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
+            BoardSlotRect boardSlotRect = slotRect.GetComponent<BoardSlotRect>();
 
-        //    boardSlotRect.UpdateCup(kvp.Value.cupQty);
-        //    boardSlotRect.UpdateKey(kvp.Value.keyQty);
-        //    boardSlotRect.UpdateHealth(kvp.Value.health);
+            boardSlotRect.UpdateName($"Player {index}");
+            boardSlotRect.UpdateCup(kvp.Value.cupQty);
+            boardSlotRect.UpdateKey(kvp.Value.keyQty);
+            boardSlotRect.UpdateHealth(kvp.Value.health);
 
-        //    string playerName = BoardGameData.instance.GetName(kvp.Key);
-
-        //    if (string.IsNullOrEmpty(playerName))
-        //        boardSlotRect.UpdateName(kvp.Key.PlayerId.ToString());
-        //    else
-        //        boardSlotRect.UpdateName(playerName);
-        //}
+            index++;
+        }
         #endregion
     }
 
@@ -165,31 +164,49 @@ public class TurnManager : MonoBehaviour
 
     void StartFirstTurn()
     {
-            currentPlayerIndex = 0;
+        if (isGoldChestOpened)
+        {
+            isGoldChestOpened = false;
+            WizardPartyData.instance.isGoldChestOpened = false;
 
-        playerController[currentPlayerIndex].StartTurn();
+            ShowChestGoldAndStartFirstTurn(); // Gọi 1 lần duy nhất
+            return;
+        }
+        else
+        {
+            int currentChestIndex = WizardPartyData.instance.currentChestIndex;
+            if (currentChestIndex != -1)
+            {
+                chestGolds[currentChestIndex].GetComponent<ChestGoldNode>().chest.Play("FlyDown");
+            }
+        }
+
+            currentPlayerIndex = 0;
+        var player = playerControllers.ElementAt(currentPlayerIndex).Value;
+        player.enabled = true;
+        player.StartTurn();
         UpdateTurnUI();
     }
+
 
     public bool CheckWin()
     {
         BoardGameData data = BoardGameData.instance;
-        
+
         return false;
     }
-  
+
     public void NextTurn()
     {
-            currentPlayerIndex = (currentPlayerIndex + 1) % playerController.Count;
-            if (currentPlayerIndex == 0)
-            {
-                LoadScene(isFirstTry ? "MNG3" : "MNG3");
-            }
-            //CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
-        
+        currentPlayerIndex = (currentPlayerIndex + 1) % playerControllers.Count;
+        if (currentPlayerIndex == 0)
+        {
+            LoadScene(WizardPartyData.instance.GetMinigame());
+        }
+        //CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
         if (currentPlayerIndex != 0)
         {
-            playerController[currentPlayerIndex].StartTurn();
+            playerControllers.ElementAt(currentPlayerIndex).Value.StartTurn();
             UpdateTurnUI();
         }
     }
@@ -240,7 +257,7 @@ public class TurnManager : MonoBehaviour
 
     IEnumerator LoadSceneCoroutine(string sceneName)
     {
-        yield return null;
+        yield return new WaitForSeconds(5f);
         LevelLoader.instance.LoadScene(sceneName);
     }
     #endregion

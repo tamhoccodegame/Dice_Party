@@ -2,10 +2,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public class PlayerBoardStat
+{
+    public int health;
+    public int keyQty;
+    public int cupQty;
+}
+
 public class WizardPartyData : MonoBehaviour
 {
     public static WizardPartyData instance;
     public List<string> minigames;
+    public Dictionary<PlayerInput, PlayerBoardStat> playersStat = new Dictionary<PlayerInput, PlayerBoardStat>();
+
+    public bool isGoldChestOpened = true;
+    public int currentChestIndex = -1;
+
+    public PlayerInput winner;
 
     private void Awake()
     {
@@ -18,20 +31,29 @@ public class WizardPartyData : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        foreach (var player in PlayerManager.instance.players)
+        {
+            playersNode.Add(player, null);
+            playersStat.Add(player, new PlayerBoardStat { cupQty = 0, keyQty = 0, health = 30 }); 
+        }
     }
 
     private void Start()
     {
-        foreach(var player in PlayerManager.instance.players)
-        {
-            playerLives.Add(player, 6);
-        }
+       
     }
 
     public string carNode;
+
     public string wizardNode;
 
-    public Dictionary<PlayerInput, int> playerLives = new Dictionary<PlayerInput, int>();
+    public Dictionary<PlayerInput, string> playersNode = new Dictionary<PlayerInput, string>();
+
+    public void UpdatePlayerNode(PlayerInput player, BoardNode node)
+    {
+        playersNode[player] = node.name;
+    }
 
     public void UpdateCarNode(BoardNode node)
     {
@@ -43,10 +65,19 @@ public class WizardPartyData : MonoBehaviour
         wizardNode = node.name;
     }
 
-    public void UpdatePlayerLive(PlayerInput input, int live)
+    public void UpdatePlayerHealth(PlayerInput input, int qty)
     {
-        if (live < 0) live = 0;
-        playerLives[input] = live;
+        playersStat[input].health += qty;
+    }
+    public void UpdatePlayerCup(PlayerInput input, int qty)
+    {
+        playersStat[input].cupQty += qty;
+        winner = input;
+        LevelLoader.instance.LoadScene("Win");
+    }
+    public void UpdatePlayerKey(PlayerInput input, int qty)
+    {
+        playersStat[input].keyQty += qty;
     }
 
     public string GetMinigame()

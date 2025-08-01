@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MovingState : BoardState
@@ -17,20 +15,12 @@ public class MovingState : BoardState
     {
     }
 
-    public override void FixedUpdateNetwork()
+    public override void Update()
     {
         if (!controller.MoveStep())
         {
             controller.ChangeState(controller.nodeState);
         }
-    }
-
-    public override void HandleInput()
-    {
-    }
-
-    public override void Update()
-    {
     }
 
     public override string ToString()

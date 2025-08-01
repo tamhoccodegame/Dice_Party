@@ -18,16 +18,17 @@ public class ChooseDirectionState : BoardState
     {
     }
 
-    public override void FixedUpdateNetwork()
-    {
-    }
-
-    public override void HandleInput()
-    {
-    }
-
     public override void Update()
     {
+        if (controller.playerInput.actions["PrimaryButton"].triggered)
+        {
+            controller.ChooseDirection(0);
+        }
+        else if (controller.playerInput.actions["SecondaryButton"].triggered)
+        {
+            controller.ChooseDirection(1);
+        }
+
     }
 
     public override string ToString()

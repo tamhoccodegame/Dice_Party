@@ -42,10 +42,7 @@ public class MNGVongXoayController : PlayerController
 
     private void Start()
     {
-        if (VongXoayManager.instance != null && input != null)
-        {
-            VongXoayManager.instance.playerObjects.Add(input, gameObject);
-        }
+       
     }
 
     public override void SetInput(PlayerInput input)
@@ -115,27 +112,6 @@ public class MNGVongXoayController : PlayerController
         bloodEffect.Play();
     }
 
-    [ContextMenu("Die Simu")]
-    public void Die()
-    {
-        if (VongXoayManager.instance.isGameOver) return;
-
-        Debug.Log("DIEE");
-        BloodEffect();
-
-        int currentLives = WizardPartyData.instance.playerLives[input];
-        int newLives = Mathf.Max(0, currentLives - 1);
-        if (newLives > 0)
-        {
-            WizardPartyData.instance.UpdatePlayerLive(input, newLives);
-        }
-        else
-        {
-            ChangeAnim("Die");
-            DisableInput();
-        }
-        VongXoayManager.instance.UpdateHUD();
-    }
 
     void DisableInput()
     {

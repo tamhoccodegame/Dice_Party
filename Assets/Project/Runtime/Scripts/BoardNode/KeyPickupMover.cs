@@ -8,14 +8,19 @@ public class KeyPickupMover : MonoBehaviour
 
     private bool isMoving = false;
     private Rigidbody rb;
-    private float delayBeforeMove = 3f;
+    private float delayBeforeMove = 5f;
     private float timer = 0f;
 
     Collider col;
 
-    public void Init(Transform targetTransform, System.Action onDone)
+    private void Awake()
     {
         col = GetComponentInChildren<Collider>();
+    }
+
+    public void Init(Transform targetTransform, System.Action onDone)
+    {
+        
         target = targetTransform;
         onArrive = onDone;
         isMoving = false;
@@ -46,18 +51,13 @@ public class KeyPickupMover : MonoBehaviour
         if (!isMoving) return;
 
         Vector3 direction = (target.position - transform.position).normalized;
-        Vector3 newPos = transform.position + direction * moveSpeed * Time.deltaTime;
 
         if (rb != null)
         {
             rb.velocity = direction * moveSpeed;
         }
-        else
-        {
-            transform.position = newPos;
-        }
 
-        if (Vector3.Distance(transform.position, target.position) < 0.5f)
+        if (Vector3.Distance(transform.position, target.position) < 0.8f)
         {
             isMoving = false;
             onArrive?.Invoke();

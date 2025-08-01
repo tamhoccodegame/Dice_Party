@@ -21,6 +21,7 @@ public class BoardCar : PlayerController
     public int stepLeft = 0;
 
     public Transform[] playerSitPositions;
+    public Transform drivePosition;
 
     [Header("Players Animator")]
     public Animator[] animators;
@@ -63,6 +64,8 @@ public class BoardCar : PlayerController
         transform.position = currentNode.transform.position;
         toMoveNode = currentNode.nextNodes[0];
 
+        drivePosition = playerSitPositions[0];
+
 
         controller = GetComponent<CharacterController>();
         Wizard.instance.player = this;
@@ -78,14 +81,14 @@ public class BoardCar : PlayerController
 
     void UpdatePlayerInput()
     {
-        MusicManager.instance.PlayMusic(music);
-
         if(isTurnDone)
         {
             StartCoroutine(DelaySetWizardCanMove());
             return;
         }
 
+        MusicManager.instance.PlayMusic(music);
+        StartCoroutine(ShowTurnAvatarUI());
         CinecameraManager.instance.TriggerCamera(rollCam);
 
         if (currentPlayerInput != null) 
@@ -95,6 +98,21 @@ public class BoardCar : PlayerController
         currentPlayerInput.actions["Trigger"].started += OnTrigger;
         dice.SetActive(true);
         moveCoroutine = null;
+    }
+
+    IEnumerator ShowTurnAvatarUI()
+    {
+        AvatarTurnManager.instance.gameObject.SetActive(true);
+        AvatarTurnManager.instance.HighlightTurn(currentPlayerInputIndex);
+        //Vector3 currentPlayerPosition = animators[currentPlayerInputIndex].transform.position;
+        //animators[currentPlayerInputIndex].transform.position = drivePosition.position;
+
+        //int prevDriverIndex = currentPlayerInputIndex - 1;
+        //if (prevDriverIndex < 0) prevDriverIndex = inputs.Count - 1;
+        //Transform prevDriver = animators[prevDriverIndex].transform;
+        //prevDriver.position = currentPlayerPosition;
+        yield return new WaitForSeconds(3f);
+        AvatarTurnManager.instance.gameObject.SetActive(false);
     }
 
     IEnumerator DelaySetWizardCanMove()
@@ -253,7 +271,7 @@ public class BoardCar : PlayerController
 
         yield return new WaitForSeconds(1f);
         dice.SetActive(false);
-        currentNode.ProcessNode(this);
+        //currentNode.ProcessNode(this);
         WizardPartyData.instance.UpdateCarNode(currentNode);
     }
 
@@ -268,7 +286,7 @@ public class BoardCar : PlayerController
 
     void ShowDirection()
     {
-        CinecameraManager.instance.ResetCamera();
+        //CinecameraManager.instance.ResetCamera();
         ClearArrow();
         for(int i = 0; i < currentNode.nextNodes.Count; i++)
         {

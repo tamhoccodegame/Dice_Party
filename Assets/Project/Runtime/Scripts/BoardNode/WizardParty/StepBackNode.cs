@@ -7,35 +7,35 @@ public class StepBackNode : BoardNode
     public GameObject horse;
     public BoardNode nodeToStepBack;
 
-    public override void ProcessNode(BoardCar player)
-    {
-        StartCoroutine(ProcessCoroutine(player));
-    }
+    //public override void ProcessNode(BoardCar player)
+    //{
+    //    StartCoroutine(ProcessCoroutine(player));
+    //}
 
-    IEnumerator ProcessCoroutine(BoardCar player)
-    {
-        CinecameraManager.instance.ResetCamera();
-        horse.SetActive(true);
-        yield return new WaitForSeconds(2f);
-        horse.GetComponent<ParticleSystem>().Play();
-        yield return new WaitForSeconds(0.5f);
-        player.enabled = false;
+    //IEnumerator ProcessCoroutine(BoardCar player)
+    //{
+    //    CinecameraManager.instance.ResetCamera();
+    //    horse.SetActive(true);
+    //    yield return new WaitForSeconds(2f);
+    //    horse.GetComponent<ParticleSystem>().Play();
+    //    yield return new WaitForSeconds(0.5f);
+    //    player.enabled = false;
         
-        while(Vector3.Distance(player.transform.position, nodeToStepBack.transform.position) > 0.4f)
-        {
-            player.transform.position = Vector3.Lerp(player.transform.position, nodeToStepBack.transform.position, 8 * Time.deltaTime);
-            yield return null;
-        }
-        horse.SetActive(false);
-        player.SetCurrentNode(nodeToStepBack);
+    //    while(Vector3.Distance(player.transform.position, nodeToStepBack.transform.position) > 0.4f)
+    //    {
+    //        player.transform.position = Vector3.Lerp(player.transform.position, nodeToStepBack.transform.position, 8 * Time.deltaTime);
+    //        yield return null;
+    //    }
+    //    horse.SetActive(false);
+    //    player.SetCurrentNode(nodeToStepBack);
 
-        foreach(var anim in player.animators)
-        {
-            anim.Play("Dizzy"); 
-        }
+    //    foreach(var anim in player.animators)
+    //    {
+    //        anim.Play("Dizzy"); 
+    //    }
 
-        yield return new WaitForSeconds(2f);
-        player.SetCanMove(true);
-        yield return null;
-    }
+    //    yield return new WaitForSeconds(2f);
+    //    player.SetCanMove(true);
+    //    yield return null;
+    //}
 }

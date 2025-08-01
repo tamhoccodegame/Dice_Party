@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Windows;
 
 public class MNGChayTruongController : PlayerController
 {
@@ -20,7 +17,6 @@ public class MNGChayTruongController : PlayerController
     private PlayerInput playerInput;
     private Vector2 movementInput;
 
-    private int TotalCoins = 0;
     public int coinsToDropOnHit = 3;
     public float coinSpawnHeight;
 
@@ -31,10 +27,16 @@ public class MNGChayTruongController : PlayerController
 
     public void Awake()
     {
+       
+
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
         cam = Camera.main;
+    }
+
+    private void Start()
+    {
     }
 
     public override void SetInput(PlayerInput playerInput)
@@ -111,7 +113,7 @@ public class MNGChayTruongController : PlayerController
         if (isGoal) return;
         isGoal = true;
 
-        T_Coin_Manager.Instance.UpdateGoal(playerInput, gameObject);
+        WizardMiniGameManager.instance.UpdatePlayerCompletedGame(playerInput);
     }
 
     public override PlayerInput GetPlayerInput()

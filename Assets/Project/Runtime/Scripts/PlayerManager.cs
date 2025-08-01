@@ -24,6 +24,7 @@ public class PlayerManager : MonoBehaviour
     public void AddPlayer(PlayerInput input)
     {
         players.Add(input);
+        input.transform.SetParent(transform);
     }
 
     public void RemovePlayer(PlayerInput input)

@@ -24,47 +24,34 @@ public class PlayerSpawner : MonoBehaviour
 
     private void Start()
     {
-        BoardGameData boardGameData = BoardGameData.instance;
-        bool isBoardScene = SceneManager.GetActiveScene().name == "Map1";
-        if (isBoardScene)
-        {
-            SpawnPlayer();
-        }
+    
     }
 
     public void SpawnPlayer()
     {
         BoardGameData boardGameData = BoardGameData.instance;
-        bool isBoardScene = SceneManager.GetActiveScene().name == "Map1";
+        bool isBoardScene = SceneManager.GetActiveScene().name == "TuanSceneMap";
 
         if (isBoardScene)
         {
-            BoardCar car = Instantiate(boardCarPrefab, spawnPosition[0].position, Quaternion.identity)
-                              .GetComponent<BoardCar>();
-            int index = 0;
-            if(playerManager.players.Count > 0)
-            foreach(var playerInput in playerManager.players)
+            foreach (var playerInput in playerManager.players)
             {
-                var player = Instantiate(playerPrefab, car.playerSitPositions[index].position, Quaternion.identity);
-                player.transform.SetParent(car.playerSitPositions[index]);
-                player.transform.localPosition = Vector3.zero;
-                player.transform.localRotation = Quaternion.Euler(0,0,0);
-
+                var player = Instantiate(playerPrefab, spawnPosition[0].position, Quaternion.identity);
                 Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
                 PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
-
                 playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
 
-                    //car.animators.Add(player.GetComponent<Animator>());
-                    if (index <= 1) player.GetComponent<Animator>().Play("Sit");
-                    else player.GetComponent<Animator>().Play("Idle");
-                index++;
+                NewBoardGameController controller = player.GetComponent<NewBoardGameController>();
+                controller.SetInput(playerInput);
+                controller.DisableRagdoll();
+                controller.enabled = false;
+                TurnManager.instance.playerControllers.Add(playerInput, controller);
             }
 
         }
-        else
+        else //Minigame Spawn
         {
-            for(int i = 0; i < PlayerManager.instance.players.Count; i++) 
+            for (int i = 0; i < PlayerManager.instance.players.Count; i++)
             {
                 PlayerInput playerInput = PlayerManager.instance.players[i];
                 var player = Instantiate(playerPrefab, spawnPosition[i].position, playerPrefab.transform.rotation).GetComponent<PlayerController>();
@@ -72,10 +59,9 @@ public class PlayerSpawner : MonoBehaviour
                 PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
                 playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
                 player.SetInput(playerManager.players[i]);
+                WizardMiniGameManager.instance.playerObjects.Add(playerInput, player.gameObject);
             }
         }
-        
-
     }
 
     public Dictionary<int, int> GetSpawnedCharacters()

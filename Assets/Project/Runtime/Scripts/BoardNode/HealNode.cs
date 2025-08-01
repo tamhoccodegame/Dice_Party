@@ -1,31 +1,24 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class HealNode : BoardNode
 {
-    //public override void ProcessNode(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    if (HasStateAuthority)
-    //    {
-    //        RPC_HealEffect(playerRef, playerObject);
-    //    }
-    //}
+    //Hàm này tất cả client đều chạy
+    public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
+    {
+        StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
+    }
 
-    //[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    //void RPC_HealEffect(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    StartCoroutine(ProcessCoroutine(playerRef, playerObject));
-    //}
-
-    //IEnumerator ProcessCoroutine(PlayerRef playerRef, NetworkId playerObject)
-    //{
-    //    if (nodeEffect != null) nodeEffect.Play();
-
-    //    TurnManager.instance.RequestUpdateHealth(playerRef, 20);
-
-    //    yield return new WaitForSecondsRealtime(0.5f);
-
-    //    EndTurn(playerRef);
-    //}
+    IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform)
+    {
+        NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
+        yield return new WaitForSeconds(0.8f); // Delay nhẹ cho mượt
+        if(nodeEffect != null)
+        nodeEffect.Play();
+        //WizardPartyData.instance.UpdaPlayerHealth();
+        yield return new WaitForSeconds(1f);
+        EndTurn(playerInput);
+    }
 }
