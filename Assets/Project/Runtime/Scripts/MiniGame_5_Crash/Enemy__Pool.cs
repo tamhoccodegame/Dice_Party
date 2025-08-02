@@ -1,9 +1,11 @@
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy__Pool : MonoBehaviour
 {
+    [Header("Pool Config")]
     public GameObject enemyPrefab;
     public int poolSize = 30;
 
@@ -11,11 +13,15 @@ public class Enemy__Pool : MonoBehaviour
 
     void Awake()
     {
+        // Tạo sẵn pool
         for (int i = 0; i < poolSize; i++)
         {
             GameObject obj = Instantiate(enemyPrefab, transform);
             obj.SetActive(false);
-            pool.Enqueue(obj.GetComponent<Enemy__Controller>());
+
+            Enemy__Controller controller = obj.GetComponent<Enemy__Controller>();
+            controller.SetPool(this);
+            pool.Enqueue(controller);
         }
     }
 
@@ -24,9 +30,16 @@ public class Enemy__Pool : MonoBehaviour
         if (pool.Count == 0)
         {
             GameObject obj = Instantiate(enemyPrefab, transform);
-            return obj.GetComponent<Enemy__Controller>();
+            obj.SetActive(false);
+
+            Enemy__Controller controller = obj.GetComponent<Enemy__Controller>();
+            controller.SetPool(this);
+            return controller;
         }
-        return pool.Dequeue();
+
+        Enemy__Controller enemy = pool.Dequeue();
+        enemy.gameObject.SetActive(true);
+        return enemy;
     }
 
     public void Return(Enemy__Controller enemy)
