@@ -23,7 +23,7 @@ public class TNTController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        mesh = GetComponent<MeshRenderer>();
+        mesh = GetComponentInChildren<MeshRenderer>();
 
         tntCam = GameObject.Find("TNTCamera")?.GetComponent<CinemachineCamera>();
         playerCam = GameObject.Find("PlayerCamera")?.GetComponent<CinemachineCamera>();
@@ -83,16 +83,16 @@ public class TNTController : MonoBehaviour
         if (hasExploded) return;
         hasExploded = true;
 
-        if (explosionFX != null)
+        Transform fx = transform.Find(explosionObjectName);
+        if (fx != null)
         {
-            explosionFX.gameObject.SetActive(true);
+            fx.SetParent(null);
+            fx.gameObject.SetActive(true);
+            Destroy(fx.gameObject, destroyDelay);
         }
 
-        if (mesh != null)
-        {
-            mesh.enabled = false;
-        }
 
+        gameObject.SetActive(false);
         Destroy(gameObject, destroyDelay);
     }
     private Transform FindDeepChild(Transform parent, string name)
