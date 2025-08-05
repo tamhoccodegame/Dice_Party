@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -17,9 +17,24 @@ public class PanelSwitcher : MonoBehaviour
     public GameObject defaultCustomizeButton;
     public GameObject defaultReadyButton;
 
+    public GameObject currentSelectedButton;
+
     private void Awake()
     {
         OpenMainPanel();
+    }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        if (focus)
+        {
+            eventSystem.SetSelectedGameObject(null);
+            eventSystem.SetSelectedGameObject(currentSelectedButton);   
+        }
+        else
+        {
+            currentSelectedButton = eventSystem.currentSelectedGameObject;
+        }
     }
 
     public void OpenCustomizePanel()
@@ -30,6 +45,7 @@ public class PanelSwitcher : MonoBehaviour
 
         eventSystem.SetSelectedGameObject(null);
         eventSystem.SetSelectedGameObject(defaultCustomizeButton);
+        currentSelectedButton = defaultCustomizeButton;
     }
 
     public void OpenMainPanel()
@@ -40,6 +56,7 @@ public class PanelSwitcher : MonoBehaviour
 
         eventSystem.SetSelectedGameObject(null);
         eventSystem.SetSelectedGameObject(defaultMainButton);
+        currentSelectedButton = defaultMainButton;
     }
 
     public void OpenReadyPanel()
@@ -50,5 +67,6 @@ public class PanelSwitcher : MonoBehaviour
 
         eventSystem.SetSelectedGameObject(null);
         eventSystem.SetSelectedGameObject(defaultReadyButton);
+        currentSelectedButton = defaultReadyButton;
     }
 }

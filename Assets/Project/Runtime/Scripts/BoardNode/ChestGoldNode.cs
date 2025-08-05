@@ -57,6 +57,7 @@ public class ChestGoldNode : BoardNode
 
         if(controller.StepsLeft > 0)
         {
+            controller.SetCurrentNode(this);
             controller.ChangeState(controller.movingState);
         }
         else

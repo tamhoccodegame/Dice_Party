@@ -172,8 +172,8 @@ public class NewBoardGameController : PlayerController
 
     IEnumerator RollDiceCoroutine()
     {
-        StepsLeft = Random.Range(1, 9);
-        //StepsLeft = 99;
+        //StepsLeft = Random.Range(1, 9);
+        StepsLeft = 99;
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
@@ -224,7 +224,6 @@ public class NewBoardGameController : PlayerController
                     }
                     index++;
                 }
-
 
                 if (index == WizardPartyData.instance.currentChestIndex)
                 {

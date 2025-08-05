@@ -29,6 +29,8 @@ public class PlayerSlotUI : MonoBehaviour
         inputSystemUIInputModule = GetComponentInChildren<InputSystemUIInputModule>();
     }
 
+ 
+
     public void InitSelector(PlayerCustom playerCustom)
     {
         this.playerCustom = playerCustom;

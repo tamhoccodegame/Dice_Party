@@ -74,6 +74,7 @@ public class WizardPartyData : MonoBehaviour
     }
     public void UpdatePlayerCup(PlayerInput input, int qty)
     {
+        Debug.Log($"Update cup for {input.name} at {Time.time}");
         playersStat[input].cupQty += qty;
         CheckWin();
     }
