@@ -45,13 +45,14 @@ public class ChestGoldNode : BoardNode
         audioSource.Play();
         yield return new WaitForSecondsRealtime(4f);
         chest.Play("Close");
-        WizardPartyData.instance.UpdatePlayerCup(playerInput, 1);
-        TurnManager.instance.UpdatePlayerDataUI();
 
         yield return new WaitForSecondsRealtime(1.5f);
         chest.Play("FlyUp");
-
         yield return new WaitForSecondsRealtime(1f);
+        WizardPartyData.instance.UpdatePlayerCup(playerInput, 1);
+        TurnManager.instance.UpdatePlayerDataUI();
+
+        yield return new WaitForSecondsRealtime(3f);
         this.controller.enabled = true;
         WizardPartyData.instance.isGoldChestOpened = true;
 

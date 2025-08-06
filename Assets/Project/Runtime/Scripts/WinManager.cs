@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Playables;
 
 public class WinManager : MonoBehaviour
@@ -16,8 +17,48 @@ public class WinManager : MonoBehaviour
 
     public void Awake()
     {
+        SpawnPlayer();
         PlayCutscene();
     }
+
+    public void SpawnPlayer()
+    {
+        Dictionary<PlayerInput, MatchAwardSystem.MatchTitle> allMatchTitle;
+        allMatchTitle = MatchAwardSystem.instance.GetAllMatchTitles();
+
+        int index = 1;
+        foreach(var playerInput in PlayerManager.instance.players)
+        {
+            GameObject spawnedPlayer = spawnedPlayer = Instantiate(playerPrefab);
+;
+            if (playerInput == WizardPartyData.instance.winner)
+            {
+                spawnedPlayer.transform.position = spawnPositions[0].position;
+                spawnedPlayer.transform.rotation = spawnPositions[0].rotation;
+            }
+            else
+            {
+                spawnedPlayer.transform.position = spawnPositions[index].position;
+                spawnedPlayer.transform.rotation = spawnPositions[index].rotation;
+                index++;
+            }
+
+            Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
+            PlayerSetup playerSetup = spawnedPlayer.GetComponent<PlayerSetup>();
+            playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
+            spawnedPlayer.GetComponent<WinController>().SetInput(playerInput);
+
+            MatchAwardSystem.MatchTitle matchTitle = MatchAwardSystem.MatchTitle.None;
+            if (allMatchTitle.ContainsKey(playerInput))
+            {
+                matchTitle = allMatchTitle[playerInput];
+            }
+
+            if(matchTitle != MatchAwardSystem.MatchTitle.None)
+            spawnedPlayer.GetComponent<WinController>().SetAwardText(matchTitle);
+        }
+    }
+
 
     void PlayCutscene()
     {

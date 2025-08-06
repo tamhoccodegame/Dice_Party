@@ -60,6 +60,8 @@ public class NewBoardGameController : PlayerController
 
     private Rigidbody[] rigidbodies;
 
+    public bool readyForInput = false;
+
     public void Awake()
     {
         rigidbodies = GetComponentsInChildren<Rigidbody>();
@@ -268,6 +270,7 @@ public class NewBoardGameController : PlayerController
         AvatarTurnManager.instance.gameObject.SetActive(true);
         AvatarTurnManager.instance.HighlightTurn(PlayerManager.instance.players.IndexOf(playerInput));
         yield return new WaitForSeconds(3f);
+        readyForInput = true;
         _controller.enabled = true;
         ShowDice();
         AvatarTurnManager.instance.gameObject.SetActive(false);
@@ -277,6 +280,7 @@ public class NewBoardGameController : PlayerController
     public void EndTurn()
     {
         TurnManager.instance.NextTurn();
+        readyForInput = false;
         this.enabled = false;
     }
 

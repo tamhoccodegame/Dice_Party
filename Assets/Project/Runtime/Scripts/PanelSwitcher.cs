@@ -43,9 +43,7 @@ public class PanelSwitcher : MonoBehaviour
         readyPanel.HideInstant();
         customizePanel.ToggleVisibility(true);
 
-        eventSystem.SetSelectedGameObject(null);
-        eventSystem.SetSelectedGameObject(defaultCustomizeButton);
-        currentSelectedButton = defaultCustomizeButton;
+        StartCoroutine(DelaySetSelectedButton(defaultCustomizeButton));
     }
 
     public void OpenMainPanel()
@@ -54,9 +52,15 @@ public class PanelSwitcher : MonoBehaviour
         readyPanel.HideInstant();
         customizePanel.HideInstant();
 
+        StartCoroutine(DelaySetSelectedButton(defaultMainButton));
+    }
+
+    IEnumerator DelaySetSelectedButton(GameObject selectedObject)
+    {
         eventSystem.SetSelectedGameObject(null);
-        eventSystem.SetSelectedGameObject(defaultMainButton);
-        currentSelectedButton = defaultMainButton;
+        yield return null;
+        eventSystem.SetSelectedGameObject(selectedObject);
+        currentSelectedButton = selectedObject;
     }
 
     public void OpenReadyPanel()
@@ -65,8 +69,7 @@ public class PanelSwitcher : MonoBehaviour
         readyPanel.ToggleVisibility(true);
         customizePanel.HideInstant();
 
-        eventSystem.SetSelectedGameObject(null);
-        eventSystem.SetSelectedGameObject(defaultReadyButton);
-        currentSelectedButton = defaultReadyButton;
+        StartCoroutine(DelaySetSelectedButton(defaultReadyButton));
+
     }
 }
