@@ -182,7 +182,7 @@ public class TurnManager : MonoBehaviour
             }
         }
 
-            currentPlayerIndex = 0;
+        currentPlayerIndex = 0;
         var player = playerControllers.ElementAt(currentPlayerIndex).Value;
         player.enabled = true;
         player.StartTurn();

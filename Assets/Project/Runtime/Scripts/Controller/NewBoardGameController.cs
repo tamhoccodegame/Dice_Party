@@ -94,8 +94,9 @@ public class NewBoardGameController : PlayerController
         }
 
         toMoveNode = currentNode.nextNodes[0];
-
-        enabled = false;
+        
+        
+        enabled = TurnManager.instance.playerControllers[playerInput] == this;
     }
 
     public override PlayerInput GetPlayerInput()
