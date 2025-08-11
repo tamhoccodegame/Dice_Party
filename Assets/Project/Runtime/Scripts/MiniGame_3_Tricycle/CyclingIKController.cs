@@ -9,7 +9,8 @@ public class CyclingIKController : MonoBehaviour
 
     [Header("Hand Targets")]
     public Transform leftHandleTarget;
-    public Transform rightHandleTarget;
+    public Transform rightHandleTarget
+        ;
 
     [Header("Foot Targets")]
     public Transform leftPedalTarget;
@@ -73,5 +74,12 @@ public class CyclingIKController : MonoBehaviour
             animator.SetIKPosition(AvatarIKGoal.RightFoot, rightPedalTarget.position);
             animator.SetIKRotation(AvatarIKGoal.RightFoot, rightPedalTarget.rotation);
         }
+    }
+
+    // Dùng method này khi pickup/drop
+    public void SetHandTargets(Transform left, Transform right)
+    {
+        leftHandleTarget = left;
+        rightHandleTarget = right;
     }
 }
