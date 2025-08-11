@@ -217,7 +217,6 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public virtual void ShowGameOverPanel()
     {
-        MusicManager.instance.PlayMusic(winMusic);
         StartCoroutine(ReturnToBoard());
     }
 
@@ -230,8 +229,13 @@ public class WizardMiniGameManager : MonoBehaviour
                        .ToDictionary(c => c.Key, c => c.Value);
 
 
+        int keyAdd = 8;
+
         for (int i = 0; i < playerScores.Count; i++)
         {
+            WizardPartyData.instance.UpdatePlayerKey(playerScores.ElementAt(i).Key, keyAdd);
+            keyAdd -= 2;
+
             gameOverSlots[i].gameObject.SetActive(true);
             var inputGo = playerObjects[playerScores.ElementAt(i).Key];
             if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");

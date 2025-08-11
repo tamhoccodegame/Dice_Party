@@ -17,7 +17,10 @@ public class WizardPartyData : MonoBehaviour
     public Dictionary<PlayerInput, PlayerBoardStat> playersStat = new Dictionary<PlayerInput, PlayerBoardStat>();
 
     public bool isGoldChestOpened = true;
+    public int chestToWin;
     public int currentChestIndex = -1;
+
+    public int currentMinigameIndex = 0;
 
     public bool isFirstTry = true;
 
@@ -74,6 +77,7 @@ public class WizardPartyData : MonoBehaviour
     }
     public void UpdatePlayerCup(PlayerInput input, int qty)
     {
+        Debug.Log($"Update cup for {input.name} at {Time.time}");
         playersStat[input].cupQty += qty;
         CheckWin();
     }
@@ -82,7 +86,7 @@ public class WizardPartyData : MonoBehaviour
     {
         foreach(var player in playersStat)
         {
-            if(player.Value.cupQty >= 2)
+            if(player.Value.cupQty >= chestToWin)
             {
                 Debug.Log(player.Value.cupQty);
                 winner = player.Key;
@@ -95,12 +99,13 @@ public class WizardPartyData : MonoBehaviour
     public void UpdatePlayerKey(PlayerInput input, int qty)
     {
         playersStat[input].keyQty += qty;
+        MatchAwardSystem.instance.keysCount[input] = playersStat[input].keyQty;
     }
 
     public string GetMinigame()
     {
-        string pendingMinigame = minigames[0];
-        minigames.RemoveAt(0);
+        string pendingMinigame = minigames[currentMinigameIndex];
+        currentMinigameIndex = (currentMinigameIndex + 1) % minigames.Count;
         return pendingMinigame;
     }
 }

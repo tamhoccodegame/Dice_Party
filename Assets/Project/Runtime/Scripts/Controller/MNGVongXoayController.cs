@@ -21,11 +21,7 @@ public class MNGVongXoayController : PlayerController
     public float gravity = -20f;
     public float jumpForce = 10f;
 
-    public float groundCheckDistance = 0.1f;
-    public LayerMask groundLayer;
     private bool isGrounded;
-
-    public Transform groundCheck;
 
     public void Awake()
     {
@@ -57,8 +53,7 @@ public class MNGVongXoayController : PlayerController
         movementInput = input.actions["Move"].ReadValue<Vector2>();
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
 
-        // Ground check
-        isGrounded = controller.isGrounded;
+        
 
         if (isGrounded && verticalVelocity < 0)
         {
@@ -80,6 +75,8 @@ public class MNGVongXoayController : PlayerController
 
         // Move
         controller.Move(move * 8f * Time.deltaTime);
+        // Ground check
+        isGrounded = controller.isGrounded;
 
         // Rotate theo hướng di chuyển (chỉ trên mặt phẳng ngang)
         Vector3 horizontalMove = new Vector3(move.x, 0, move.z);

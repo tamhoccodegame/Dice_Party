@@ -29,6 +29,8 @@ public class PlayerSlotUI : MonoBehaviour
         inputSystemUIInputModule = GetComponentInChildren<InputSystemUIInputModule>();
     }
 
+ 
+
     public void InitSelector(PlayerCustom playerCustom)
     {
         this.playerCustom = playerCustom;
@@ -54,6 +56,11 @@ public class PlayerSlotUI : MonoBehaviour
     {
         this.isReady = isReady;
         Lobby.instance.SetReady(playerInput, isReady);
+
+        if(isReady)
+        playerCustom.GetComponent<Animator>().CrossFade("Ready", 0.25f);
+        else 
+        playerCustom.GetComponent<Animator>().CrossFade("Idle", 0.25f);
     }
 
     public void ApplyCustom()

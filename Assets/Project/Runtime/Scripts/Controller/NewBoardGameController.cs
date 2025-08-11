@@ -60,6 +60,8 @@ public class NewBoardGameController : PlayerController
 
     private Rigidbody[] rigidbodies;
 
+    public bool readyForInput = false;
+
     public void Awake()
     {
         rigidbodies = GetComponentsInChildren<Rigidbody>();
@@ -81,7 +83,7 @@ public class NewBoardGameController : PlayerController
         if (savedNode != null)
         {
             BoardNode node = GameObject.Find(savedNode).GetComponent<BoardNode>();
-            _controller.enabled = false;
+            _controller.enabled = false;    
             transform.position = node.transform.position;
             currentNode = node;
             _controller.enabled = true;
@@ -92,6 +94,9 @@ public class NewBoardGameController : PlayerController
         }
 
         toMoveNode = currentNode.nextNodes[0];
+        
+        
+        enabled = TurnManager.instance.playerControllers[playerInput] == this;
     }
 
     public override PlayerInput GetPlayerInput()
@@ -173,7 +178,7 @@ public class NewBoardGameController : PlayerController
     IEnumerator RollDiceCoroutine()
     {
         StepsLeft = Random.Range(1, 9);
-        //StepsLeft = 99;
+        //StepsLeft = 1;
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
@@ -225,7 +230,6 @@ public class NewBoardGameController : PlayerController
                     index++;
                 }
 
-
                 if (index == WizardPartyData.instance.currentChestIndex)
                 {
                     ChangeState(nodeState);
@@ -269,6 +273,7 @@ public class NewBoardGameController : PlayerController
         AvatarTurnManager.instance.gameObject.SetActive(true);
         AvatarTurnManager.instance.HighlightTurn(PlayerManager.instance.players.IndexOf(playerInput));
         yield return new WaitForSeconds(3f);
+        readyForInput = true;
         _controller.enabled = true;
         ShowDice();
         AvatarTurnManager.instance.gameObject.SetActive(false);
@@ -278,6 +283,7 @@ public class NewBoardGameController : PlayerController
     public void EndTurn()
     {
         TurnManager.instance.NextTurn();
+        readyForInput = false;
         this.enabled = false;
     }
 

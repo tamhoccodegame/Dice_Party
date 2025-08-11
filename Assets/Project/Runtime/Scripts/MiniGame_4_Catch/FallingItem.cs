@@ -120,7 +120,8 @@ public class FallingItem : MonoBehaviour
                 Vector3 hitPoint = collision.contacts[0].point;
                 //cup.AddItem(this.gameObject, hitPoint);
                 cup.AddItem(this.gameObject, hitPoint, false);
-                
+                hasLanded = true;
+
                 return; // KHÔNG tiếp tục xử lý nảy nữa
             }
         }
@@ -132,6 +133,8 @@ public class FallingItem : MonoBehaviour
                 // Ground hit -> isGroundHit = true
                 cup.AddItem(this.gameObject, collision.contacts[0].point, true);
             }
+            hasLanded = true;
+
         }
 
         hasLanded = true;

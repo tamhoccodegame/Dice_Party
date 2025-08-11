@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Cinemachine;
 using UnityEngine;
 
 public class IdleState : BoardState
@@ -21,7 +18,7 @@ public class IdleState : BoardState
 
     public override void Update()
     {
-        if (controller.playerInput.actions["Trigger"].triggered && !isRoll)
+        if (controller.playerInput.actions["Trigger"].triggered && !isRoll && controller.readyForInput)
         {
             isRoll = true;
             controller.RollDice();
