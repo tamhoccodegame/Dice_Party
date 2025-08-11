@@ -83,7 +83,7 @@ public class NewBoardGameController : PlayerController
         if (savedNode != null)
         {
             BoardNode node = GameObject.Find(savedNode).GetComponent<BoardNode>();
-            _controller.enabled = false;
+            _controller.enabled = false;    
             transform.position = node.transform.position;
             currentNode = node;
             _controller.enabled = true;
@@ -94,6 +94,8 @@ public class NewBoardGameController : PlayerController
         }
 
         toMoveNode = currentNode.nextNodes[0];
+
+        enabled = false;
     }
 
     public override PlayerInput GetPlayerInput()
@@ -175,7 +177,7 @@ public class NewBoardGameController : PlayerController
     IEnumerator RollDiceCoroutine()
     {
         //StepsLeft = Random.Range(1, 9);
-        StepsLeft = 99;
+        StepsLeft = 1;
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);

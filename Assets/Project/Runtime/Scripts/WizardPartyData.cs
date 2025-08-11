@@ -20,6 +20,8 @@ public class WizardPartyData : MonoBehaviour
     public int chestToWin;
     public int currentChestIndex = -1;
 
+    public int currentMinigameIndex = 0;
+
     public bool isFirstTry = true;
 
     public PlayerInput winner;
@@ -102,8 +104,8 @@ public class WizardPartyData : MonoBehaviour
 
     public string GetMinigame()
     {
-        string pendingMinigame = minigames[0];
-        minigames.RemoveAt(0);
+        string pendingMinigame = minigames[currentMinigameIndex];
+        currentMinigameIndex = (currentMinigameIndex + 1) % minigames.Count;
         return pendingMinigame;
     }
 }

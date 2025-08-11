@@ -29,6 +29,7 @@ public class KeyPickupMover : MonoBehaviour
         if (rb != null)
         {
             rb.isKinematic = false; // Ban đầu bị vật lý tác động
+            rb.AddTorque(new Vector3(1, 50, 1), ForceMode.Impulse);
         }
 
         timer = delayBeforeMove;

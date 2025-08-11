@@ -44,7 +44,6 @@ public class PlayerSpawner : MonoBehaviour
                 NewBoardGameController controller = player.GetComponent<NewBoardGameController>();
                 controller.SetInput(playerInput);
                 controller.DisableRagdoll();
-                controller.enabled = false;
                 TurnManager.instance.playerControllers.Add(playerInput, controller);
             }
 
