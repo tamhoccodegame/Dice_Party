@@ -1,12 +1,13 @@
 ﻿using System.Collections;
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 
-[RequireComponent(typeof(CharacterController))]
-public class MNGVongXoayController : PlayerController
+public class MNGPlayerController : PlayerController
 {
+    public bool canJump;
+
     private CharacterController controller;
     private Animator animator;
 
@@ -14,46 +15,49 @@ public class MNGVongXoayController : PlayerController
 
     public string currentAnim;
 
-    public PlayerInput input;
     private Vector2 movementInput;
 
     private float verticalVelocity = 0f;
     public float gravity = -20f;
     public float jumpForce = 10f;
+    public float moveSpeed = 8f;
 
     private bool isGrounded;
 
-    public void Awake()
-    {
-        bloodEffect.Stop();
-        controller = GetComponent<CharacterController>();
-        controller.enabled = true;
-        animator = GetComponent<Animator>();
+    private PlayerInput playerInput;
 
-        if (VongXoayManager.instance != null)
-        {
-            //VongXoayManager.instance.RequestUpdateLive(Object.InputAuthority, Object.Id);
-        }
-    }
-
-    private void Start()
+    public override PlayerInput GetPlayerInput()
     {
-       
+        return playerInput;
     }
 
     public override void SetInput(PlayerInput input)
     {
-        this.input = input;
+        playerInput = input;
+    }
+
+    public void Awake()
+    {
+        if(bloodEffect != null) 
+        bloodEffect.Stop();
+
+        controller = GetComponent<CharacterController>();
+        controller.enabled = true;
+        animator = GetComponent<Animator>();
+    }
+
+    private void Start()
+    {
+
     }
 
     void Update()
     {
-        if (input == null) return;
+        if (playerInput == null) return;
 
-        movementInput = input.actions["Move"].ReadValue<Vector2>();
+        movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
 
-        
 
         if (isGrounded && verticalVelocity < 0)
         {
@@ -61,7 +65,7 @@ public class MNGVongXoayController : PlayerController
         }
 
         // Jump khi bấm Trigger
-        if (input.actions["Trigger"].triggered && isGrounded)
+        if (playerInput.actions["Trigger"].triggered && isGrounded && canJump)
         {
             verticalVelocity = jumpForce;
             ChangeAnim("Jump");
@@ -120,8 +124,4 @@ public class MNGVongXoayController : PlayerController
         GetComponent<Ragdoll>().EnableRagdoll();
     }
 
-    public override PlayerInput GetPlayerInput()
-    {
-        return input;
-    }
 }

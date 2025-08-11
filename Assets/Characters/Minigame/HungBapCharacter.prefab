@@ -7462,8 +7462,8 @@ GameObject:
   - component: {fileID: 808086511778130761}
   - component: {fileID: 4835949260068490931}
   - component: {fileID: 6233057142885218894}
-  - component: {fileID: 4218254729408800200}
   - component: {fileID: 1011412345296562609}
+  - component: {fileID: 8235269270044798338}
   m_Layer: 3
   m_Name: HungBapCharacter
   m_TagString: Player
@@ -7614,23 +7614,6 @@ MonoBehaviour:
   - {fileID: 2549144850627742368}
   - {fileID: 5379182700318850531}
   - {fileID: 5150020087408035355}
---- !u!114 &4218254729408800200
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4696988639626890356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 828252d98a6fe2949b12a67759e8c73e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentAnim: 
-  playerInput: {fileID: 0}
-  gravity: -20
-  jumpForce: 10
-  groundCheck: {fileID: 0}
 --- !u!114 &1011412345296562609
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7650,6 +7633,24 @@ MonoBehaviour:
   rightPedalTarget: {fileID: 0}
   handIKWeight: 1
   footIKWeight: 0
+--- !u!114 &8235269270044798338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4696988639626890356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a02aaeb4f73f041b6bf63f55e65a99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canJump: 0
+  bloodEffect: {fileID: 0}
+  currentAnim: 
+  input: {fileID: 0}
+  gravity: -20
+  jumpForce: 10
 --- !u!1 &4707939526439029483
 GameObject:
   m_ObjectHideFlags: 0

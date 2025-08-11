@@ -196,7 +196,6 @@ public class WizardMiniGameManager : MonoBehaviour
 
     IEnumerator ReturnToBoard()
     {
-        StopAllCoroutines();
         //Volume active
         //gameOverVolume.SetActive(true);
         yield return new WaitForSeconds(1.5f);

@@ -17,14 +17,6 @@ public class MNGChayTruongController : PlayerController
     private PlayerInput playerInput;
     private Vector2 movementInput;
 
-    public int coinsToDropOnHit = 3;
-    public float coinSpawnHeight;
-
-    public GameObject coinPrefab;
-    public float coinLifetime;
-    public GameObject pickupVFX;
-    public float spawnForce;
-
     public void Awake()
     {
        
