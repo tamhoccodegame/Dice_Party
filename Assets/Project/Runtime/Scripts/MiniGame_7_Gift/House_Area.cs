@@ -6,8 +6,8 @@ public class House_Area : MonoBehaviour
 {
     public int ownerID;
     public int maxGifts = 16;
-    public int columns = 4; // số cột khi xếp
-    public float spacing = 1.0f; // khoảng cách giữa các gift
+    public int columns = 4;
+    public float spacing = 1.0f;
 
     private List<GiftBox> giftsInArea = new List<GiftBox>();
     private BoxCollider areaCollider;
@@ -27,7 +27,6 @@ public class House_Area : MonoBehaviour
         giftsInArea.Add(gift);
         gift.isCarried = false;
         gift.transform.SetParent(transform);
-
         ArrangeGifts();
     }
 
@@ -39,6 +38,28 @@ public class House_Area : MonoBehaviour
             ArrangeGifts();
         }
     }
+
+    public GiftBox GetNearestGift(Vector3 playerPos)
+    {
+        GiftBox nearest = null;
+        float minDist = Mathf.Infinity;
+
+        foreach (GiftBox gift in giftsInArea)
+        {
+            if (gift == null) continue;
+
+            float dist = Vector3.Distance(playerPos, gift.transform.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearest = gift;
+            }
+        }
+
+        return nearest;
+    }
+
+
 
     public Vector3 GetNextDropPosition()
     {
@@ -62,26 +83,46 @@ public class House_Area : MonoBehaviour
         int row = index / columns;
         int col = index % columns;
 
-        // Lấy size và center từ BoxCollider
         Vector3 size = areaCollider.size;
-        Vector3 center = areaCollider.center;
+        float startX = -((columns - 1) * spacing) / 2f;
+        float startZ = -((Mathf.CeilToInt((float)maxGifts / columns) - 1) * spacing) / 2f;
 
-        // Số hàng tối đa
-        int totalRows = Mathf.CeilToInt((float)maxGifts / columns);
-
-        // Canh giữa dựa theo spacing
-        float totalWidth = (columns - 1) * spacing;
-        float totalHeight = (totalRows - 1) * spacing;
-
-        float startX = -totalWidth / 2f;
-        float startZ = -totalHeight / 2f;
-
-        // Tính local position
         float x = startX + col * spacing;
         float z = startZ + row * spacing;
 
-        // Cộng thêm center để đúng vị trí BoxCollider
-        return new Vector3(x + center.x, 0f, z + center.z);
+        return new Vector3(x, 0f, z);
+    }
+
+    public Vector3 GetNearestDropPosition(Vector3 playerPos)
+    {
+        // Nếu đã full quà thì không thể drop
+        if (!CanAddGift())
+            return Vector3.zero;
+
+        // Lấy tất cả vị trí khả dụng (từ index 0 -> maxGifts-1)
+        List<int> emptySlots = new List<int>();
+        for (int i = 0; i < maxGifts; i++)
+        {
+            if (i >= giftsInArea.Count) // slot trống
+                emptySlots.Add(i);
+        }
+
+        // Tìm slot trống gần player nhất
+        float minDist = Mathf.Infinity;
+        Vector3 nearestPos = Vector3.zero;
+
+        foreach (int slotIndex in emptySlots)
+        {
+            Vector3 worldPos = transform.TransformPoint(IndexToLocalPosition(slotIndex));
+            float dist = Vector3.Distance(playerPos, worldPos);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearestPos = worldPos;
+            }
+        }
+
+        return nearestPos;
     }
 
 }

@@ -22,10 +22,7 @@ public class GiftGameManager : MonoBehaviour
     void Update()
     {
         timer -= Time.deltaTime;
-        if (timer <= 0f)
-        {
-            EndGame();
-        }
+        if (timer <= 0f) EndGame();
     }
 
     void SpawnGifts()
@@ -35,11 +32,9 @@ public class GiftGameManager : MonoBehaviour
             for (int i = 0; i < giftsPerArea; i++)
             {
                 if (!house.CanAddGift()) break;
-
                 GameObject giftObj = Instantiate(giftPrefab);
                 GiftBox gift = giftObj.GetComponent<GiftBox>();
                 gift.ownerID = house.ownerID;
-
                 house.AddGift(gift);
             }
         }

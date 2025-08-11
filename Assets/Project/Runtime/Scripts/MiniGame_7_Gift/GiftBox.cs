@@ -15,7 +15,7 @@ public class GiftBox : MonoBehaviour
         transform.SetParent(carryParent);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
-        Debug.Log("Gift picked up by player");
+        Debug.Log("Gift picked up");
     }
 
     public void Drop(Vector3 dropPos)
@@ -24,5 +24,6 @@ public class GiftBox : MonoBehaviour
         carryPoint = null;
         transform.SetParent(null);
         transform.position = dropPos;
+        transform.rotation = Quaternion.identity;
     }
 }

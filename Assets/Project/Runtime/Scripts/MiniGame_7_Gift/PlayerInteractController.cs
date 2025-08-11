@@ -21,17 +21,24 @@ public class PlayerInteractController : MonoBehaviour
     private GiftBox carriedGift;
     private Animator animator;
     private bool isHoldingGift = false;
+    private float lastInteractTime = 0f;
+    private float interactCooldown = 0.15f; // chống spam bấm
+
+    private Transform playerTransform; // tham chiếu Player để so sánh khoảng cách
 
     void Start()
     {
         animator = GetComponent<Animator>();
         animator.applyRootMotion = false;
+        playerTransform = transform;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) && Time.time - lastInteractTime > interactCooldown)
         {
+            lastInteractTime = Time.time;
+
             if (carriedGift == null)
                 TryPickupGift();
             else
@@ -41,54 +48,89 @@ public class PlayerInteractController : MonoBehaviour
 
     void TryPickupGift()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, pickupRange, giftLayer);
-        foreach (Collider hit in hits)
+        Collider[] areaHits = Physics.OverlapSphere(transform.position, pickupRange, dropAreaLayer);
+
+        GiftBox nearestGift = null;
+        float nearestDist = Mathf.Infinity;
+
+        foreach (Collider areaCol in areaHits)
         {
-            GiftBox gift = hit.GetComponent<GiftBox>();
+            House_Area area = areaCol.GetComponent<House_Area>();
+            if (area == null) continue;
+
+            GiftBox gift = area.GetNearestGift(transform.position);
             if (gift != null && !gift.isCarried)
             {
-                House_Area area = gift.GetComponentInParent<House_Area>();
-                if (area != null) area.RemoveGift(gift);
-
-                carriedGift = gift;
-                gift.PickUp(carryPoint);
-
-                leftHandIKTarget = gift.transform.Find("LeftHandTarget");
-                rightHandIKTarget = gift.transform.Find("RightHandTarget");
-                handIKWeight = 1f;
-                isHoldingGift = true;
-
-                break;
+                float dist = Vector3.Distance(transform.position, gift.transform.position);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestGift = gift;
+                }
             }
+        }
+
+        if (nearestGift != null)
+        {
+            House_Area parentArea = nearestGift.GetComponentInParent<House_Area>();
+            if (parentArea != null)
+            {
+                parentArea.RemoveGift(nearestGift);
+            }
+
+            carriedGift = nearestGift;
+            nearestGift.PickUp(carryPoint);
+
+            leftHandIKTarget = nearestGift.transform.Find("LeftHandTarget");
+            rightHandIKTarget = nearestGift.transform.Find("RightHandTarget");
+            handIKWeight = 1f;
+            isHoldingGift = true;
         }
     }
 
+
+
+
     void TryDropGift()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, pickupRange, dropAreaLayer);
+        Collider[] hits = Physics.OverlapSphere(playerTransform.position, pickupRange, dropAreaLayer);
+
+        House_Area nearestArea = null;
+        float nearestDist = Mathf.Infinity;
+
         foreach (Collider hit in hits)
         {
             House_Area area = hit.GetComponent<House_Area>();
             if (area != null && area.ownerID == playerID && area.CanAddGift())
             {
-                Vector3 dropPos = area.GetNextDropPosition();
-                carriedGift.Drop(dropPos);
-                area.AddGift(carriedGift);
-
-                leftHandIKTarget = null;
-                rightHandIKTarget = null;
-                handIKWeight = 0f;
-                isHoldingGift = false;
-
-                carriedGift = null;
-                score++;
-                Debug.Log($"Player {playerID + 1} Score: {score}");
-                break;
+                float dist = Vector3.Distance(playerTransform.position, area.transform.position);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestArea = area;
+                }
             }
         }
+
+        if (nearestArea != null)
+        {
+            // Lấy đúng vị trí drop gần Player nhất trong area
+            Vector3 dropPos = nearestArea.GetNearestDropPosition(playerTransform.position);
+
+            carriedGift.Drop(dropPos);
+            nearestArea.AddGift(carriedGift);
+
+            // Reset IK
+            leftHandIKTarget = null;
+            rightHandIKTarget = null;
+            handIKWeight = 0f;
+            isHoldingGift = false;
+
+            carriedGift = null;
+            score++;
+            Debug.Log($"Player {playerID + 1} Score: {score}");
+        }
     }
-
-
 
     void OnAnimatorIK(int layerIndex)
     {
