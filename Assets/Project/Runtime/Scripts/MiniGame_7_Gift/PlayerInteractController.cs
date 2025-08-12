@@ -22,15 +22,11 @@ public class PlayerInteractController : MonoBehaviour
     private Animator animator;
     private bool isHoldingGift = false;
     private float lastInteractTime = 0f;
-    private float interactCooldown = 0.15f; // chống spam bấm
-
-    private Transform playerTransform; // tham chiếu Player để so sánh khoảng cách
+    private float interactCooldown = 0.12f; // giảm nhẹ delay
 
     void Start()
     {
         animator = GetComponent<Animator>();
-        animator.applyRootMotion = false;
-        playerTransform = transform;
     }
 
     void Update()
@@ -48,17 +44,13 @@ public class PlayerInteractController : MonoBehaviour
 
     void TryPickupGift()
     {
-        Collider[] areaHits = Physics.OverlapSphere(transform.position, pickupRange, dropAreaLayer);
-
+        Collider[] hits = Physics.OverlapSphere(transform.position, pickupRange, giftLayer);
         GiftBox nearestGift = null;
         float nearestDist = Mathf.Infinity;
 
-        foreach (Collider areaCol in areaHits)
+        foreach (Collider hit in hits)
         {
-            House_Area area = areaCol.GetComponent<House_Area>();
-            if (area == null) continue;
-
-            GiftBox gift = area.GetNearestGift(transform.position);
+            GiftBox gift = hit.GetComponent<GiftBox>();
             if (gift != null && !gift.isCarried)
             {
                 float dist = Vector3.Distance(transform.position, gift.transform.position);
@@ -72,11 +64,9 @@ public class PlayerInteractController : MonoBehaviour
 
         if (nearestGift != null)
         {
-            House_Area parentArea = nearestGift.GetComponentInParent<House_Area>();
-            if (parentArea != null)
-            {
-                parentArea.RemoveGift(nearestGift);
-            }
+            House_Area area = nearestGift.GetComponentInParent<House_Area>();
+            if (area != null)
+                area.RemoveGift(nearestGift);
 
             carriedGift = nearestGift;
             nearestGift.PickUp(carryPoint);
@@ -88,13 +78,9 @@ public class PlayerInteractController : MonoBehaviour
         }
     }
 
-
-
-
     void TryDropGift()
     {
-        Collider[] hits = Physics.OverlapSphere(playerTransform.position, pickupRange, dropAreaLayer);
-
+        Collider[] hits = Physics.OverlapSphere(transform.position, pickupRange, dropAreaLayer);
         House_Area nearestArea = null;
         float nearestDist = Mathf.Infinity;
 
@@ -103,7 +89,7 @@ public class PlayerInteractController : MonoBehaviour
             House_Area area = hit.GetComponent<House_Area>();
             if (area != null && area.ownerID == playerID && area.CanAddGift())
             {
-                float dist = Vector3.Distance(playerTransform.position, area.transform.position);
+                float dist = Vector3.Distance(transform.position, area.transform.position);
                 if (dist < nearestDist)
                 {
                     nearestDist = dist;
@@ -114,39 +100,33 @@ public class PlayerInteractController : MonoBehaviour
 
         if (nearestArea != null)
         {
-            // Lấy đúng vị trí drop gần Player nhất trong area
-            Vector3 dropPos = nearestArea.GetNearestDropPosition(playerTransform.position);
-
+            Vector3 dropPos = nearestArea.GetNearestDropPosition(transform.position);
             carriedGift.Drop(dropPos);
             nearestArea.AddGift(carriedGift);
 
-            // Reset IK
             leftHandIKTarget = null;
             rightHandIKTarget = null;
             handIKWeight = 0f;
             isHoldingGift = false;
-
             carriedGift = null;
             score++;
-            Debug.Log($"Player {playerID + 1} Score: {score}");
         }
     }
 
     void OnAnimatorIK(int layerIndex)
     {
-        if (animator == null) return;
+        if (!animator) return;
 
         if (isHoldingGift)
         {
-            if (leftHandIKTarget != null)
+            if (leftHandIKTarget)
             {
                 animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, handIKWeight);
                 animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, handIKWeight);
                 animator.SetIKPosition(AvatarIKGoal.LeftHand, leftHandIKTarget.position);
                 animator.SetIKRotation(AvatarIKGoal.LeftHand, leftHandIKTarget.rotation);
             }
-
-            if (rightHandIKTarget != null)
+            if (rightHandIKTarget)
             {
                 animator.SetIKPositionWeight(AvatarIKGoal.RightHand, handIKWeight);
                 animator.SetIKRotationWeight(AvatarIKGoal.RightHand, handIKWeight);
