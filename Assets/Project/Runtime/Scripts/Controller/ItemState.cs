@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ItemState : BoardState
 {
@@ -10,16 +11,27 @@ public class ItemState : BoardState
 
     public override void Enter()
     {
-        //controller.RequestChangeAnimation("GunAim");
-        //controller.RequestSetUsingItem(0);
+        Debug.Log("Entering ItemState");
+
+        if (controller.currentItem != null)
+        {
+            controller.currentItem.Use(controller);
+        }
+        else
+        {
+            Debug.LogWarning("No item found in controller.");
+            controller.ChangeState(controller.idleState);
+        }
     }
 
     public override void Exit()
     {
+
     }
 
     public override void Update()
     {
+
     }
 
     public override string ToString()

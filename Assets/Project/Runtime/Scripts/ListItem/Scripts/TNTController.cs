@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Dreamteck.Splines.Editor;
+using Dreamteck.Splines;
 using Unity.Cinemachine;
 using UnityEngine;
 

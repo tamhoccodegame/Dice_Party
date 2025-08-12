@@ -137,6 +137,11 @@ public class NewBoardGameController : PlayerController
     {
         currentState?.Update();
 
+        if (Keyboard.current.fKey.wasPressedThisFrame)
+        {
+            UseSelectedItem();
+        }
+
         verticalVelocity = -5f * Time.deltaTime;
 
         Vector3 move = Vector3.zero;
@@ -152,13 +157,14 @@ public class NewBoardGameController : PlayerController
 
         _controller.Move(move); // tốc độ di chuyển
 
-        if (toMoveNode != null)
+        if (toMoveNode != null && currentState != itemState)
         {
             Vector3 direction = toMoveNode.transform.position - transform.position;
             direction.y = 0;
             Quaternion newRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 20 * Time.deltaTime);
         }
+      
     }
 
     #region Move
@@ -223,8 +229,13 @@ public class NewBoardGameController : PlayerController
     // Item (tạm bỏ qua inventory)
     public void UseSelectedItem()
     {
-        Debug.Log("💥 Sử dụng item!");
-        // Sau này xử lý skill / bắn súng / trap
+        if (currentItem == null)
+        {
+            Debug.LogWarning("No item to use.");
+            return;
+        }
+
+        ChangeState(itemState);
     }
 
     public void StartTurn()
