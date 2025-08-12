@@ -16,19 +16,19 @@ public class UiManager : WizardMiniGameManager
 
     protected override void Awake()
     {
-        base.Awake();
+        //base.Awake();
     }
 
     protected override void Start()
     {
-        base.Start();
+        //base.Start();
 
         StartCoroutine(SpawnEnemy());
     }
 
     IEnumerator SpawnEnemy()
     {
-        while(!isGameStarted || isGameOver) yield return null;
+        //while(!isGameStarted || isGameOver) yield return null;
         while(time > 0)
         {
             while (activeEnemys > 7) yield return null;
@@ -73,6 +73,7 @@ public class UiManager : WizardMiniGameManager
                 lastRandomPosition = randomPosition;
 
                 var go = Instantiate(enemyPrefab, spawnPositions[randomPosition].position, Quaternion.identity);
+                activeEnemys++;
                 yield return null;
             }
 
