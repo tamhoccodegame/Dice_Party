@@ -69,6 +69,8 @@ public class AvatarTurnManager : MonoBehaviour
 
         currentIndex = playerIndex;
 
+        playerNameText.text = $"Player {currentIndex + 1}";
+
         // Chạy animation Press → Pop → Active
         RectTransform target = avatars[playerIndex];
 
