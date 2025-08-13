@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -40,7 +38,7 @@ public class Lobby : MonoBehaviour
     {
         yield return new WaitForSeconds(1.5f);
         //SceneManager.LoadScene("Map1");
-        SceneManager.LoadScene("TuanSceneMap");
+        LevelLoader.instance.LoadScene("TuanSceneMap");
 
     }
 
@@ -90,8 +88,9 @@ public class Lobby : MonoBehaviour
                                     Quaternion.Euler(0, 180, 0));
             spawnedAvatars.Add(playerInput, model);
             playerSlots[playerCount].gameObject.SetActive(true);
-            playerSlots[playerCount].GetComponent<PlayerSlotUI>().InitSelector(model.GetComponent<PlayerCustom>());
             playerSlots[playerCount].GetComponent<PlayerSlotUI>().playerInput = playerInput;
+            model.GetComponent<PlayerCustom>().applyButton = playerSlots[playerCount].GetComponent<PlayerSlotUI>().applyButton;
+            playerSlots[playerCount].GetComponent<PlayerSlotUI>().InitSelector(model.GetComponent<PlayerCustom>());
             playerCount++;
             model.GetComponent<PlayerCustom>().Init(playerInput);
         }

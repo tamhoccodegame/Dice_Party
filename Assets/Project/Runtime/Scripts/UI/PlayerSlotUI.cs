@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.UI;
 
 public class PlayerSlotUI : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class PlayerSlotUI : MonoBehaviour
     public GameObject unreadyPanel;
     public GameObject unreadyButton;
     public GameObject readyPanel;
+    public Button applyButton;
+
 
     public OptionSelector colorSelector;
     public OptionSelector hairSelector;

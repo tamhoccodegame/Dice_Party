@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -27,5 +28,29 @@ public class CustomData : MonoBehaviour
     public Custom GetCustom(PlayerInput playerInput)
     {
         return customs[playerInput];
+    }
+
+    public PlayerInput GetColorPlayer(int colorIndex)
+    {
+        foreach(var customData in customs)
+        {
+            if(customData.Value.colorIndex == colorIndex)
+            {
+                return customData.Key;
+            }
+        }
+        return null;
+    }
+
+    public bool IsColorChoosen(int colorIndex)
+    {
+        Debug.Log($"Check {colorIndex}");
+        foreach(var customData in customs.Values)
+        {
+            if (customData.colorIndex == colorIndex)
+                return true;
+        }
+
+        return false;
     }
 }
