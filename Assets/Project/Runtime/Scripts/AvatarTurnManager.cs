@@ -49,11 +49,7 @@ public class AvatarTurnManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            int nextIndex = (currentIndex + 1) % avatars.Count;
-            HighlightTurn(nextIndex);
-        }
+
     }
 
     /// <summary>

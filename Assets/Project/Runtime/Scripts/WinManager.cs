@@ -23,7 +23,6 @@ public class WinManager : MonoBehaviour
     {
         SpawnPlayer();
         PlayCutscene();
-        Invoke(nameof(ReturnToMainMenu), 60f);
     }
 
     private void Start()
