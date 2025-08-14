@@ -71,7 +71,7 @@ public class WizardMiniGameManager : MonoBehaviour
         {
             InvokeRepeating(nameof(CountDown), 0f, 1f);
         }
-        else
+        else if(timeText != null) 
         {
             timeText.transform.parent.gameObject.SetActive(false);
         }
@@ -234,8 +234,8 @@ public class WizardMiniGameManager : MonoBehaviour
         for (int i = 0; i < playerScores.Count; i++)
         {
             WizardPartyData.instance.UpdatePlayerKey(playerScores.ElementAt(i).Key, keyAdd);
+            gameOverSlots[i].keyQtyText.text = keyAdd.ToString();
             keyAdd -= 2;
-
             gameOverSlots[i].gameObject.SetActive(true);
             var inputGo = playerObjects[playerScores.ElementAt(i).Key];
             if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");

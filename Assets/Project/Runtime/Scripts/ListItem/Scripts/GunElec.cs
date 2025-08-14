@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 
 public class GunElec : BoardItem
@@ -12,6 +13,7 @@ public class GunElec : BoardItem
     private Transform playerModel;
     private GameObject currentGun;
     private VisualEffect shootVFX;
+    public LaserBeam laserBeam;
     private bool isUsingGun = false;
     private NewBoardGameController controller;
 
@@ -21,10 +23,11 @@ public class GunElec : BoardItem
         gunHoldPoint = controller.gunSpawnPoint;
         playerModel = controller.GetComponent<Animator>().transform;
         
+
         if (gunHoldPoint == null)
         {
             Debug.LogError("GunSpawnPoint not assigned in controller!");
-            controller.EndTurn();
+            //controller.EndTurn();
             return;
         }
         controller.StartCoroutine(HandleGunUsage());
@@ -32,25 +35,34 @@ public class GunElec : BoardItem
 
     private IEnumerator HandleGunUsage()
     {
-        currentGun = Instantiate(gunPrefab, gunHoldPoint.position, gunHoldPoint.rotation, gunHoldPoint);
+        controller.ChangeAnimation("GunAim");
+        currentGun = Instantiate(gameObject, gunHoldPoint.position, gunHoldPoint.rotation, gunHoldPoint);
         currentGun.transform.localRotation = Quaternion.Euler(180, 90, 0);
         isUsingGun = true;
 
         shootVFX = currentGun.GetComponentInChildren<VisualEffect>();
         if (shootVFX != null) shootVFX.Stop();
 
-        yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
-
         while (isUsingGun)
         {
             RotatePlayerToKeyboard();
+            NewBoardGameController target = currentGun.GetComponent<LaserBeam>().hitTarget;
+
             yield return null;
-            if (Input.GetMouseButtonDown(0))
+            if (controller.playerInput.actions["Trigger"].triggered)
             {
                 if (shootVFX != null)
                 {
                     shootVFX.Play();
                     yield return new WaitForSeconds(5f);
+                    {
+                        target.enabled = true;
+                        target.readyForInput = false;
+                        target.EnableRagdoll();
+                        WizardPartyData.instance.UpdatePlayerHealth(target.playerInput, -10);
+                        TurnManager.instance.UpdatePlayerDataUI();
+                        Debug.Log("Enable Ragdoll");
+                    }
                 }
 
                 isUsingGun = false;
@@ -61,21 +73,16 @@ public class GunElec : BoardItem
         isUsingGun = false;
         Destroy(currentGun);
 
-        controller.EndTurn();
+        controller.ChangeState(controller.idleState);
     }
 
     void RotatePlayerToKeyboard()
     {
-        float rotateInput = 0f;
-        if (Input.GetKey(KeyCode.LeftArrow))
-            rotateInput = -1f;
-        else if (Input.GetKey(KeyCode.RightArrow))
-            rotateInput = 1f;
+        float rotateInput = controller.playerInput.actions["Move"].ReadValue<Vector2>().x;
 
         if (rotateInput != 0f && playerModel != null)
         {
             playerModel.Rotate(Vector3.up, rotateSpeed * rotateInput * Time.deltaTime);
         }
-        Debug.Log(rotateInput);
     }
 }

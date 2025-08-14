@@ -111,6 +111,7 @@ public class NewBoardGameController : PlayerController
 
     public void ChangeState(BoardState newState)
     {
+        Debug.Log($"Change to {newState}");
         currentState?.Exit();
         switch (newState)
         {
@@ -136,15 +137,16 @@ public class NewBoardGameController : PlayerController
 
     public void ChangeAnimation(string animName)
     {
+        if (currentAnim == animName) return;
         currentAnim = animName;
-        animator.Play(animName);
+        animator.CrossFade(animName, 0.25f);
     }
 
     private void Update()
     {
         currentState?.Update();
 
-        if (Keyboard.current.fKey.wasPressedThisFrame)
+        if (Input.GetKeyDown(KeyCode.F))
         {
             UseSelectedItem();
         }
@@ -184,7 +186,7 @@ public class NewBoardGameController : PlayerController
     IEnumerator RollDiceCoroutine()
     {
         //StepsLeft = Random.Range(1, 9);
-        StepsLeft = 9;
+        StepsLeft = 99;
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
@@ -426,7 +428,6 @@ public class NewBoardGameController : PlayerController
         clone.GetComponent<Animator>().enabled = true;
         yield return new WaitForSeconds(1.5f);
         clone.GetComponent<NewBoardGameController>().enabled = false;
-        TurnManager.instance.NextTurn();
         Destroy(gameObject);
     }
 

@@ -33,6 +33,12 @@ public class MusicManager : MonoBehaviour
         StartCoroutine(SwitchTrack(newClip));
     }
 
+    public void PlayMainTheme()
+    {
+        StartCoroutine(SwitchTrack(mainTheme));
+    }
+
+
     private IEnumerator SwitchTrack(AudioClip newClip)
     {
         yield return StartCoroutine(FadeOut());
