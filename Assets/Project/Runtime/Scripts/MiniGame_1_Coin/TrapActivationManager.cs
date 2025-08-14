@@ -18,7 +18,7 @@ public class TrapActivationManager : MonoBehaviour
 
     void DelayFindTrap()
     {
-        player = FindFirstObjectByType<MNGChayTruongController>().transform;
+        player = FindFirstObjectByType<MNGPlayerController>().transform;
         // Tìm tất cả trap trong scene (có thể tối ưu nếu có nhiều)
         TrapActivator[] foundTraps = FindObjectsOfType<TrapActivator>(true); // true để tìm cả những trap bị tắt
 

@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class MainMenu : MonoBehaviour
 {
+    private void Start()
+    {
+        Cursor.lockState = CursorLockMode.None;
+
+        Destroy(PlayerManager.instance.gameObject);
+    }
     public void ExitGame()
     {
         Application.Quit();

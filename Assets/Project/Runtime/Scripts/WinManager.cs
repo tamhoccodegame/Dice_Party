@@ -7,7 +7,7 @@ using UnityEngine.Playables;
 public class WinManager : MonoBehaviour
 {
     public static WinManager instance;
-
+    public AudioClip music;
     public GameObject playerPrefab;
     public Transform[] spawnPositions;
 
@@ -27,6 +27,7 @@ public class WinManager : MonoBehaviour
 
     private void Start()
     {
+        MusicManager.instance.PlayMusic(music);
         playerInputs = PlayerManager.instance.players;
     }
 

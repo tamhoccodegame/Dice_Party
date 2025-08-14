@@ -30,6 +30,11 @@ public class Throne : MonoBehaviour
                 }
             }
         }
+        else
+        {
+            playerInput = null;
+            playerObject = null;
+        }
 
         if (playerInput == null) return;
 
