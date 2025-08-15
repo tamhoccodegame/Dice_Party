@@ -8,6 +8,7 @@ public class MainMenu : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
 
+        if(PlayerManager.instance != null)
         Destroy(PlayerManager.instance.gameObject);
     }
     public void ExitGame()
