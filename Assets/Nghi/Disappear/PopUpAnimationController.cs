@@ -10,20 +10,20 @@ public class PopUpAnimationController : MonoBehaviour
     private bool isShowing = false;
 
     // Coroutine để show panel mà không bị lộ UI
-    public IEnumerator ShowRoutine()
+    public IEnumerator ShowRoutine() // Coroutine để show panel
     {
-        if (isShowing) yield break;
-        isShowing = true;
+        if (isShowing) yield break; // Nếu đã đang hiện thì không làm gì
+        isShowing = true; // Nếu chưa hiện thì đánh dấu là đang hiện
 
         // Kích hoạt panel
         gameObject.SetActive(true);
 
-        if (appear != null)
+        if (appear != null) // Nếu có appear script, sử dụng nó để show
         {
             // Ẩn tất cả UI element trước khi start appear
-            appear.HideAllItemsInstant();
+            appear.HideAllItemsInstant(); 
             yield return null; // đảm bảo hide xong và layout ổn
-            yield return appear.PlaySequence();
+            yield return appear.PlaySequence(); // Chờ cho animation hoàn thành
         }
         else
         {
@@ -35,13 +35,13 @@ public class PopUpAnimationController : MonoBehaviour
     // Coroutine để hide panel
     public IEnumerator HideRoutine()
     {
-        if (!isShowing) yield break;
-        isShowing = false;
+        if (!isShowing) yield break; // Nếu không đang hiện thì không làm gì
+        isShowing = false; // Đánh dấu là không còn hiện nữa
 
         if (disappear != null)
             yield return disappear.PlaySequence();
 
-        gameObject.SetActive(false);
+        gameObject.SetActive(false); // Ẩn panel sau khi hoàn thành animation
     }
 
     // Ẩn ngay lập tức khi Awake
@@ -51,55 +51,9 @@ public class PopUpAnimationController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void SetChildrenActive(bool active)
+    private void SetChildrenActive(bool active) // Helper method để bật/tắt tất cả children
     {
-        foreach (Transform child in transform)
-            child.gameObject.SetActive(active);
+        foreach (Transform child in transform) // Duyệt qua tất cả children
+            child.gameObject.SetActive(active); // Bật/tắt chúng
     }
-
-    //public PopUpAppearUI appear;
-    //public PopUpDisappearUI disappear;
-
-    //private bool isShowing = false;
-
-    //// Coroutine để show panel
-    //public IEnumerator ShowRoutine()
-    //{
-    //    if (isShowing) yield break;
-    //    isShowing = true;
-
-    //    // Ẩn toàn bộ children trước 1 frame để tránh lộ UI
-    //    SetChildrenActive(false);
-    //    gameObject.SetActive(true);
-    //    yield return null;
-    //    SetChildrenActive(true);
-
-    //    if (appear != null)
-    //        yield return appear.PlaySequence();
-    //}
-
-    //// Coroutine để hide panel
-    //public IEnumerator HideRoutine()
-    //{
-    //    if (!isShowing) yield break;
-    //    isShowing = false;
-
-    //    if (disappear != null)
-    //        yield return disappear.PlaySequence();
-
-    //    gameObject.SetActive(false);
-    //}
-
-    //// Ẩn ngay lập tức khi Awake
-    //public void InstantHide()
-    //{
-    //    isShowing = false;
-    //    gameObject.SetActive(false);
-    //}
-
-    //private void SetChildrenActive(bool active)
-    //{
-    //    foreach (Transform child in transform)
-    //        child.gameObject.SetActive(active);
-    //}
 }

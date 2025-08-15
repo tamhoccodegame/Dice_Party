@@ -7,25 +7,25 @@ public class PlayerBlinking : MonoBehaviour
 {
     [Header("Animation & Invincibility")]
     public Animator animator;
-    public float invincibleDuration = 2f;
-    public float blinkInterval = 0.15f;
+    public float invincibleDuration = 2f; // Thời gian bất tử sau khi bị va chạm
+    public float blinkInterval = 0.15f; // Thời gian giữa các lần nhấp nháy
 
-    private bool isInvincible { get; set; }
-    private bool isBlinking { get; set; }
+    private bool isInvincible { get; set; } // Biến để kiểm tra trạng thái bất tử
+    private bool isBlinking { get; set; } // Biến để kiểm tra trạng thái nhấp nháy
 
-    private List<SkinnedMeshRenderer> skinnedMeshes = new List<SkinnedMeshRenderer>();
+    private List<SkinnedMeshRenderer> skinnedMeshes = new List<SkinnedMeshRenderer>(); // Danh sách các SkinnedMeshRenderer để điều khiển hiển thị
 
     private void Start()
     {
         if (animator == null)
-            animator = GetComponentInChildren<Animator>();
+            animator = GetComponentInChildren<Animator>(); // Lấy Animator từ con nếu không có trên chính đối tượng
 
-        skinnedMeshes.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>());
+        skinnedMeshes.AddRange(GetComponentsInChildren<SkinnedMeshRenderer>()); // Lấy tất cả SkinnedMeshRenderer từ con để điều khiển hiển thị
     }
 
-    public void OnHitByObstacle(Vector3 hitPoint)
+    public void OnHitByObstacle(Vector3 hitPoint) // Hàm này sẽ được gọi khi va chạm với vật cản
     {
-        if (isInvincible)
+        if (isInvincible) // Nếu đang bất tử thì không làm gì
         {
             Debug.Log("[⚡ IMMUNE] Player is invincible");
             return;
@@ -86,12 +86,12 @@ public class PlayerBlinking : MonoBehaviour
         Debug.Log("[🛡️ DONE] Invincibility ended.");
     }
 
-    private void SetAllMeshesVisible(bool visible)
+    private void SetAllMeshesVisible(bool visible) // Hàm này sẽ bật/tắt hiển thị của tất cả các SkinnedMeshRenderer
     {
-        foreach (var mesh in skinnedMeshes)
+        foreach (var mesh in skinnedMeshes) // Duyệt qua tất cả các SkinnedMeshRenderer
         {
             if (mesh != null)
-                mesh.enabled = visible;
+                mesh.enabled = visible; // Bật/tắt hiển thị của từng SkinnedMeshRenderer
         }
     }
 
@@ -102,7 +102,7 @@ public class PlayerBlinking : MonoBehaviour
         animator.SetTrigger("isHurt");
     }
 
-    void SetVisible(bool visible)
+    void SetVisible(bool visible) // Hàm này sẽ được gọi để bật/tắt hiển thị của tất cả các SkinnedMeshRenderer
     {
         SetAllMeshesVisible(visible);
     }
