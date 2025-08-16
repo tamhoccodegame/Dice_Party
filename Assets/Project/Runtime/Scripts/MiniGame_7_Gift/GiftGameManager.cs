@@ -35,6 +35,7 @@ public class GiftGameManager : MonoBehaviour
                 GameObject giftObj = Instantiate(giftPrefab);
                 GiftBox gift = giftObj.GetComponent<GiftBox>();
                 gift.ownerID = house.ownerID;
+                // đặt vào slot trống gần center (mặc định) – không quan trọng, vì pick/drop theo khoảng cách rồi
                 house.AddGift(gift);
             }
         }
