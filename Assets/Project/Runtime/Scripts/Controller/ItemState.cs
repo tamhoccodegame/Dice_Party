@@ -13,9 +13,9 @@ public class ItemState : BoardState
     {
         Debug.Log("Entering ItemState");
 
-        if (controller.currentItem != null)
+        if (controller.gun != null)
         {
-            controller.currentItem.Use(controller);
+            controller.gun.Use(controller);
         }
         else
         {

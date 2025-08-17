@@ -30493,7 +30493,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -30526,7 +30526,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 1
 --- !u!114 &4085472473950053309
 MonoBehaviour:
@@ -30540,13 +30540,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75e2877489ed5274d9fd8ec8df8d2c45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: 
   moveSpeed: 10
   turnSpeed: 100
   explosionObjectName: ExplosionFX
   destroyDelay: 0.7
   triggerDelay: 2
-  tntCam: {fileID: 0}
-  playerCam: {fileID: 0}
+  controller: {fileID: 0}
+  playerInput: {fileID: 0}
 --- !u!1 &8122998783540370663
 GameObject:
   m_ObjectHideFlags: 0

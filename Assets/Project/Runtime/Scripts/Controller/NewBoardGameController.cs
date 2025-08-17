@@ -55,8 +55,17 @@ public class NewBoardGameController : PlayerController
     [Header("Effect")]
     public ParticleSystem rollDiceEffect;
 
-    public BoardItem currentItem;
+    [Header("ItemGun")]
+    public BoardItem gun;
     public Transform gunSpawnPoint;
+
+    [Header("ItemShit")]
+    public BoardItem shitItem;
+    public Transform shitSpawnPoint;
+
+    [Header("ItemHorse")]
+    public BoardItem horseItem;
+    public Transform horseSpawnPoint;
 
     private Rigidbody[] rigidbodies;
 
@@ -266,7 +275,7 @@ public class NewBoardGameController : PlayerController
     // Item (tạm bỏ qua inventory)
     public void UseSelectedItem()
     {
-        if (currentItem == null)
+        if (gun == null)
         {
             Debug.LogWarning("No item to use.");
             return;

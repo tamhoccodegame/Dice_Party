@@ -1,10 +1,11 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Dreamteck.Splines;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class TNTController : MonoBehaviour
+public class TNTController : BoardItem
 {
     public float moveSpeed = 10f;
     public float turnSpeed = 100f;
@@ -13,20 +14,18 @@ public class TNTController : MonoBehaviour
     public float destroyDelay = 0.7f;
     public float triggerDelay = 2f;
 
-    public CinemachineCamera tntCam;
-    public CinemachineCamera playerCam;
-
     private Rigidbody rb;
     private bool hasExploded = false;
     private Transform explosionFX;
     private MeshRenderer mesh;
+
+    public NewBoardGameController controller;
+    public PlayerInput playerInput;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         mesh = GetComponentInChildren<MeshRenderer>();
-
-        tntCam = GameObject.Find("TNTCamera")?.GetComponent<CinemachineCamera>();
-        playerCam = GameObject.Find("PlayerCamera")?.GetComponent<CinemachineCamera>();
 
         explosionFX = transform.Find(explosionObjectName);
         if (explosionFX == null)
@@ -42,31 +41,40 @@ public class TNTController : MonoBehaviour
     void Update()
     {
         if (hasExploded) return;
-        if (Input.GetMouseButtonDown(0))
+        if (playerInput.actions["Trigger"].triggered)
         {
-                Explode();
-
-            if (playerCam != null && tntCam != null)
-            {
-                playerCam.Priority = 20;
-                tntCam.Priority = 10;
-            }
+            Explode();
         }
 
-    }
-    void FixedUpdate()
-    {
-        if (hasExploded) return;
+        float moveInput = playerInput.actions["Move"].ReadValue<Vector2>().y;
+        float turnInput = playerInput.actions["Move"].ReadValue<Vector2>().x;
 
-        float moveInput = Input.GetAxis("Vertical");
-        float turnInput = Input.GetAxis("Horizontal");
+        // Lấy hướng camera (camera chính hoặc camera follow hiện tại)
+        Transform cam = Camera.main.transform;
+        Vector3 camForward = cam.forward;
+        Vector3 camRight = cam.right;
 
-        Vector3 move = transform.forward * moveInput * moveSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(rb.position + move);
+        // Loại bỏ ảnh hưởng trục Y để tránh nghiêng xuống đất
+        camForward.y = 0;
+        camRight.y = 0;
 
-        float turn = turnInput * turnSpeed * Time.fixedDeltaTime;
-        Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
-        rb.MoveRotation(rb.rotation * turnRotation);
+        camForward.Normalize();
+        camRight.Normalize();
+
+        // Tính hướng di chuyển theo input và camera
+        Vector3 moveDir = (camForward * moveInput + camRight * turnInput).normalized;
+
+        if (moveDir.magnitude >= 0.1f)
+        {
+            // Xoay TNT theo hướng di chuyển
+            Quaternion targetRotation = Quaternion.LookRotation(moveDir, Vector3.up);
+            rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime));
+
+            // Di chuyển TNT
+            Vector3 move = moveDir * moveSpeed * Time.fixedDeltaTime;
+            rb.MovePosition(rb.position + move);
+        }
+
     }
     private void OnCollisionEnter(Collision collision)
     {
@@ -90,8 +98,8 @@ public class TNTController : MonoBehaviour
             fx.gameObject.SetActive(true);
             Destroy(fx.gameObject, destroyDelay);
         }
-
-
+        CameraFollow.instance.StartFollowTarget(controller.transform);
+        controller.ChangeState(controller.idleState);
         gameObject.SetActive(false);
         Destroy(gameObject, destroyDelay);
     }
@@ -105,5 +113,13 @@ public class TNTController : MonoBehaviour
             if (result != null) return result;
         }
         return null;
+    }
+
+    public override void Use(NewBoardGameController controller)
+    {
+        var tnt = Instantiate(gameObject, controller.transform.position, Quaternion.identity).GetComponent<TNTController>();
+        tnt.controller = controller;
+        tnt.playerInput = controller.playerInput;
+        CameraFollow.instance.StartFollowTarget(tnt.transform);
     }
 }
