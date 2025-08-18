@@ -1,7 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -120,8 +118,8 @@ public class DoanTauManager : WizardMiniGameManager
         base.UpdateHUD();
     }
 
-    protected override void TriggerAfterTutorial()
+    protected override void TriggerAfterCutscene()
     {
-        base.TriggerAfterTutorial();
+        base.TriggerAfterCutscene();
     }
 }

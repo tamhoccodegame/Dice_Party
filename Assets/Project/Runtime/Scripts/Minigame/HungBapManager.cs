@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -25,9 +23,9 @@ public class HungBapManager : WizardMiniGameManager
         base.ShowGameOverPanel();
     }
 
-    protected override void TriggerAfterTutorial()
+    protected override void TriggerAfterCutscene()
     {
-        base.TriggerAfterTutorial();
+        base.TriggerAfterCutscene();
     }
 
     public override void SpawnRewardAvatar()

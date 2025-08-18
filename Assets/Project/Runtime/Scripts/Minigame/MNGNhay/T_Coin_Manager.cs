@@ -1,12 +1,12 @@
 ﻿using Dreamteck.Splines;
-using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class T_Coin_Manager : WizardMiniGameManager
 {
     public static T_Coin_Manager Instance { get; private set; }
+
+    public SplineFollower cam;
+    public SplineFollower spike;
 
     protected override void Awake()
     {
@@ -21,14 +21,19 @@ public class T_Coin_Manager : WizardMiniGameManager
         UpdateHUD();
     }
 
-    protected override void TriggerAfterTutorial()
+    private void Update()
     {
-        SplineFollower[] cams = FindObjectsByType<SplineFollower>(FindObjectsSortMode.None);
-
-        foreach(var cam in cams)
+        if (isGameStarted && cam.follow && spike.follow) return;
+        else if (isGameStarted && (!cam.follow || !spike.follow))
         {
             cam.follow = true;
+            spike.follow = true;
         }
+    }
+
+    protected override void TriggerAfterCutscene()
+    {
+        base.TriggerAfterCutscene();
     }
 
     public override void SpawnRewardAvatar()

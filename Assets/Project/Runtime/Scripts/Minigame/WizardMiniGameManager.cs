@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Mono.Cecil;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -21,8 +22,13 @@ public class WizardMiniGameManager : MonoBehaviour
     public bool isGameOver { get; set; } = false;
     public bool isGameStarted { get; set; } = false;
 
+    public bool isAllReady = false;
+
     public int time;
     public TextMeshProUGUI timeText;
+
+    public TextMeshProUGUI startText;
+    public AudioSource startSound;
 
     public PlayableDirector introCutscene;
     public AudioClip music;
@@ -36,6 +42,9 @@ public class WizardMiniGameManager : MonoBehaviour
 
     [Header("Tutorial Panel")]
     public GameObject tutorialPanel;
+    public Image[] playerAvatarReady;
+    public TextMeshProUGUI[] playerReadyText;
+    public Dictionary<PlayerInput, bool> playersReadyStatus = new Dictionary<PlayerInput, bool>();
 
     [Header("Game Over Panel")]
     public GameObject gameOverPanel;
@@ -63,25 +72,35 @@ public class WizardMiniGameManager : MonoBehaviour
     {
         GetComponent<PlayerSpawner>().SpawnPlayer();
         MusicManager.instance.PlayMusic(music);
-        tutorialPanel.SetActive(true);
-        HideTutorial();
+        ShowTutorial();
         InitHUD();
+        InitReadyStatus();
 
         if (time != -1)
         {
             InvokeRepeating(nameof(CountDown), 0f, 1f);
         }
-        else if(timeText != null) 
+        else if (timeText != null)
         {
             timeText.transform.parent.gameObject.SetActive(false);
         }
 
-            foreach (var player in playerObjects.Keys)
-            {
-                playerScores.Add(player, 1000); //Mỗi player khởi đầu 1k điểm
-            }
+        foreach (var player in playerObjects.Keys)
+        {
+            playerScores.Add(player, 1000); //Mỗi player khởi đầu 1k điểm
+        }
 
         UpdateHUD();
+    }
+
+    protected void InitReadyStatus()
+    {
+        var players = PlayerManager.instance.players;
+        for(int i = 0; i < players.Count; i++)
+        {
+            playerReadyText[i].gameObject.SetActive(false);
+            playersReadyStatus.Add(players[i], false);
+        }
     }
 
     public void UpdatePlayerCompletedGame(PlayerInput input)
@@ -131,12 +150,15 @@ public class WizardMiniGameManager : MonoBehaviour
 
             playerHUDs[i].avatar.sprite = playerAvatar;
             playerHUDs[i].textUI.transform.parent.gameObject.SetActive(true);
+
+            playerAvatarReady[i].sprite = playerAvatar;
+            playerAvatarReady[i].transform.parent.gameObject.SetActive(true);
         }
     }
 
-    protected void HideTutorial()
+    protected void ShowTutorial()
     {
-        StartCoroutine(HideTutorialCouroutine());
+        StartCoroutine(DelayShowTutorial());
     }
 
     private IEnumerator FadeBlackScreen(float from, float to)
@@ -160,14 +182,10 @@ public class WizardMiniGameManager : MonoBehaviour
         blackScreen.color = newColor;
     }
 
-    protected IEnumerator HideTutorialCouroutine()
+    protected IEnumerator DelayShowTutorial()
     {
-        yield return new WaitForSeconds(10f);
-
-        yield return StartCoroutine(FadeBlackScreen(0, 1));
         tutorialPanel.SetActive(false);
 
-        yield return new WaitForSeconds(2.5f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
 
         if (introCutscene != null && introCutscene.gameObject.activeSelf)
@@ -177,21 +195,50 @@ public class WizardMiniGameManager : MonoBehaviour
         }
         else
         {
-            isGameStarted = true;
+            TriggerAfterCutscene();
         }
     }
 
-    protected virtual void TriggerAfterTutorial()
+    protected virtual void TriggerAfterCutscene()
     {
+        tutorialPanel.SetActive(true);
+        StartCoroutine(WaitForAllReady());
+    }
 
+    IEnumerator WaitForAllReady()
+    {
+        while (!isAllReady)
+        {
+            for(int i = 0; i < playersReadyStatus.Count; i++)
+            {
+                PlayerInput playerInput = playersReadyStatus.ElementAt(i).Key;
+                if (playerInput.actions["Confirm"].triggered && !playersReadyStatus[playerInput])
+                {
+                    playersReadyStatus[playerInput] = true;
+                    playerReadyText[i].gameObject.SetActive(true);
+                }
+            }
+
+            isAllReady = playersReadyStatus.Values.All(r => r);
+
+            yield return null;
+        }
+        yield return new WaitForSeconds(2.5f);
+
+        tutorialPanel.SetActive(false);
+        startText.gameObject.SetActive(true);
+        startSound.Play();
+
+        yield return new WaitForSeconds(2f);
+
+        startText.gameObject.SetActive(false);
+        isGameStarted = true;
     }
 
     private void StartGame(PlayableDirector obj)
     {
-        TriggerAfterTutorial();
+        TriggerAfterCutscene();
         Destroy(obj.gameObject);
-
-        isGameStarted = true;
     }
 
     IEnumerator ReturnToBoard()
@@ -239,8 +286,8 @@ public class WizardMiniGameManager : MonoBehaviour
             gameOverSlots[i].gameObject.SetActive(true);
             var inputGo = playerObjects[playerScores.ElementAt(i).Key];
             if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
-            else       inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
-            
+            else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+
             inputGo.GetComponent<PlayerController>().enabled = false;
             inputGo.GetComponent<CharacterController>().enabled = false;
             inputGo.transform.position = rankPositions[i].position;
