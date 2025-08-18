@@ -2683,6 +2683,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3270498665513102295}
+  - {fileID: 7137098901813243232}
   - {fileID: 3540302753715301727}
   m_Father: {fileID: 2935424376565863942}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4059,6 +4061,37 @@ SkinnedMeshRenderer:
     m_Center: {x: 0, y: -0.19713065, z: 1.4121807}
     m_Extent: {x: 0.123744726, y: 0.1520836, z: 0.15258801}
   m_DirtyAABB: 0
+--- !u!1 &2378857719673718068
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7137098901813243232}
+  m_Layer: 3
+  m_Name: HorsePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7137098901813243232
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2378857719673718068}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: 0.016, y: -0.701, z: 1.005}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1343395031851572626}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: -90}
 --- !u!1 &2437172518863208122
 GameObject:
   m_ObjectHideFlags: 0
@@ -4383,7 +4416,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerInput: {fileID: 0}
-  player: {fileID: 2935424376565863942}
   feet: {fileID: 5339602891216914746}
   currentNode: {fileID: 0}
   currentNodeId: 0
@@ -4393,8 +4425,9 @@ MonoBehaviour:
   arrowDirectionPrefab: {fileID: 9035063740964656231, guid: e788408d93fc4df4c869f756e543deab, type: 3}
   spawnedArrows: []
   rollDiceEffect: {fileID: 5714308519246576880}
-  currentItem: {fileID: 4428145591479321959, guid: 83132659afe331a4a8209d95e6311f04, type: 3}
-  gunSpawnPoint: {fileID: 3270498665513102295}
+  currentItem: {fileID: -9055737352029737969, guid: 8239f0c0750ab5249a011a8a6372c369, type: 3}
+  handSpawnPoint: {fileID: 3270498665513102295}
+  horseSpawnPoint: {fileID: 7137098901813243232}
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0
@@ -10300,13 +10333,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5307633130454662063}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0018298924, y: -0.0017873244, z: -0.0013369089, w: 0.9999959}
-  m_LocalPosition: {x: -0.08631514, y: -0.051756784, z: 0.20292169}
+  m_LocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: 0.016, y: -0.701, z: 1.005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8093806596086079961}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Father: {fileID: 1343395031851572626}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: -90}
 --- !u!1 &5405963384088779829
 GameObject:
   m_ObjectHideFlags: 0
@@ -11760,7 +11793,6 @@ Transform:
   - {fileID: 2587766814923461780}
   - {fileID: 5262639414972325752}
   - {fileID: 4108640020523232700}
-  - {fileID: 3270498665513102295}
   m_Father: {fileID: 8869416843177938360}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6464695342959024423

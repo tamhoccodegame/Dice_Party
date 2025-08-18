@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VFX;
 
-public class GunElec : BoardItem
+public class GunElec : BoardItem, IRotatableItem
 {
     [SerializeField] float rotateSpeed = 90f;
     public GameObject gunPrefab;
@@ -13,18 +13,18 @@ public class GunElec : BoardItem
     private GameObject currentGun;
     private VisualEffect shootVFX;
     private bool isUsingGun = false;
+    private bool isShooting = false;
     private NewBoardGameController controller;
 
     public override void Use(NewBoardGameController controller)
     {
         this.controller = controller;
-        gunHoldPoint = controller.gunSpawnPoint;
+        gunHoldPoint = controller.handSpawnPoint;
         playerModel = controller.GetComponent<Animator>().transform;
         
         if (gunHoldPoint == null)
         {
             Debug.LogError("GunSpawnPoint not assigned in controller!");
-            controller.EndTurn();
             return;
         }
         controller.StartCoroutine(HandleGunUsage());
@@ -33,49 +33,40 @@ public class GunElec : BoardItem
     private IEnumerator HandleGunUsage()
     {
         currentGun = Instantiate(gunPrefab, gunHoldPoint.position, gunHoldPoint.rotation, gunHoldPoint);
-        currentGun.transform.localRotation = Quaternion.Euler(180, 90, 0);
         isUsingGun = true;
-
         shootVFX = currentGun.GetComponentInChildren<VisualEffect>();
         if (shootVFX != null) shootVFX.Stop();
 
-        yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
-
         while (isUsingGun)
         {
-            RotatePlayerToKeyboard();
-            yield return null;
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButton(0))
             {
-                if (shootVFX != null)
-                {
-                    shootVFX.Play();
-                    yield return new WaitForSeconds(5f);
-                }
-
-                isUsingGun = false;
+                yield return Shoot();
             }
 
             yield return null;
         }
         isUsingGun = false;
         Destroy(currentGun);
-
-        controller.EndTurn();
     }
-
-    void RotatePlayerToKeyboard()
+    public IEnumerator Shoot()
     {
-        float rotateInput = 0f;
-        if (Input.GetKey(KeyCode.LeftArrow))
-            rotateInput = -1f;
-        else if (Input.GetKey(KeyCode.RightArrow))
-            rotateInput = 1f;
-
-        if (rotateInput != 0f && playerModel != null)
+        isShooting = true;
+        if (shootVFX != null && !shootVFX.aliveParticleCount.Equals(0))
         {
-            playerModel.Rotate(Vector3.up, rotateSpeed * rotateInput * Time.deltaTime);
+            shootVFX.Play();
+            yield return new WaitForSeconds(5f);
         }
-        Debug.Log(rotateInput);
+        isShooting = false;
+        isUsingGun = false;
+    }
+    public void Rotate(float direction)
+    {
+        if (isShooting)
+            return;
+        if (playerModel != null)
+        {
+            playerModel.Rotate(Vector3.up * direction * rotateSpeed * Time.deltaTime);
+        }
     }
 }

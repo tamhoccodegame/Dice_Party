@@ -54,7 +54,8 @@ public class NewBoardGameController : PlayerController
     public ParticleSystem rollDiceEffect;
 
     public BoardItem currentItem;
-    public Transform gunSpawnPoint;
+    public Transform handSpawnPoint;
+    public Transform horseSpawnPoint;
 
     private Rigidbody[] rigidbodies;
 
