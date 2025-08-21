@@ -2,22 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VFX;
-public class HandItem : BoardItem, IRotatableItem
+
+public class Magnet : BoardItem, IRotatableItem
 {
-    [SerializeField] public float rotateSpeed;
+    [SerializeField] float rotateSpeed = 90f;
     public GameObject handPrefab;
     public Transform handHoldPoint;
 
-    private GameObject currentHand;
     private Transform playerModel;
+    private GameObject currentHand;
     private Animator animator;
-    private bool isUsingHand = false;
+    private bool isUsing = false;
     private bool isAttack = false;
 
-    private GameObject chargeEffect;
-    private GameObject impactEffect;
+    private GameObject effect;
     private NewBoardGameController controller;
-
     public override void Use(NewBoardGameController controller)
     {
         this.controller = controller;
@@ -28,63 +27,51 @@ public class HandItem : BoardItem, IRotatableItem
             Debug.LogError("GunSpawnPoint not assigned in controller!");
             return;
         }
-        controller.StartCoroutine(SpawnHand());
+        controller.StartCoroutine(SpawnMagnet());
     }
-
-    private IEnumerator SpawnHand()
+    private IEnumerator SpawnMagnet()
     {
-        currentHand = Instantiate(handPrefab, handHoldPoint.position + new Vector3(0,-1,0), handHoldPoint.rotation, handHoldPoint);
-        currentHand.transform.localRotation = Quaternion.Euler(180, 90, 180);
-        isUsingHand = true;
+        currentHand = Instantiate(handPrefab, handHoldPoint.position + new Vector3(0, -0.5f, -1.2f), handHoldPoint.rotation, handHoldPoint);
+        currentHand.transform.localRotation = Quaternion.Euler(90, 180, -90);
+        isUsing = true;
         animator = currentHand.GetComponentInChildren<Animator>();
 
         ParticleSystem[] effects = currentHand.GetComponentsInChildren<ParticleSystem>(true);
         foreach (var fx in effects)
         {
-            if (fx.name.Contains("Charge"))
-                chargeEffect = fx.gameObject;
-            else if (fx.name.Contains("Impact"))
-                impactEffect = fx.gameObject;
+            if (fx.name.Contains("MagnetEffect"))
+                effect = fx.gameObject;
+
         }
 
-        if (chargeEffect) chargeEffect.SetActive(false);
-        if (impactEffect) impactEffect.SetActive(false);
+        if (effect) effect.SetActive(false);
         yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
-        while (isUsingHand)
+        while (isUsing)
         {
             if (Input.GetMouseButton(0))
             {
-                yield return Smash();
+                yield return MagnetHandle();
             }
 
             yield return null;
         }
 
-        isUsingHand = false;
+        isUsing = false;
         Destroy(currentHand);
     }
-
-    public IEnumerator Smash()
+    public IEnumerator MagnetHandle()
     {
         isAttack = true;
-        animator.CrossFade("HandAni", 0.2f);
-        controller.StartCoroutine(ChargeEffect());
-        controller.StartCoroutine(OnHandImpact());
+        controller.StartCoroutine(MagnetEffect());
         yield return new WaitForSeconds(5f);
         isAttack = false;
-        isUsingHand= false;
+        isUsing = false;
 
     }
-
-    private IEnumerator ChargeEffect()
+    private IEnumerator MagnetEffect()
     {
         yield return new WaitForSeconds(0.5f);
-        if (chargeEffect) chargeEffect.SetActive(true);
-    }
-    private IEnumerator OnHandImpact()
-    {
-        yield return new WaitForSeconds(1.2f);
-        if (impactEffect) impactEffect.SetActive(true);
+        if (effect) effect.SetActive(true);
     }
     public void Rotate(float direction)
     {
