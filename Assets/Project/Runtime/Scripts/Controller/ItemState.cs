@@ -30,17 +30,7 @@ public class ItemState : BoardState
 
     public override void Update()
     {
-        if (controller.currentItem is IRotatableItem rotatable)
-        {
-            float rotateInput = 0f;
-            if (Keyboard.current.leftArrowKey.isPressed)
-                rotateInput = -1f;
-            else if (Keyboard.current.rightArrowKey.isPressed)
-                rotateInput = 1f;
-
-            if (rotateInput != 0f)
-                rotatable.Rotate(rotateInput);
-        }
+        
     }
 
     public override string ToString()
