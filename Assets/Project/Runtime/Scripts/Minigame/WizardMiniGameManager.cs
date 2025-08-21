@@ -223,15 +223,21 @@ public class WizardMiniGameManager : MonoBehaviour
 
             yield return null;
         }
-        yield return new WaitForSeconds(2.5f);
 
+        yield return new WaitForSeconds(2.5f);
         tutorialPanel.SetActive(false);
+
+        yield return new WaitForSeconds(1.5f);
+
         startText.gameObject.SetActive(true);
         startSound.Play();
 
         yield return new WaitForSeconds(2f);
 
         startText.gameObject.SetActive(false);
+
+        yield return new WaitForSeconds(1.5f);
+
         isGameStarted = true;
     }
 
