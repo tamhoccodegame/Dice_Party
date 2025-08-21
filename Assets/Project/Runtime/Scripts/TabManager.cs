@@ -21,77 +21,43 @@ public class TabManager : MonoBehaviour
         public Color highlightColor = Color.yellow; // Màu khi được chọn
     }
 
-    [SerializeField] private TabInfo[] tabs;
+    [SerializeField] private TabInfo[] tabs; // Mảng chứa thông tin các tab
     [SerializeField] private float fadeDuration = 0.3f; // Thời gian hiệu ứng fading
-    //[SerializeField] private Color normalColor = Color.white; // Màu nút bình thường
-    //[SerializeField] private Color highlightColor = Color.yellow; // Màu tô đậm khi active
 
     private int currentTabIndex = 0;
 
     private void Start()
     {
-        //// Ẩn tất cả panels trừ panel đầu tiên
-        //for (int i = 0; i < tabs.Length; i++)
-        //{
-        //    int index = i; // Lưu lại index để tránh lỗi delegate
-        //    tabs[i].button.onClick.AddListener(() => SwitchTab(index));
-        //    tabs[i].panel.SetActive(i == currentTabIndex);
-        //    tabs[i].buttonText.color = (i == currentTabIndex) ? highlightColor : normalColor;
-        //}
 
-        for (int i = 0; i < tabs.Length; i++)
+        for (int i = 0; i < tabs.Length; i++) // Duyệt qua tất cả các tab
         {
-            int index = i;
-            tabs[i].button.onClick.AddListener(() => SwitchTab(index));
-            tabs[i].panel.SetActive(i == currentTabIndex);
-            tabs[i].buttonText.color = (i == currentTabIndex) ? tabs[i].highlightColor : tabs[i].normalColor;
+            int index = i; // Lưu index 
+            tabs[i].button.onClick.AddListener(() => SwitchTab(index)); // Gán sự kiện click cho nút tab
+            tabs[i].panel.SetActive(i == currentTabIndex); // Chỉ kích hoạt panel của tab đầu tiên
+            tabs[i].buttonText.color = (i == currentTabIndex) ? tabs[i].highlightColor : tabs[i].normalColor; // Đặt màu cho nút tab đầu tiên là highlight, các tab khác là normal
         }
     }
 
-    private void SwitchTab(int tabIndex)
+    private void SwitchTab(int tabIndex) // Hàm để chuyển đổi giữa các tab
     {
-        if (tabIndex == currentTabIndex) return;
+        if (tabIndex == currentTabIndex) return; // Nếu tab đã được chọn thì không làm gì
 
-        GameObject oldPanel = tabs[currentTabIndex].panel;
+        GameObject oldPanel = tabs[currentTabIndex].panel; 
         GameObject newPanel = tabs[tabIndex].panel;
 
-        oldPanel.GetComponent<CanvasGroup>().DOFade(0, fadeDuration).OnComplete(() =>
+        oldPanel.GetComponent<CanvasGroup>().DOFade(0, fadeDuration).OnComplete(() => // Khi hiệu ứng fade out hoàn tất
         {
-            oldPanel.SetActive(false);
+            oldPanel.SetActive(false); // Ẩn panel cũ
         });
 
-        newPanel.SetActive(true);
-        newPanel.GetComponent<CanvasGroup>().alpha = 0;
-        newPanel.GetComponent<CanvasGroup>().DOFade(1, fadeDuration);
+        newPanel.SetActive(true); // Kích hoạt panel mới
+        newPanel.GetComponent<CanvasGroup>().alpha = 0; // Đặt alpha về 0 để bắt đầu fade in
+        newPanel.GetComponent<CanvasGroup>().DOFade(1, fadeDuration); // Bắt đầu hiệu ứng fade in
 
         // Cập nhật màu cho nút cũ và mới theo màu riêng
-        tabs[currentTabIndex].buttonText.color = tabs[currentTabIndex].normalColor;
-        tabs[tabIndex].buttonText.color = tabs[tabIndex].highlightColor;
+        tabs[currentTabIndex].buttonText.color = tabs[currentTabIndex].normalColor; // Đặt lại màu nút cũ về bình thường
+        tabs[tabIndex].buttonText.color = tabs[tabIndex].highlightColor; // Đặt màu nút mới thành màu highlight
 
-        currentTabIndex = tabIndex;
-
-        //if (tabIndex == currentTabIndex) return; // Nếu đã ở tab này thì không làm gì cả
-
-        //// Ẩn tab cũ bằng hiệu ứng fading
-        //GameObject oldPanel = tabs[currentTabIndex].panel;
-        //GameObject newPanel = tabs[tabIndex].panel;
-
-        //// Tắt panel cũ
-        //oldPanel.GetComponent<CanvasGroup>().DOFade(0, fadeDuration).OnComplete(() =>
-        //{
-        //    oldPanel.SetActive(false);
-        //});
-
-        //// Hiển thị panel mới
-        //newPanel.SetActive(true);
-        //newPanel.GetComponent<CanvasGroup>().alpha = 0;
-        //newPanel.GetComponent<CanvasGroup>().DOFade(1, fadeDuration);
-
-        //// Đổi màu highlight cho nút
-        //tabs[currentTabIndex].buttonText.color = normalColor;
-        //tabs[tabIndex].buttonText.color = highlightColor;
-
-        //// Cập nhật tab hiện tại
-        //currentTabIndex = tabIndex;
+        currentTabIndex = tabIndex; // Cập nhật chỉ số tab hiện tại
     }
 }

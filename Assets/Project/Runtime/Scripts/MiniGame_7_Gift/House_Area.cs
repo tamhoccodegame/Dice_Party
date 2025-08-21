@@ -9,106 +9,120 @@ public class House_Area : MonoBehaviour
     public int columns = 4;
     public float spacing = 1.0f;
 
-    private List<GiftBox> giftsInArea = new List<GiftBox>();
+    // Registry toàn map để Player có thể fallback nếu collider hơi lệch
+    public static readonly List<House_Area> All = new List<House_Area>();
+
+    private GiftBox[] slots;          // mỗi slot chứa 1 quà hoặc null
+    private Vector3[] slotPositions;  // vị trí cố định của từng slot
     private BoxCollider areaCollider;
 
     void Awake()
     {
+        All.Add(this);
+
         areaCollider = GetComponent<BoxCollider>();
-        if (!areaCollider) Debug.LogError("House_Area cần BoxCollider để tính vị trí!");
+        slots = new GiftBox[maxGifts];
+        slotPositions = new Vector3[maxGifts];
+
+        // Tính sẵn vị trí slot (grid ngay hàng thẳng lối)
+        for (int i = 0; i < maxGifts; i++)
+            slotPositions[i] = transform.TransformPoint(IndexToLocalPosition(i));
+
+        // Khuyến nghị để dễ bắt phạm vi: collider là Trigger & bao trùm khu slot
+        // areaCollider.isTrigger = true; // bật nếu bạn muốn
     }
 
-    public bool CanAddGift() => giftsInArea.Count < maxGifts;
-
-    public void AddGift(GiftBox gift)
+    void OnDestroy()
     {
-        if (!CanAddGift()) return;
+        All.Remove(this);
+    }
 
-        giftsInArea.Add(gift);
+    public bool CanAddGift() => GetEmptySlotIndex() != -1;
+
+    public void AddGift(GiftBox gift, int slotIndex = -1)
+    {
+        if (slotIndex == -1) slotIndex = GetEmptySlotIndex();
+        if (slotIndex == -1) return;
+
+        slots[slotIndex] = gift;
         gift.isCarried = false;
         gift.transform.SetParent(transform);
-        ArrangeGifts();
+        gift.transform.position = slotPositions[slotIndex];
+        gift.transform.rotation = Quaternion.identity;
     }
 
     public void RemoveGift(GiftBox gift)
     {
-        if (giftsInArea.Contains(gift))
+        for (int i = 0; i < slots.Length; i++)
         {
-            giftsInArea.Remove(gift);
-            ArrangeGifts();
+            if (slots[i] == gift)
+            {
+                slots[i] = null;
+                return;
+            }
         }
     }
 
-    public GiftBox GetNearestGift(Vector3 playerPos)
+    // Tìm quà gần player nhất nằm trong "range" (tha thứ)
+    public GiftBox GetNearestGift(Vector3 playerPos, float range)
     {
         GiftBox nearest = null;
         float minDist = Mathf.Infinity;
 
-        foreach (GiftBox gift in giftsInArea)
+        foreach (GiftBox gift in slots)
         {
-            if (gift == null) continue;
-
+            if (gift == null || gift.isCarried) continue;
             float dist = Vector3.Distance(playerPos, gift.transform.position);
-            if (dist < minDist)
+            if (dist < minDist && dist <= range)
             {
                 minDist = dist;
                 nearest = gift;
             }
         }
-
         return nearest;
     }
 
-    public Vector3 GetNearestDropPosition(Vector3 playerPos)
+    // Slot trống gần player nhất (có thể kèm maxDistance nếu muốn siết)
+    public int GetNearestEmptySlot(Vector3 playerPos, float maxDistance = Mathf.Infinity)
     {
-        if (!CanAddGift()) return Vector3.zero;
-
-        List<int> emptySlots = new List<int>();
-        for (int i = 0; i < maxGifts; i++)
-        {
-            if (i >= giftsInArea.Count)
-                emptySlots.Add(i);
-        }
-
+        int nearestSlot = -1;
         float minDist = Mathf.Infinity;
-        Vector3 nearestPos = Vector3.zero;
 
-        foreach (int slotIndex in emptySlots)
+        for (int i = 0; i < slots.Length; i++)
         {
-            Vector3 worldPos = transform.TransformPoint(IndexToLocalPosition(slotIndex));
-            float dist = Vector3.Distance(playerPos, worldPos);
-            if (dist < minDist)
+            if (slots[i] != null) continue;
+
+            float dist = Vector3.Distance(playerPos, slotPositions[i]);
+            if (dist < minDist && dist <= maxDistance)
             {
                 minDist = dist;
-                nearestPos = worldPos;
+                nearestSlot = i;
             }
         }
-
-        return nearestPos;
+        return nearestSlot;
     }
 
-    void ArrangeGifts()
+    public Vector3 GetSlotPosition(int index) => slotPositions[index];
+
+    private int GetEmptySlotIndex()
     {
-        for (int i = 0; i < giftsInArea.Count; i++)
-        {
-            Vector3 targetPos = transform.TransformPoint(IndexToLocalPosition(i));
-            giftsInArea[i].transform.position = targetPos;
-            giftsInArea[i].transform.rotation = Quaternion.identity;
-        }
+        for (int i = 0; i < slots.Length; i++)
+            if (slots[i] == null) return i;
+        return -1;
     }
 
-    Vector3 IndexToLocalPosition(int index)
+    private Vector3 IndexToLocalPosition(int index)
     {
         int row = index / columns;
         int col = index % columns;
 
         float startX = -((columns - 1) * spacing) / 2f;
-        float startZ = -((Mathf.CeilToInt((float)maxGifts / columns) - 1) * spacing) / 2f;
+        float rows = Mathf.CeilToInt((float)maxGifts / columns);
+        float startZ = -((rows - 1) * spacing) / 2f;
 
         float x = startX + col * spacing;
         float z = startZ + row * spacing;
 
         return new Vector3(x, 0f, z);
     }
-
 }

@@ -14,9 +14,9 @@ public class T_CannonProjectile : MonoBehaviour
         _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
     }
 
-    public void Init(ProjectileData data, Vector3 direction)
+    public void Init(ProjectileData data, Vector3 direction) // Hàm khởi tạo đạn với dữ liệu và hướng
     {
-        _data = data;
+        _data = data; // Lưu dữ liệu đạn
 
         // Nạp lực – dùng VelocityChange để bỏ qua khối lượng
         _rb.AddForce(direction.normalized * _data.speed, ForceMode.VelocityChange);
@@ -29,18 +29,18 @@ public class T_CannonProjectile : MonoBehaviour
     {
         // Spawn VFX nếu có
         if (_data.impactVFX)
-            Instantiate(_data.impactVFX, transform.position, Quaternion.identity);
+            Instantiate(_data.impactVFX, transform.position, Quaternion.identity); // Spawn VFX tại vị trí va chạm
 
         if (collision.collider.CompareTag("Player"))
         {
-            PlayerBlinking player = collision.collider.GetComponent<PlayerBlinking>();
+            PlayerBlinking player = collision.collider.GetComponent<PlayerBlinking>(); // Lấy PlayerBlinking từ collider
             if (player == null)
-                player = collision.collider.GetComponentInParent<PlayerBlinking>();
+                player = collision.collider.GetComponentInParent<PlayerBlinking>(); // Kiểm tra cả collider và parent
 
-            if (player != null)
+            if (player != null) // Nếu tìm thấy PlayerBlinking
             {
-                Vector3 hitPoint = collision.contacts[0].point;
-                player.OnHitByObstacle(hitPoint);
+                Vector3 hitPoint = collision.contacts[0].point; // Lấy điểm va chạm
+                player.OnHitByObstacle(hitPoint); // Gọi hàm xử lý va chạm
             }
         }
 
