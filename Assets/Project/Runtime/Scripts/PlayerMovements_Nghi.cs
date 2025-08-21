@@ -41,11 +41,17 @@ public class PlayerMovements_Nghi : MonoBehaviour
     private float coyoteTimer;
     private float jumpBufferTimer;
 
+    private PlayerInteractMoneyController bagController;
+
+    private bool IsMovementLocked => bagController != null && bagController.isFalling;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
         cam = Camera.main.transform;
+
+        bagController = GetComponent<PlayerInteractMoneyController>(); // 👈 lấy nếu có
 
         if (!animator) Debug.LogError("Animator not found!");
         if (!cam) Debug.LogError("Main Camera not found!");
@@ -53,6 +59,18 @@ public class PlayerMovements_Nghi : MonoBehaviour
 
     void Update()
     {
+        if (IsMovementLocked)
+        {
+            // vẫn cho apply gravity để nhân vật rớt tự nhiên
+            verticalVelocity += gravity * Time.deltaTime;
+
+            // Move chỉ với gravity (không nhận input ngang)
+            Vector3 finalMove = Vector3.up * verticalVelocity;
+            controller.Move(finalMove * Time.deltaTime);
+
+            return; // ⛔ skip mọi xử lý input/rotation/animation
+        }
+
         CacheInputs();
         UpdateGroundCheck();
         UpdateCoyoteTime();
@@ -117,8 +135,48 @@ public class PlayerMovements_Nghi : MonoBehaviour
         verticalVelocity += gravity * Time.deltaTime;
     }
 
+    //void HandleMovement()
+    //{
+    //    float horizontal = Input.GetAxisRaw("Horizontal");
+    //    float vertical = Input.GetAxisRaw("Vertical");
+    //    bool isRunning = Input.GetKey(KeyCode.LeftShift);
+
+    //    Vector3 inputDir = new Vector3(horizontal, 0f, vertical).normalized;
+
+    //    Vector3 camForward = cam.forward;
+    //    Vector3 camRight = cam.right;
+    //    camForward.y = 0f;
+    //    camRight.y = 0f;
+    //    camForward.Normalize();
+    //    camRight.Normalize();
+
+    //    Vector3 moveDir = camForward * inputDir.z + camRight * inputDir.x;
+    //    moveDir.Normalize();
+
+    //    float targetSpeed = (isRunning && inputDir != Vector3.zero) ? runSpeed : walkSpeed;
+    //    Vector3 targetVelocity = moveDir * targetSpeed;
+
+    //    horizontalVelocity = Vector3.SmoothDamp(horizontalVelocity, targetVelocity, ref velocitySmooth, accelerationTime);
+
+    //    Vector3 finalMove = horizontalVelocity + Vector3.up * verticalVelocity;
+    //    controller.Move(finalMove * Time.deltaTime);
+
+
+    //    // nhận số bag từ controller
+    //    int bagCount = GetComponent<PlayerInteractMoneyController>().carriedBags.Count;
+
+    //    // slow factor: mỗi bag giảm 20% tốc độ
+    //    float carrySlowFactor = 1f - (0.2f * bagCount);
+    //    carrySlowFactor = Mathf.Clamp(carrySlowFactor, 0.4f, 1f); // không cho chậm quá
+
+    //    float targetSpeed_Bag = (isRunning && inputDir != Vector3.zero) ? runSpeed : walkSpeed;
+    //    targetSpeed_Bag *= carrySlowFactor;
+    //}
+
     void HandleMovement()
     {
+        if (IsMovementLocked) return; // ⛔ không cho đi ngang
+
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
@@ -135,7 +193,24 @@ public class PlayerMovements_Nghi : MonoBehaviour
         Vector3 moveDir = camForward * inputDir.z + camRight * inputDir.x;
         moveDir.Normalize();
 
-        float targetSpeed = (isRunning && inputDir != Vector3.zero) ? runSpeed : walkSpeed;
+        // 👇 mặc định = 0 bag
+        int bagCount = 0;
+
+        // 👇 chỉ lấy nếu có bagController
+        if (bagController != null)
+            bagCount = bagController.carriedBags.Count;
+
+        // 👇 base speed
+        float baseSpeed = (isRunning && inputDir != Vector3.zero) ? runSpeed : walkSpeed;
+
+        // 👇 factor theo số bag (opt-in)
+        float[] bagSpeedFactor = { 1.3f, 1.0f, 0.7f, 0.4f };
+        float carryFactor = bagSpeedFactor[Mathf.Clamp(bagCount, 0, bagSpeedFactor.Length - 1)];
+
+        float targetSpeed = baseSpeed * carryFactor;
+
+
+        // 👇 apply tốc độ
         Vector3 targetVelocity = moveDir * targetSpeed;
 
         horizontalVelocity = Vector3.SmoothDamp(horizontalVelocity, targetVelocity, ref velocitySmooth, accelerationTime);
@@ -144,8 +219,11 @@ public class PlayerMovements_Nghi : MonoBehaviour
         controller.Move(finalMove * Time.deltaTime);
     }
 
+
     void HandleRotation()
     {
+        if (IsMovementLocked) return; // ⛔ không cho xoay
+
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
@@ -184,5 +262,14 @@ public class PlayerMovements_Nghi : MonoBehaviour
             animator.SetTrigger("JumpAir");
             hasTriggeredJumpAir = true;
         }
+
+
+        int bagCount = 0;
+        if (bagController != null)
+            bagCount = bagController.carriedBags.Count;
+
+        float[] animSpeedFactor = { 1.3f, 1.0f, 0.7f, 0.5f };
+        animator.speed = animSpeedFactor[Mathf.Clamp(bagCount, 0, animSpeedFactor.Length - 1)];
+
     }
 }

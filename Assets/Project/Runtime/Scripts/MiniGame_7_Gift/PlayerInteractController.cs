@@ -4,6 +4,10 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class PlayerInteractController : MonoBehaviour
 {
+    public enum CarryMode { IK, Animation }
+    [Header("Carry Mode")]
+    public CarryMode carryMode = CarryMode.IK;
+
     [Header("Interact Config")]
     public Transform carryPoint;
     public int playerID;
@@ -48,6 +52,11 @@ public class PlayerInteractController : MonoBehaviour
         animator = GetComponent<Animator>();
         areaHits = new Collider[Mathf.Max(4, areaHitCapacity)];
         giftHits = new Collider[Mathf.Max(8, giftHitCapacity)];
+
+        if (carryMode == CarryMode.Animation)
+        {
+            animator.SetLayerWeight(1, 0f);
+        }
     }
 
     void Update()
@@ -117,10 +126,23 @@ public class PlayerInteractController : MonoBehaviour
             carriedGift = bestGift;
             bestGift.PickUp(carryPoint);
 
-            leftHandIKTarget = bestGift.transform.Find("LeftHandTarget");
-            rightHandIKTarget = bestGift.transform.Find("RightHandTarget");
-            handIKWeight = 1f;
+            //leftHandIKTarget = bestGift.transform.Find("LeftHandTarget");
+            //rightHandIKTarget = bestGift.transform.Find("RightHandTarget");
+            //handIKWeight = 1f;
             isHoldingGift = true;
+
+            //!!!!!!!!!!!!!!!!!
+            if (carryMode == CarryMode.IK)
+            {
+                leftHandIKTarget = bestGift.transform.Find("LeftHandTarget");
+                rightHandIKTarget = bestGift.transform.Find("RightHandTarget");
+                handIKWeight = 1f;
+            }
+            else if (carryMode == CarryMode.Animation)
+            {
+                animator.SetLayerWeight(1, 1f); // bật layer Carry
+            }
+
             return true;
         }
 
@@ -180,6 +202,10 @@ public class PlayerInteractController : MonoBehaviour
                 handIKWeight = 0f;
                 isHoldingGift = false;
                 carriedGift = null;
+
+                if (carryMode == CarryMode.Animation)
+                    animator.SetLayerWeight(1, 0f);
+
                 score++;
                 return true;
             }
