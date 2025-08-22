@@ -50,7 +50,7 @@ public class Throne : MonoBehaviour
                     playerObject.GetComponent<WinController>().enabled = false;
                     playerObject.transform.position = sitPosition.position;
                     playerObject.transform.rotation = sitPosition.rotation;
-                    playerObject.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+                    playerObject.GetComponent<Animator>().Play($"Win5");
                     effect.SetActive(true);
                 }
                 else

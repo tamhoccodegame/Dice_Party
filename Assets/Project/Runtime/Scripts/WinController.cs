@@ -1,9 +1,6 @@
-using System.Collections.Specialized;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 
 public class WinController : PlayerController
 {
@@ -13,6 +10,8 @@ public class WinController : PlayerController
     public Vector2 movementInput;
 
     public TextMeshPro awardText;
+
+    public bool isDancing = false;
 
     public override PlayerInput GetPlayerInput()
     {
@@ -39,6 +38,18 @@ public class WinController : PlayerController
     {
         if (Camera.main == null) return;
 
+        if (playerInput.actions["Interact"].triggered && playerInput != WizardPartyData.instance.winner)
+        {
+            if (!isDancing)
+            {
+                ChangeAnimation($"Win{Random.Range(1, 7)}");
+            }
+            else
+            {
+                isDancing = false;
+            }
+        }
+
         movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
 
         Vector3 camForward = Camera.main.transform.forward;
@@ -49,6 +60,8 @@ public class WinController : PlayerController
         Vector3 movement = movementInput.x * camRight + movementInput.y * camForward;
 
         movement.y = -5f;
+
+        if (isDancing) return;
 
         _cc.Move(movement * moveSpeed * Time.deltaTime);
 

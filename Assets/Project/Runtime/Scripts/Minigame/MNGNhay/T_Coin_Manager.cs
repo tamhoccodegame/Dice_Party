@@ -1,5 +1,6 @@
 ﻿using Dreamteck.Splines;
 using System.Linq;
+using System.Numerics;
 
 public class T_Coin_Manager : WizardMiniGameManager
 {
