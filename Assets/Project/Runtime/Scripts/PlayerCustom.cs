@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerCustom : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class PlayerCustom : MonoBehaviour
 
     private PlayerInput playerInput;
 
+    public Button applyButton;
+
     public void Awake()
     {
     }
@@ -22,12 +25,13 @@ public class PlayerCustom : MonoBehaviour
     public void Init(PlayerInput playerInput)
     {
         this.playerInput = playerInput;
-        ApplyCustoms();
+        ApplyCustoms(); 
     }
 
     public void ApplyCustoms()
     {
         CustomData customData = PlayerManager.instance.GetComponentInChildren<CustomData>();
+        Debug.Log($"Save Custom: {playerInput} {currentColorIndex}");
         if (customData != null)
         {
             Custom custom = new Custom { hairIndex = currentHairIndex, colorIndex = currentColorIndex, bodyPartIndex = currentBodypartIndex };
@@ -78,6 +82,24 @@ public class PlayerCustom : MonoBehaviour
         {
             colors[i].SetActive(i == index);
         }
+
+        if (PlayerManager.instance.GetComponentInChildren<CustomData>().IsColorChoosen(index))
+        {
+            PlayerInput colorPicker = PlayerManager.instance.GetComponentInChildren<CustomData>().GetColorPlayer(index);
+            if (colorPicker != playerInput && colorPicker != null)
+            {
+                applyButton.interactable = false;
+            }
+            else
+            {
+                applyButton.interactable = true;
+            }
+        }
+        else
+        {
+            applyButton.interactable = true;
+        }
+
     }
 
     public void NextBodypart()

@@ -55,6 +55,17 @@ public class OptionSelector : MonoBehaviour
         textOptions = _textOptions;
 
         this.playerCustom = playerCustom;
+
+        if(selectorType == Type.Color)
+        {
+            while(PlayerManager.instance.GetComponentInChildren<CustomData>().IsColorChoosen(currentIndex))
+            {
+                currentIndex = (currentIndex + 1) % colorOptions.Count;
+            }
+
+            playerCustom.currentColorIndex = currentIndex;
+            UpdateDisplay();
+        }
     }
 
     private void Update()

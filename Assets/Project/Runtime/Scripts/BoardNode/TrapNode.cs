@@ -22,6 +22,8 @@ public class TrapNode : BoardNode
         TurnManager.instance.UpdatePlayerDataUI();
         nodeEffect.gameObject.SetActive(true);
         controller.EnableRagdoll();
+        yield return new WaitForSeconds(5f);
+        TurnManager.instance.NextTurn();
     }
 }
 

@@ -18,6 +18,12 @@ public class ChestGoldNode : BoardNode
 
     public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
     {
+        if (TurnManager.instance.chestGolds[WizardPartyData.instance.currentChestIndex] != transform)
+        {
+            base.ProcessNode(playerInput, playerTransform);
+            return;
+        }
+
         if(processCoroutine == null)
         processCoroutine = StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
     }

@@ -49,11 +49,7 @@ public class AvatarTurnManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            int nextIndex = (currentIndex + 1) % avatars.Count;
-            HighlightTurn(nextIndex);
-        }
+
     }
 
     /// <summary>
@@ -69,6 +65,8 @@ public class AvatarTurnManager : MonoBehaviour
 
         currentIndex = playerIndex;
 
+        playerNameText.text = $"Player {currentIndex + 1}";
+
         // Chạy animation Press → Pop → Active
         RectTransform target = avatars[playerIndex];
 
@@ -82,5 +80,15 @@ public class AvatarTurnManager : MonoBehaviour
             // Bật ra to (Pop)
             target.DOScale(activeScale, popDuration).SetEase(popEase);
         });
+    }
+
+    public void Appear()
+    {
+        GetComponentInChildren<PopUpAppearGroup_UI>().StartAppearSequence();
+    }
+
+    public void Disappear()
+    {
+        GetComponentInChildren<PopUpDisappearGroup_UI>().StartDisappearSequence();
     }
 }

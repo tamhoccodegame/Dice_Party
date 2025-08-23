@@ -55,8 +55,17 @@ public class NewBoardGameController : PlayerController
     [Header("Effect")]
     public ParticleSystem rollDiceEffect;
 
-    public BoardItem currentItem;
+    [Header("ItemGun")]
+    public BoardItem gun;
     public Transform gunSpawnPoint;
+
+    [Header("ItemShit")]
+    public BoardItem shitItem;
+    public Transform shitSpawnPoint;
+
+    [Header("ItemHorse")]
+    public BoardItem horseItem;
+    public Transform horseSpawnPoint;
 
     private Rigidbody[] rigidbodies;
 
@@ -111,6 +120,7 @@ public class NewBoardGameController : PlayerController
 
     public void ChangeState(BoardState newState)
     {
+        Debug.Log($"Change to {newState}");
         currentState?.Exit();
         switch (newState)
         {
@@ -136,13 +146,19 @@ public class NewBoardGameController : PlayerController
 
     public void ChangeAnimation(string animName)
     {
+        if (currentAnim == animName) return;
         currentAnim = animName;
-        animator.Play(animName);
+        animator.CrossFade(animName, 0.25f);
     }
 
     private void Update()
     {
         currentState?.Update();
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            UseSelectedItem();
+        }
 
         verticalVelocity = -5f * Time.deltaTime;
 
@@ -159,13 +175,14 @@ public class NewBoardGameController : PlayerController
 
         _controller.Move(move); // tốc độ di chuyển
 
-        if (toMoveNode != null)
+        if (toMoveNode != null && currentState != itemState)
         {
             Vector3 direction = toMoveNode.transform.position - transform.position;
             direction.y = 0;
             Quaternion newRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 20 * Time.deltaTime);
         }
+      
     }
 
     #region Move
@@ -177,8 +194,8 @@ public class NewBoardGameController : PlayerController
 
     IEnumerator RollDiceCoroutine()
     {
-        StepsLeft = Random.Range(1, 9);
-        //StepsLeft = 1;
+        StepsLeft = Random.Range(1, 6);
+        //StepsLeft = 99;
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
@@ -258,8 +275,13 @@ public class NewBoardGameController : PlayerController
     // Item (tạm bỏ qua inventory)
     public void UseSelectedItem()
     {
-        Debug.Log("💥 Sử dụng item!");
-        // Sau này xử lý skill / bắn súng / trap
+        if (gun == null)
+        {
+            Debug.LogWarning("No item to use.");
+            return;
+        }
+
+        ChangeState(itemState);
     }
 
     public void StartTurn()
@@ -271,11 +293,13 @@ public class NewBoardGameController : PlayerController
     IEnumerator ShowTurnAvatarUI()
     {
         AvatarTurnManager.instance.gameObject.SetActive(true);
+        AvatarTurnManager.instance.Appear();
         AvatarTurnManager.instance.HighlightTurn(PlayerManager.instance.players.IndexOf(playerInput));
         yield return new WaitForSeconds(3f);
         readyForInput = true;
         _controller.enabled = true;
         ShowDice();
+        AvatarTurnManager.instance.Disappear();
         AvatarTurnManager.instance.gameObject.SetActive(false);
     }
 
@@ -415,7 +439,6 @@ public class NewBoardGameController : PlayerController
         clone.GetComponent<Animator>().enabled = true;
         yield return new WaitForSeconds(1.5f);
         clone.GetComponent<NewBoardGameController>().enabled = false;
-        TurnManager.instance.NextTurn();
         Destroy(gameObject);
     }
 

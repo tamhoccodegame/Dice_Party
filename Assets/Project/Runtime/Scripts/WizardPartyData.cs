@@ -74,6 +74,12 @@ public class WizardPartyData : MonoBehaviour
     public void UpdatePlayerHealth(PlayerInput input, int qty)
     {
         playersStat[input].health += qty;
+        if (playersStat[input].health <= 0)
+        {
+            playersStat[input].health = 30;
+            playersStat[input].keyQty = 0;
+            MatchAwardSystem.instance.keysCount[input] = playersStat[input].keyQty;
+        }
     }
     public void UpdatePlayerCup(PlayerInput input, int qty)
     {

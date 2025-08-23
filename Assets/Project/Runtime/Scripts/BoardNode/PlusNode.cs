@@ -16,6 +16,7 @@ public class PlusNode : BoardNode
         NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
         if(nodeEffect != null) 
         nodeEffect.Play();
+        yield return new WaitForSeconds(0.2f);
         controller.SetStepLeft(3);
         controller.ChangeState(controller.movingState);
         yield return null;

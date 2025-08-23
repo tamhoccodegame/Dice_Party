@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,7 +7,7 @@ using UnityEngine.Playables;
 public class WinManager : MonoBehaviour
 {
     public static WinManager instance;
-
+    public AudioClip music;
     public GameObject playerPrefab;
     public Transform[] spawnPositions;
 
@@ -15,10 +15,42 @@ public class WinManager : MonoBehaviour
 
     public PlayableDirector cutscene;
 
+    public List<PlayerInput> playerInputs = new List<PlayerInput>();
+    private HashSet<PlayerInput> confirmedPlayers = new HashSet<PlayerInput>();
+
+
     public void Awake()
     {
         SpawnPlayer();
         PlayCutscene();
+    }
+
+    private void Start()
+    {
+        MusicManager.instance.PlayMusic(music);
+        playerInputs = PlayerManager.instance.players;
+    }
+
+    void ReturnToMainMenu()
+    {
+        MusicManager.instance.PlayMainTheme();
+        LevelLoader.instance.LoadScene("UI_StartScene");
+    }
+
+    private void Update()
+    {
+        foreach (var playerInput in playerInputs)
+        {
+            if (playerInput.actions["Confirm"].WasPressedThisFrame())
+            {
+                confirmedPlayers.Add(playerInput);
+            }
+        }
+
+        if (confirmedPlayers.Count == playerInputs.Count)
+        {
+            ReturnToMainMenu();
+        }
     }
 
     public void SpawnPlayer()

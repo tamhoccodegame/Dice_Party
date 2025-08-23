@@ -55,8 +55,13 @@ public class MNGPlayerController : PlayerController
     {
         if (playerInput == null) return;
 
+        Vector3 camForward = Camera.main.transform.forward;
+        camForward.y = 0f;
+        Vector3 camRight = Camera.main.transform.right;
+        camRight.y = 0f;
+
         movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
-        Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
+        Vector3 move = camForward * movementInput.y + camRight * movementInput.x;
 
 
         if (isGrounded && verticalVelocity < 0)
@@ -78,7 +83,7 @@ public class MNGPlayerController : PlayerController
         move.y = verticalVelocity;
 
         // Move
-        controller.Move(move * 8f * Time.deltaTime);
+        controller.Move(move * moveSpeed * Time.deltaTime);
         // Ground check
         isGrounded = controller.isGrounded;
 

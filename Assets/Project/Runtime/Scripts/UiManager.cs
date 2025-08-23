@@ -1,6 +1,6 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-//using Unity.VisualScripting.YamlDotNet.Serialization;
+/*using Unity.VisualScripting.YamlDotNet.Serialization;*/
 using UnityEngine;
 
 public class UiManager : WizardMiniGameManager
@@ -16,69 +16,66 @@ public class UiManager : WizardMiniGameManager
 
     protected override void Awake()
     {
-        base.Awake();
+        //base.Awake();
     }
 
     protected override void Start()
     {
-        base.Start();
+        //base.Start();
 
         StartCoroutine(SpawnEnemy());
     }
 
     IEnumerator SpawnEnemy()
     {
-        while(!isGameStarted || isGameOver) yield return null;
-        while(time > 0)
+        while (time > 0)
         {
-            while (activeEnemys > 7) yield return null;
+            while (activeEnemys >= 7) yield return null;
 
-            Transform[] spawnPositions = GetRandomSpawnDirection();
+            HashSet<Transform> usedPositions = new HashSet<Transform>();
 
-            Transform[] lastSpawnPositions = spawnPositions;
+            int spawnCount = Mathf.Min(7 - activeEnemys, 3); // spawn 3 con 1 batch
+            int spawned = 0;
 
-            int lastRandomPosition = -1;
-
-            foreach(var pos in spawnPositions)
+            while (spawned < spawnCount)
             {
-                int randomPosition = lastRandomPosition;
-                while(randomPosition == lastRandomPosition)
-                {
-                    randomPosition = Random.Range(0, spawnPositions.Length);
-                    yield return null;
-                }
-                lastRandomPosition = randomPosition;
+                Transform[] direction = GetRandomSpawnDirection();
+                Transform pos = direction[Random.Range(0, direction.Length)];
 
-                var go = Instantiate(enemyPrefab, spawnPositions[randomPosition].position, Quaternion.identity);
-                yield return null;
+                // Check trùng vị trí
+                if (!usedPositions.Contains(pos))
+                {
+                    Instantiate(enemyPrefab, pos.position, pos.rotation);
+                    usedPositions.Add(pos);
+                    activeEnemys++;
+                    spawned++;
+                }
+                else
+                {
+                    // Trùng thì random lại
+                    yield return null;
+                    continue;
+                }
+
+                yield return null; // tránh freeze
             }
 
             yield return new WaitForSeconds(0.5f);
-
-            while(spawnPositions == lastSpawnPositions)
-            {
-                spawnPositions = GetRandomSpawnDirection();
-                yield return null;
-            }
-
-
-            foreach (var pos in spawnPositions)
-            {
-                int randomPosition = lastRandomPosition;
-                while (randomPosition == lastRandomPosition)
-                {
-                    randomPosition = Random.Range(0, spawnPositions.Length);
-                    yield return null;
-                }
-                lastRandomPosition = randomPosition;
-
-                var go = Instantiate(enemyPrefab, spawnPositions[randomPosition].position, Quaternion.identity);
-                yield return null;
-            }
-
-            yield return null;
         }
     }
+
+
+
+    bool IsPositionFree(Vector3 pos, float checkRadius = 0.5f)
+    {
+        Collider[] hits = Physics.OverlapSphere(pos, checkRadius);
+        foreach (var hit in hits)
+        {
+            if (hit.CompareTag("Enemy")) return false;
+        }
+        return true;
+    }
+
 
     Transform[] GetRandomSpawnDirection()
     {
