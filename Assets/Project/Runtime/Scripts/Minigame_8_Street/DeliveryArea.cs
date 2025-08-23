@@ -28,6 +28,9 @@ public class DeliveryArea : MonoBehaviour
         if (player == null) return;
         if (!playerHasGift(player)) return;
 
+        int deliveredCount = player.carriedBags.Count; // lấy số bag player đang cầm
+        if (deliveredCount <= 0) return;
+
         // --- Spawn VFX tại vị trí tay ---
         if (deliveryVFXPrefab != null && player.carryPoint != null)
         {
@@ -53,8 +56,10 @@ public class DeliveryArea : MonoBehaviour
         if (player.carryMode == PlayerInteractMoneyController.CarryMode.Animation)
             player.GetComponent<Animator>().SetLayerWeight(1, 0f);
 
-        // --- Score +1 ---
-        player.score++;
+
+        // --- Score += deliveredCount ---
+        player.score += deliveredCount;
+        player.UpdateScoreUI(); // gọi update UI luôn
         Debug.Log($"Player {player.playerID} delivered money! Total score = {player.score}");
     }
 
