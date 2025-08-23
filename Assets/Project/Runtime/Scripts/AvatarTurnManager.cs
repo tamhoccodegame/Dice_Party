@@ -81,4 +81,14 @@ public class AvatarTurnManager : MonoBehaviour
             target.DOScale(activeScale, popDuration).SetEase(popEase);
         });
     }
+
+    public void Appear()
+    {
+        GetComponentInChildren<PopUpAppearGroup_UI>().StartAppearSequence();
+    }
+
+    public void Disappear()
+    {
+        GetComponentInChildren<PopUpDisappearGroup_UI>().StartDisappearSequence();
+    }
 }

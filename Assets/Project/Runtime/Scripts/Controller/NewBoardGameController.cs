@@ -293,11 +293,13 @@ public class NewBoardGameController : PlayerController
     IEnumerator ShowTurnAvatarUI()
     {
         AvatarTurnManager.instance.gameObject.SetActive(true);
+        AvatarTurnManager.instance.Appear();
         AvatarTurnManager.instance.HighlightTurn(PlayerManager.instance.players.IndexOf(playerInput));
         yield return new WaitForSeconds(3f);
         readyForInput = true;
         _controller.enabled = true;
         ShowDice();
+        AvatarTurnManager.instance.Disappear();
         AvatarTurnManager.instance.gameObject.SetActive(false);
     }
 
