@@ -32,17 +32,7 @@ public class PlayerBlinking : MonoBehaviour
         }
 
         PlayerInput playerInput = GetComponent<PlayerController>().GetPlayerInput();
-        int score = WizardMiniGameManager.instance.playerScores[playerInput];
-
-        if (score - 20 <= 0)
-        {
-            score = 0;
-        }
-        else score -= 20;
-
-        WizardMiniGameManager.instance.playerScores[playerInput] = score;
-
-        WizardMiniGameManager.instance.UpdateHUD();
+        WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, -20);
 
 
         PlayHurtAnim();

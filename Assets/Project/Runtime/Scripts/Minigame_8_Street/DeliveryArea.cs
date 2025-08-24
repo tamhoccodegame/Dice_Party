@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class DeliveryArea : MonoBehaviour
 {
@@ -42,6 +43,9 @@ public class DeliveryArea : MonoBehaviour
         if (player.carriedBagInstance != null)
             GameObject.Destroy(player.carriedBagInstance);
 
+        PlayerInput playerInput = player.GetComponent<MNGPlayerController>().GetPlayerInput();
+        WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, player.carriedBags.Count);
+
         // --- Xoá danh sách bag logic ---
         if (player.carriedBags != null)
             player.carriedBags.Clear();
@@ -57,10 +61,6 @@ public class DeliveryArea : MonoBehaviour
             player.GetComponent<Animator>().SetLayerWeight(1, 0f);
 
 
-        // --- Score += deliveredCount ---
-        player.score += deliveredCount;
-        player.UpdateScoreUI(); // gọi update UI luôn
-        Debug.Log($"Player {player.playerID} delivered money! Total score = {player.score}");
     }
 
 

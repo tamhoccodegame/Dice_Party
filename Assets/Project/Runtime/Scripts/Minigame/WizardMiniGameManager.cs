@@ -36,7 +36,6 @@ public class WizardMiniGameManager : MonoBehaviour
 
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
-    public Transform[] avatarHUDPositions;
 
     public PlayerSlotHUD[] playerHUDs;
 
@@ -115,6 +114,8 @@ public class WizardMiniGameManager : MonoBehaviour
     public void UpdatePlayerScore(PlayerInput input, int ammount)
     {
         playerScores[input] += ammount;
+
+        playerScores[input] = Mathf.Max(0, playerScores[input]);
         UpdateHUD();
 
         if (CheckGameOver())
