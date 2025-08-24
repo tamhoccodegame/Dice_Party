@@ -122,4 +122,15 @@ public class CarInfo : MonoBehaviour
         float dynSafe = minGap + currentSpeed * timeHeadway + 0.1f;
         Gizmos.DrawLine(transform.position, transform.position + fwd * (dynSafe + vehicleLength));
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.TryGetComponent<PlayerInteractMoneyController>(out var player))
+        {
+            if (!player.isFalling)
+            {
+                player.LoseOneBag();
+            }
+        }
+    }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FirstGearGames.Utilities.Objects;
 using FirstGearGames.SmoothCameraShaker;
+using UnityEngine.InputSystem;
 
 public class Bullman : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class Bullman : MonoBehaviour
     public Transform centerPoint;
 
     public bool isHitWall = false;
-    
+
     public ShakeData shakeData;
 
     public enum State
@@ -30,6 +31,12 @@ public class Bullman : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        availabeTargets.Clear();
+        foreach(var p in WizardMiniGameManager.instance.playerObjects)
+        {
+            availabeTargets.Add(p.Value.transform);
+        }
+
         state = State.Idle;
         StartCoroutine(StateMachine());
     }
@@ -59,6 +66,9 @@ public class Bullman : MonoBehaviour
     {
         isHitWall = false;
         animator.CrossFade("Idle", 0.25f);
+
+        lockedTarget = availabeTargets[Random.Range(0, availabeTargets.Count)];
+        yield return null;
 
         float elaspedTime = 0;
 
@@ -126,9 +136,17 @@ public class Bullman : MonoBehaviour
         state = State.Idle;
     }
 
-
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         isHitWall = true;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.TryGetComponent<MNGPlayerController>(out var player))
+        {
+            PlayerInput playerInput = player.GetPlayerInput();
+            WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, -20);
+        }
     }
 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static Codice.Client.Common.EventTracking.TrackFeatureUseEvent.Features.DesktopGUI.Filters;
 
 public class PlayerInteractMoneyController : MonoBehaviour
 {
@@ -55,13 +57,18 @@ public class PlayerInteractMoneyController : MonoBehaviour
     public float bagScaleStep = 0.25f;
 
     // ==== mới thêm ====
-    [HideInInspector] public bool isFalling = false;
+    public bool isFalling = false;
     private Vector3 cachedPosition;
+
+    private PlayerInput playerInput;
+
     void Start()
     {
         animator = GetComponent<Animator>();
         areaHits = new Collider[Mathf.Max(4, areaHitCapacity)];
         giftHits = new Collider[Mathf.Max(8, giftHitCapacity)];
+        TryGetComponent<MNGPlayerController>(out var p);
+        playerInput = p != null ? p.GetPlayerInput() : null;    
 
         if (carryMode == CarryMode.Animation)
             animator.SetLayerWeight(1, 0f);
@@ -93,7 +100,7 @@ public class PlayerInteractMoneyController : MonoBehaviour
         if (isFalling) return; // đang té thì bỏ qua input
 
         // buffer input
-        if (Input.GetKeyDown(KeyCode.E))
+        if (playerInput != null && playerInput.actions["Interact"].triggered)
             interactBufferTimer = inputBufferSeconds;
 
         if (interactBufferTimer > 0f)
@@ -111,14 +118,13 @@ public class PlayerInteractMoneyController : MonoBehaviour
     }
 
     // ===== VA CHẠM XE =====
-
     private void OnTriggerEnter(Collider other)
     {
         if (((1 << other.gameObject.layer) & carHitboxLayer) != 0)
         {
             Debug.Log($"[Player {playerID}] Hit by car hitbox: {other.gameObject.name}");
 
-            if (carriedBags.Count > 0 && !isFalling)
+            if (!isFalling)
             {
                 LoseOneBag();
             }
@@ -126,19 +132,14 @@ public class PlayerInteractMoneyController : MonoBehaviour
     }
 
     // ===== MẤT BAG =====
-    private void LoseOneBag()
+    public void LoseOneBag()
     {
-        carriedBags.RemoveAt(carriedBags.Count - 1);
+        if(carriedBags.Count > 0)
+        carriedBags.Clear();
         UpdateCountUI();
         // update scale hoặc disable nếu hết
         if (carriedBagInstance != null)
         {
-            if (carriedBags.Count > 0)
-            {
-                float scaleFactor = 1f + (bagScaleStep * (carriedBags.Count - 1));
-                carriedBagInstance.transform.localScale = baseBagScale * scaleFactor;
-            }
-            else
             {
                 Destroy(carriedBagInstance);
                 carriedBagInstance = null;
@@ -155,7 +156,8 @@ public class PlayerInteractMoneyController : MonoBehaviour
         Debug.Log($"[Player {playerID}] Hit by car! Bags left: {carriedBags.Count}");
 
         // Crossfade sang Fall
-        animator.CrossFade("Fall", 0.05f);
+        GetComponent<MNGPlayerController>().isFalling = true;
+        GetComponent<MNGPlayerController>().ChangeAnim("Fall");
 
         // Fall chỉ 1s rồi tự recover
         StartCoroutine(RecoverFromFall());
@@ -171,40 +173,12 @@ public class PlayerInteractMoneyController : MonoBehaviour
         // recover
         isFalling = false;
 
-        if (carriedBags.Count > 0)
-        {
-            if (carriedBagInstance != null)
-            {
-                carriedBagInstance.SetActive(true);
-                float scaleFactor = 1f + (bagScaleStep * (carriedBags.Count - 1));
-                carriedBagInstance.transform.localScale = baseBagScale * scaleFactor;
-            }
-            else
-            {
-                carriedBagInstance = Instantiate(bagPrefab, carryPoint);
-                carriedBagInstance.transform.localPosition = Vector3.zero;
-                carriedBagInstance.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-                baseBagScale = carriedBagInstance.transform.localScale;
-            }
-
-            if (carryMode == CarryMode.IK)
-            {
-                handIKWeight = 1f;
-            }
-            else if (carryMode == CarryMode.Animation)
-            {
-                animator.SetLayerWeight(1, 1f);
-                animator.CrossFade("CarryIdle", 0.1f); // <<-- ép trở về state Carry
-            }
-
-            isHoldingBag = true;
-        }
-        else
         {
             if (carryMode == CarryMode.Animation)
                 animator.SetLayerWeight(1, 0f);
 
-            animator.CrossFade("Idle", 0.1f); // <<-- ép trở về Idle
+            GetComponent<MNGPlayerController>().isFalling = false;
+            GetComponent<MNGPlayerController>().ChangeAnim("Idle"); // <<-- ép trở về Idle
             isHoldingBag = false;
         }
     }

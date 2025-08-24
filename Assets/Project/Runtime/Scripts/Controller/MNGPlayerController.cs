@@ -23,6 +23,7 @@ public class MNGPlayerController : PlayerController
     public float moveSpeed = 8f;
 
     private bool isGrounded;
+    public bool isFalling = false;
 
     private PlayerInput playerInput;
 
@@ -60,8 +61,14 @@ public class MNGPlayerController : PlayerController
         Vector3 camRight = Camera.main.transform.right;
         camRight.y = 0f;
 
-        movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
-        Vector3 move = camForward * movementInput.y + camRight * movementInput.x;
+        Vector3 move = Vector3.zero;
+
+        if (!isFalling)
+        {
+            movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
+            move = camForward * movementInput.y + camRight * movementInput.x;
+        }
+  
 
 
         if (isGrounded && verticalVelocity < 0)
@@ -96,7 +103,7 @@ public class MNGPlayerController : PlayerController
         }
 
         // Animation
-        if (isGrounded)
+        if (isGrounded && !isFalling)
         {
             if (horizontalMove.magnitude > 0.1f)
                 ChangeAnim("Run");
