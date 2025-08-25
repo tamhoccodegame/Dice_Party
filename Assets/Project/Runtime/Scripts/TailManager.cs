@@ -41,7 +41,7 @@ public class TailManager : MonoBehaviour
             attackCounter++;
             currentDelay = Mathf.Max(minDelay, currentDelay - speedUpRate);
 
-            if (attackCounter >= 3)
+            if (attackCounter >= 5)
             {
                 yield return new WaitForSeconds(pauseAfter3Attacks);
                 attackCounter = 0;
@@ -73,7 +73,7 @@ public class TailManager : MonoBehaviour
         List<GameObject> warnings = new List<GameObject>();
         foreach (Transform crate in row.cratesInRow)
         {
-            GameObject warning = Instantiate(warningPrefab, crate.position + Vector3.up * 5f, Quaternion.identity);
+            GameObject warning = Instantiate(warningPrefab, crate.position + Vector3.up * 2f, Quaternion.identity);
             warnings.Add(warning);
         }
 

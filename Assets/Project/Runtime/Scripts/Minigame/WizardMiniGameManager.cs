@@ -19,42 +19,45 @@ public class PlayerSlotHUD
 public class WizardMiniGameManager : MonoBehaviour
 {
     public static WizardMiniGameManager instance;
+
     public bool isGameOver { get; set; } = false;
     public bool isGameStarted { get; set; } = false;
 
     public bool isAllReady = false;
 
+    [Header("UIs & Sounds")]
     public int time;
     public TextMeshProUGUI timeText;
-
     public TextMeshProUGUI startText;
     public AudioSource startSound;
-
     public PlayableDirector introCutscene;
     public AudioClip music;
     public AudioClip winMusic;
 
+    [Space(20)]
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
 
     public PlayerSlotHUD[] playerHUDs;
 
+    [Space(20)]
     [Header("Tutorial Panel")]
     public GameObject tutorialPanel;
     public Image[] playerAvatarReady;
     public TextMeshProUGUI[] playerReadyText;
     public Dictionary<PlayerInput, bool> playersReadyStatus = new Dictionary<PlayerInput, bool>();
 
+    [Space(20)]
     [Header("Game Over Panel")]
     public GameObject gameOverPanel;
     public GameOverSlotUI[] gameOverSlots;
     public TextMeshProUGUI whoWinsText;
     public GameObject gameOverVolume;
-
     public Image blackScreen;
-
     public float fadeDuration = 1f;
 
+    [Space(20)]
+    [Header("Players Condition")]
     public Dictionary<PlayerInput, int> playerScores = new Dictionary<PlayerInput, int>();
 
     //Từng player tự đăng ký vô

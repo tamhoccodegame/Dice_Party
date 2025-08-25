@@ -1,9 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FirstGearGames.Utilities.Objects;
 using FirstGearGames.SmoothCameraShaker;
-using UnityEngine.InputSystem;
 
 public class Bullman : MonoBehaviour
 {
@@ -43,6 +41,11 @@ public class Bullman : MonoBehaviour
 
     IEnumerator StateMachine()
     {
+        while (!WizardMiniGameManager.instance.isGameStarted || WizardMiniGameManager.instance.isGameOver)
+        {
+            yield return null;
+        }
+
         while (true)
         {
             switch (state)
@@ -143,10 +146,10 @@ public class Bullman : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"Trigger with {other.name}");
         if(other.TryGetComponent<MNGPlayerController>(out var player))
         {
-            PlayerInput playerInput = player.GetPlayerInput();
-            WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, -20);
+            player.GetComponent<PlayerBlinking>().OnHitByObstacle(other.ClosestPoint(transform.position));
         }
     }
 }

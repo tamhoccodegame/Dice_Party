@@ -96,7 +96,7 @@ public class TYuanMovement : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        if (!canTakeDamage || isInvincible) return;
+        //if (!canTakeDamage || isInvincible) return;
 
         if (other.CompareTag("Water"))
         {
