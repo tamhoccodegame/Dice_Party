@@ -97,7 +97,7 @@ public class Bullman : MonoBehaviour
 
         while (!isHitWall)
         {
-            controller.Move(transform.forward * 20 * Time.deltaTime);
+            controller.Move(transform.forward * 30 * Time.deltaTime);
             yield return null;
         }
 

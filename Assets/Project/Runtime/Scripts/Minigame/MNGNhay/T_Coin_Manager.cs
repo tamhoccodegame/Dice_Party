@@ -7,8 +7,6 @@ public class T_Coin_Manager : WizardMiniGameManager
     public static T_Coin_Manager Instance { get; private set; }
 
     public SplineFollower cam;
-    public SplineFollower spike;
-
     protected override void Awake()
     {
         base.Awake();
@@ -24,11 +22,11 @@ public class T_Coin_Manager : WizardMiniGameManager
 
     private void Update()
     {
-        if (isGameStarted && cam.follow && spike.follow) return;
-        else if (isGameStarted && (!cam.follow || !spike.follow))
+        if (isGameStarted && cam.follow) return;
+        else if (isGameStarted && (!cam.follow))
         {
             cam.follow = true;
-            spike.follow = true;
+            //spike.follow = true;
         }
     }
 

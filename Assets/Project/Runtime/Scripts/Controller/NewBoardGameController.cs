@@ -194,7 +194,7 @@ public class NewBoardGameController : PlayerController
 
     IEnumerator RollDiceCoroutine()
     {
-        StepsLeft = Random.Range(1, 6);
+        StepsLeft = Random.Range(1, 7);
         //StepsLeft = 99;
 
         ChangeAnimation("RollDice");

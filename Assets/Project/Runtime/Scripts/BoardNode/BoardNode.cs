@@ -25,6 +25,12 @@ public class BoardNode : MonoBehaviour
     }
     public virtual void ProcessNode(PlayerInput playerInput, Transform playerTransform)
     {
+        StartCoroutine(DelayEndTurn(playerInput));
+    }
+
+    IEnumerator DelayEndTurn(PlayerInput playerInput)
+    {
+        yield return new WaitForSeconds(0.5f);
         EndTurn(playerInput);
     }
 

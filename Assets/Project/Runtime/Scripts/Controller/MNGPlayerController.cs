@@ -22,6 +22,8 @@ public class MNGPlayerController : PlayerController
     public float jumpForce = 10f;
     public float moveSpeed = 8f;
 
+    public float speedFactor = 1;
+
     private bool isGrounded;
     public bool isFalling = false;
 
@@ -90,7 +92,7 @@ public class MNGPlayerController : PlayerController
         move.y = verticalVelocity;
 
         // Move
-        controller.Move(move * moveSpeed * Time.deltaTime);
+        controller.Move(move * (moveSpeed * speedFactor) * Time.deltaTime);
         // Ground check
         isGrounded = controller.isGrounded;
 

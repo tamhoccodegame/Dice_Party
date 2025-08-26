@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static Codice.Client.Common.EventTracking.TrackFeatureUseEvent.Features.DesktopGUI.Filters;
 
 public class PlayerInteractMoneyController : MonoBehaviour
 {
@@ -145,6 +144,7 @@ public class PlayerInteractMoneyController : MonoBehaviour
                 carriedBagInstance = null;
             }
         }
+        GetComponent<MNGPlayerController>().speedFactor = 1;
 
         isFalling = true;
         cachedPosition = transform.position;
@@ -273,6 +273,11 @@ public class PlayerInteractMoneyController : MonoBehaviour
             }
             UpdateCountUI();
             Debug.Log($"[Player {playerID}] Picked bag #{carriedBags.Count} / {maxCarryCount}. Total now: {carriedBags.Count}");
+
+
+            GetComponent<MNGPlayerController>().speedFactor = carriedBags.Count == 1? 0.8f
+                                                              : carriedBags.Count == 2? 0.6f 
+                                                              : carriedBags.Count == 3? 0.4f : 1;
 
             return true;
         }

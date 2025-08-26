@@ -8,7 +8,7 @@ public class KeyPickupMover : MonoBehaviour
 
     private bool isMoving = false;
     private Rigidbody rb;
-    private float delayBeforeMove = 5f;
+    private float delayBeforeMove = 2f;
     private float timer = 0f;
 
     Collider col;
