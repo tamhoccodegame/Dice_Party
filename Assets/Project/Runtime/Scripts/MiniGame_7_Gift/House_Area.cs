@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class House_Area : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class House_Area : MonoBehaviour
     private GiftBox[] slots;          // mỗi slot chứa 1 quà hoặc null
     private Vector3[] slotPositions;  // vị trí cố định của từng slot
     private BoxCollider areaCollider;
+
+    public PlayerInput houseOwner;
+    public SpriteRenderer houseOwnerAvatar;
 
     void Awake()
     {
@@ -49,6 +53,9 @@ public class House_Area : MonoBehaviour
         gift.transform.SetParent(transform);
         gift.transform.position = slotPositions[slotIndex];
         gift.transform.rotation = Quaternion.identity;
+
+        if(houseOwner != null)
+        WizardMiniGameManager.instance.UpdatePlayerScore(houseOwner, 20);
     }
 
     public void RemoveGift(GiftBox gift)
@@ -58,6 +65,8 @@ public class House_Area : MonoBehaviour
             if (slots[i] == gift)
             {
                 slots[i] = null;
+                if(houseOwner != null)
+                WizardMiniGameManager.instance.UpdatePlayerScore(houseOwner, -20);
                 return;
             }
         }

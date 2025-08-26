@@ -34,6 +34,8 @@ public class TiltAI : MonoBehaviour
 
     void Update()
     {
+        if (!WizardMiniGameManager.instance.isGameStarted || WizardMiniGameManager.instance.isGameOver) return;
+
         // Nếu Roller gần cạnh → đổi hướng ngay lập tức
         if (IsRollerNearEdge(horizontalRoller, "Horizontal") || IsRollerNearEdge(verticalRoller, "Vertical"))
         {

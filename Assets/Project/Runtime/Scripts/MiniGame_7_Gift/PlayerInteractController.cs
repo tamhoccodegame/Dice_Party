@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 [RequireComponent(typeof(Animator))]
 public class PlayerInteractController : MonoBehaviour
 {
@@ -47,11 +48,17 @@ public class PlayerInteractController : MonoBehaviour
     private Collider[] areaHits;
     private Collider[] giftHits;
 
+    private PlayerInput playerInput;
+
+
     void Start()
     {
         animator = GetComponent<Animator>();
         areaHits = new Collider[Mathf.Max(4, areaHitCapacity)];
         giftHits = new Collider[Mathf.Max(8, giftHitCapacity)];
+
+        TryGetComponent<MNGPlayerController>(out var p);
+        playerInput = p != null ? p.GetPlayerInput() : null;
 
         if (carryMode == CarryMode.Animation)
         {
@@ -62,7 +69,7 @@ public class PlayerInteractController : MonoBehaviour
     void Update()
     {
         // Bấm E => nạp buffer
-        if (Input.GetKeyDown(KeyCode.E))
+        if (playerInput != null && playerInput.actions["Interact"].triggered)
             interactBufferTimer = inputBufferSeconds;
 
         if (interactBufferTimer > 0f)

@@ -23,8 +23,10 @@ public class WizardMiniGameManager : MonoBehaviour
     public bool isGameOver { get; set; } = false;
     public bool isGameStarted { get; set; } = false;
 
+    [Space(20)]
     public bool isAllReady = false;
 
+    [Space(20)]
     [Header("UIs & Sounds")]
     public int time;
     public TextMeshProUGUI timeText;

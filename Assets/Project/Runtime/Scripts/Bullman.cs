@@ -30,10 +30,6 @@ public class Bullman : MonoBehaviour
     void Start()
     {
         availabeTargets.Clear();
-        foreach(var p in WizardMiniGameManager.instance.playerObjects)
-        {
-            availabeTargets.Add(p.Value.transform);
-        }
 
         state = State.Idle;
         StartCoroutine(StateMachine());
@@ -44,6 +40,12 @@ public class Bullman : MonoBehaviour
         while (!WizardMiniGameManager.instance.isGameStarted || WizardMiniGameManager.instance.isGameOver)
         {
             yield return null;
+        }
+
+        yield return new WaitForSeconds(1.5f);
+        foreach (var p in WizardMiniGameManager.instance.playerObjects)
+        {
+            availabeTargets.Add(p.Value.transform);
         }
 
         while (true)

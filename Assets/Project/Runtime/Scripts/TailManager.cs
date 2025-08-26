@@ -21,15 +21,17 @@ public class TailManager : MonoBehaviour
     public float warningDuration = 0.5f;
     public float pauseAfter3Attacks = 3f;
     public GameObject warningPrefab;
+
     void Start()
     {
-
         StartCoroutine(LoopTentacleAttacks());
     }
 
     IEnumerator LoopTentacleAttacks()
     {
-        yield return new WaitForSeconds(battleStartDelay);
+        while (!WizardMiniGameManager.instance.isGameStarted || WizardMiniGameManager.instance.isGameOver) yield return null;
+
+        yield return new WaitForSeconds(2f);
 
         int attackCounter = 0;
         float currentDelay = startDelay;
@@ -73,7 +75,7 @@ public class TailManager : MonoBehaviour
         List<GameObject> warnings = new List<GameObject>();
         foreach (Transform crate in row.cratesInRow)
         {
-            GameObject warning = Instantiate(warningPrefab, crate.position + Vector3.up * 2f, Quaternion.identity);
+            GameObject warning = Instantiate(warningPrefab, crate.position + Vector3.up * 4f, Quaternion.identity);
             warnings.Add(warning);
         }
 
