@@ -27,7 +27,7 @@ public class MNGPlayerController : PlayerController
     private bool isGrounded;
     public bool isFalling = false;
 
-    private PlayerInput playerInput;
+    protected PlayerInput playerInput;
 
     public override PlayerInput GetPlayerInput()
     {
@@ -39,7 +39,7 @@ public class MNGPlayerController : PlayerController
         playerInput = input;
     }
 
-    public void Awake()
+    public virtual void Awake()
     {
         if(bloodEffect != null) 
         bloodEffect.Stop();
@@ -54,7 +54,7 @@ public class MNGPlayerController : PlayerController
 
     }
 
-    void Update()
+    protected virtual void Update()
     {
         if (playerInput == null) return;
 

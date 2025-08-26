@@ -195,7 +195,7 @@ public class NewBoardGameController : PlayerController
     IEnumerator RollDiceCoroutine()
     {
         StepsLeft = Random.Range(1, 7);
-        //StepsLeft = 99;
+        //StepsLeft = 6;
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
@@ -216,6 +216,7 @@ public class NewBoardGameController : PlayerController
     {
         currentNode = node;
         toMoveNode = currentNode.nextNodes[0];
+        WizardPartyData.instance.UpdatePlayerNode(playerInput, currentNode);
     }
 
     // Di chuyển từng bước

@@ -21,7 +21,6 @@ public class HomeNode : BoardNode
         controller.gameObject.GetComponent<CharacterController>().enabled = false;
         controller.gameObject.AddComponent<Rigidbody>();
         CameraFollow.instance.StartFollowTarget(transform);
-        //WizardPartyData.instance.UpdaPlayerHealth();
         yield return new WaitForSeconds(1f);
         portalVFX.SetActive(false);
         yield return new WaitForSeconds(1f);

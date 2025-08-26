@@ -36,9 +36,13 @@ public class HungBapManager : WizardMiniGameManager
                        .OrderByDescending(c => c.Value)
                        .ToDictionary(c => c.Key, c => c.Value);
 
+        int keyAdd = 8;
 
         for (int i = 0; i < playerScores.Count; i++)
         {
+            WizardPartyData.instance.UpdatePlayerKey(playerScores.ElementAt(i).Key, keyAdd);
+            gameOverSlots[i].keyQtyText.text = keyAdd.ToString();
+            keyAdd -= 2;
             gameOverSlots[i].gameObject.SetActive(true);
             var inputGo = playerObjects[playerScores.ElementAt(i).Key];
             inputGo.GetComponent<CyclingIKController>().enabled = false;

@@ -17,7 +17,8 @@ public class HealNode : BoardNode
         yield return new WaitForSeconds(0.8f); // Delay nhẹ cho mượt
         if(nodeEffect != null)
         nodeEffect.Play();
-        //WizardPartyData.instance.UpdaPlayerHealth();
+        WizardPartyData.instance.UpdatePlayerHealth(playerInput, 10);
+        TurnManager.instance.UpdatePlayerDataUI();
         yield return new WaitForSeconds(1f);
         EndTurn(playerInput);
     }

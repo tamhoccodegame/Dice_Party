@@ -32,6 +32,8 @@ public class DeliveryArea : MonoBehaviour
         int deliveredCount = player.carriedBags.Count; // lấy số bag player đang cầm
         if (deliveredCount <= 0) return;
 
+        player.GetComponent<MNGPlayerController>().speedFactor = 1f;
+
         // --- Spawn VFX tại vị trí tay ---
         if (deliveryVFXPrefab != null && player.carryPoint != null)
         {
