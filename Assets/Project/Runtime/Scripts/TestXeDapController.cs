@@ -15,6 +15,7 @@ public class TestXeDapController : MNGPlayerController
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        GetComponentInChildren<Animator>().Play("Sit");
     }
 
     protected override void Update()

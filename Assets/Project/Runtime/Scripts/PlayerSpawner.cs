@@ -56,6 +56,7 @@ public class PlayerSpawner : MonoBehaviour
                 var player = Instantiate(playerPrefab, spawnPosition[i].position, playerPrefab.transform.rotation).GetComponent<PlayerController>();
                 Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
                 PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
+                if(playerSetup == null) playerSetup = player.GetComponentInChildren<PlayerSetup>();
                 playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
                 player.SetInput(playerManager.players[i]);
                 WizardMiniGameManager.instance.playerObjects.Add(playerInput, player.gameObject);
