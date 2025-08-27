@@ -10997,6 +10997,72 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a5e568db0b228c24589c17f5b015934d, type: 3}
+--- !u!1001 &2127647009
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 697.8057
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -22.765167
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 419
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6279254365319544072, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: 2aa6e47d159f8dd40b764a1201ce2e68, type: 2}
+    - target: {fileID: 8835469277928601504, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_Name
+      value: FirstRankRT (3)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+--- !u!4 &2127647010 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6859693160281745541, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+  m_PrefabInstance: {fileID: 2127647009}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2146390182
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11502,7 +11568,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7428113593738043556, guid: 13c27cdb9f4c01d4b9d08b3cc3408dfa, type: 3}
       propertyPath: rankPositions.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7428113593738043556, guid: 13c27cdb9f4c01d4b9d08b3cc3408dfa, type: 3}
       propertyPath: playerReadyText.Array.size
@@ -11536,6 +11602,10 @@ PrefabInstance:
       propertyPath: rankPositions.Array.data[2]
       value: 
       objectReference: {fileID: 63613432}
+    - target: {fileID: 7428113593738043556, guid: 13c27cdb9f4c01d4b9d08b3cc3408dfa, type: 3}
+      propertyPath: rankPositions.Array.data[3]
+      value: 
+      objectReference: {fileID: 2127647010}
     - target: {fileID: 7428113593738043556, guid: 13c27cdb9f4c01d4b9d08b3cc3408dfa, type: 3}
       propertyPath: playerAvatarReady.Array.size
       value: 4
@@ -11880,5 +11950,6 @@ SceneRoots:
   - {fileID: 306495865}
   - {fileID: 719395198}
   - {fileID: 63613431}
+  - {fileID: 2127647009}
   - {fileID: 711865684}
   - {fileID: 1533594191}

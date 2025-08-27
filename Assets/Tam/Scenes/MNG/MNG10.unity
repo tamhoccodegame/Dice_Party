@@ -740,6 +740,72 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6577632474564330291, guid: cebbe719f93337945a61ad6c25bd1907, type: 3}
   m_PrefabInstance: {fileID: 136130719}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &150703092
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 233.48318
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 327.2133
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 557.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223618495301759917, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6279254365319544072, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: 2aa6e47d159f8dd40b764a1201ce2e68, type: 2}
+    - target: {fileID: 8835469277928601504, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+      propertyPath: m_Name
+      value: FirstRankRT (3)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+--- !u!4 &150703093 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6859693160281745541, guid: de0527262930e124c80b1aa96d0e7f1c, type: 3}
+  m_PrefabInstance: {fileID: 150703092}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &157066499
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7720,7 +7786,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2337919913272050373, guid: 3c3f91bb1e25a9b439ea6c2367523fc0, type: 3}
       propertyPath: rankPositions.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2337919913272050373, guid: 3c3f91bb1e25a9b439ea6c2367523fc0, type: 3}
       propertyPath: playerReadyText.Array.size
@@ -7754,6 +7820,10 @@ PrefabInstance:
       propertyPath: rankPositions.Array.data[2]
       value: 
       objectReference: {fileID: 932354923}
+    - target: {fileID: 2337919913272050373, guid: 3c3f91bb1e25a9b439ea6c2367523fc0, type: 3}
+      propertyPath: rankPositions.Array.data[3]
+      value: 
+      objectReference: {fileID: 150703093}
     - target: {fileID: 2337919913272050373, guid: 3c3f91bb1e25a9b439ea6c2367523fc0, type: 3}
       propertyPath: playerAvatarReady.Array.size
       value: 4
@@ -8160,4 +8230,5 @@ SceneRoots:
   - {fileID: 1881605380}
   - {fileID: 204569119}
   - {fileID: 932354922}
+  - {fileID: 150703092}
   - {fileID: 2140429950}
