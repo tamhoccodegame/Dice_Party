@@ -194,8 +194,8 @@ public class NewBoardGameController : PlayerController
 
     IEnumerator RollDiceCoroutine()
     {
-        StepsLeft = Random.Range(1, 7);
-        //StepsLeft = 6;
+        //StepsLeft = Random.Range(1, 7);
+        StepsLeft = 99;
 
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
@@ -236,23 +236,8 @@ public class NewBoardGameController : PlayerController
 
             if(currentNode is ChestGoldNode chest)
             {
-                TurnManager tm = TurnManager.instance;
-
-                int index = 0;
-                for(int i = 0; i < tm.chestGolds.Length; i++)
-                {
-                    if(tm.chestGolds[i] == chest.transform)
-                    {
-                        break;
-                    }
-                    index++;
-                }
-
-                if (index == WizardPartyData.instance.currentChestIndex)
-                {
                     ChangeState(nodeState);
                     return true;
-                }
             }
 
             if (StepsLeft > 0)
@@ -301,6 +286,7 @@ public class NewBoardGameController : PlayerController
         _controller.enabled = true;
         ShowDice();
         AvatarTurnManager.instance.Disappear();
+        yield return new WaitForSeconds(1f);
         AvatarTurnManager.instance.gameObject.SetActive(false);
     }
 

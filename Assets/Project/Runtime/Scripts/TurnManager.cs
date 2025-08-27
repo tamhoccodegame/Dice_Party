@@ -165,21 +165,26 @@ public class TurnManager : MonoBehaviour
 
     void StartFirstTurn()
     {
-        if (isGoldChestOpened)
-        {
-            isGoldChestOpened = false;
-            WizardPartyData.instance.isGoldChestOpened = false;
+        //if (isGoldChestOpened)
+        //{
+        //    isGoldChestOpened = false;
+        //    WizardPartyData.instance.isGoldChestOpened = false;
 
-            ShowChestGoldAndStartFirstTurn(); // Gọi 1 lần duy nhất
-            return;
-        }
-        else
+        //    ShowChestGoldAndStartFirstTurn(); // Gọi 1 lần duy nhất
+        //    return;
+        //}
+        //else
+        //{
+        //    int currentChestIndex = WizardPartyData.instance.currentChestIndex;
+        //    if (currentChestIndex != -1)
+        //    {
+        //        chestGolds[currentChestIndex].GetComponent<ChestGoldNode>().chest.Play("FlyDown");
+        //    }
+        //}
+
+        foreach(var goldChest in FindObjectsByType<ChestGoldNode>(FindObjectsSortMode.None))
         {
-            int currentChestIndex = WizardPartyData.instance.currentChestIndex;
-            if (currentChestIndex != -1)
-            {
-                chestGolds[currentChestIndex].GetComponent<ChestGoldNode>().chest.Play("FlyDown");
-            }
+            goldChest.chest.Play("FlyDown");
         }
 
         currentPlayerIndex = 0;

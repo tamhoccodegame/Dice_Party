@@ -90,6 +90,9 @@ public class Bullman : MonoBehaviour
         state = State.Run;
     }
 
+    public int maxCharges = 3;   // số lần ủi trước khi về giữa
+    private int currentCharge = 0;
+
     IEnumerator Run()
     {
         isHitWall = false;
@@ -101,15 +104,35 @@ public class Bullman : MonoBehaviour
             yield return null;
         }
 
+        // khi đụng tường
         CameraShakerHandler.Shake(shakeData);
-
         animator.CrossFade("Idle", 0.25f);
+        yield return new WaitForSeconds(0.5f);
 
-        yield return new WaitForSeconds(2f);
+        currentCharge++;
 
+        if (currentCharge < maxCharges)
+        {
+            // góc lệch ngẫu nhiên quanh 180 độ (ví dụ ±30)
+            float randomAngle = 180f + Random.Range(-30f, 30f);
 
-        state = State.MoveToCenter;
+            // xoay từ forward hiện tại sang hướng mới
+            Vector3 newDir = Quaternion.Euler(0f, randomAngle, 0f) * transform.forward;
+
+            transform.rotation = Quaternion.LookRotation(newDir);
+
+            state = State.Run;
+        }
+        else
+        {
+            currentCharge = 0;
+            yield return new WaitForSeconds(1f);
+            state = State.MoveToCenter;
+        }
+
     }
+
+
 
     IEnumerator MoveToCenter()
     {

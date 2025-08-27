@@ -29,7 +29,7 @@ public class MusicManager : MonoBehaviour
 
     public void PlayMusic(AudioClip newClip)
     {
-        if (audioSource.clip == newClip) return;
+        //if (audioSource.clip == newClip) return;
         StartCoroutine(SwitchTrack(newClip));
     }
 

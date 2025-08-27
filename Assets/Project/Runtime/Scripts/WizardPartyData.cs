@@ -74,6 +74,7 @@ public class WizardPartyData : MonoBehaviour
     public void UpdatePlayerHealth(PlayerInput input, int qty)
     {
         playersStat[input].health += qty;
+        playersStat[input].health = Mathf.Min(playersStat[input].health, 30);
         if (playersStat[input].health <= 0)
         {
             playersStat[input].health = 30;

@@ -232,6 +232,7 @@ public class WizardMiniGameManager : MonoBehaviour
 
         yield return new WaitForSeconds(2.5f);
         tutorialPanel.SetActive(false);
+        MusicManager.instance.PlayMusic(music);
 
         yield return new WaitForSeconds(1.5f);
 
