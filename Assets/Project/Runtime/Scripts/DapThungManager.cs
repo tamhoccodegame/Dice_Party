@@ -22,6 +22,7 @@ public class DapThungManager : WizardMiniGameManager
     public override void ShowGameOverPanel()
     {
         base.ShowGameOverPanel();
+        FindFirstObjectByType<TriggerRespawn>().StopAllCoroutines();
     }
 
     public override void SpawnRewardAvatar()
