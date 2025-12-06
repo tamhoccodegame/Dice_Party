@@ -14,7 +14,7 @@ public class DoanTauManager : WizardMiniGameManager
     protected override void Awake()
     {
         instance = this;
-
+        if (PlayerManager.instance == null) return;
         var players = PlayerManager.instance.players;
         for(int i = 0; i < players.Count; i++)
         {

@@ -19,6 +19,7 @@ public class VongXoayManager : WizardMiniGameManager
     protected override void Start()
     {
         base.Start();
+        if (PlayerManager.instance == null) return;
         UpdateHUD();
     }
 

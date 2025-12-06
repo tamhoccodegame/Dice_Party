@@ -38,9 +38,9 @@ public class TurnManager : MonoBehaviour
 
     private void Start()
     {
-        GetComponent<PlayerSpawner>().SpawnPlayer();
+        GetComponent<PlayerSpawner>().TrySpawnPlayer();
         AvatarTurnManager.instance.gameObject.SetActive(false);
-        MusicManager.instance.PlayMusic(music);
+        MusicManager.instance?.PlayMusic(music);
         StartCoroutine(FadeBlackScreen(1, 0));
 
         isGoldChestOpened = WizardPartyData.instance.isGoldChestOpened;

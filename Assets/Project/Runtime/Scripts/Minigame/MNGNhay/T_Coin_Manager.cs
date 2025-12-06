@@ -17,6 +17,7 @@ public class T_Coin_Manager : WizardMiniGameManager
     protected override void Start()
     {
         base.Start();
+        //if (PlayerManager.instance == null) return;
         UpdateHUD();
     }
 

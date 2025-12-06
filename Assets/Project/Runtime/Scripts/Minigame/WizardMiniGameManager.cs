@@ -66,15 +66,33 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public List<PlayerInput> playersCompleteGame = new List<PlayerInput>();
 
+    public bool isDevMode = false;
+
+    void CheckDevMode()
+    {
+        isDevMode = PlayerManager.instance == null && MusicManager.instance == null;
+    }
+
     protected virtual void Awake()
     {
+        CheckDevMode();
         instance = this;
     }
 
     protected virtual void Start()
     {
-        GetComponent<PlayerSpawner>().SpawnPlayer();
-        MusicManager.instance.PlayMusic(music);
+
+        if (isDevMode)
+        {
+            GameObject obj = new GameObject("PlayerManager");
+            PlayerManager playerManager = obj.AddComponent<PlayerManager>();
+        }
+
+        PlayerSpawner playerSpawner = GetComponent<PlayerSpawner>();
+        playerSpawner.TrySpawnPlayer();
+
+        MusicManager.instance?.PlayMusic(music);
+
         ShowTutorial();
         InitHUD();
         InitReadyStatus();
@@ -99,7 +117,7 @@ public class WizardMiniGameManager : MonoBehaviour
     protected void InitReadyStatus()
     {
         var players = PlayerManager.instance.players;
-        for(int i = 0; i < players.Count; i++)
+        for (int i = 0; i < players.Count; i++)
         {
             playerReadyText[i].gameObject.SetActive(false);
             playersReadyStatus.Add(players[i], false);
@@ -144,6 +162,7 @@ public class WizardMiniGameManager : MonoBehaviour
 
     void InitHUD()
     {
+        if (AvatarLoader.instance == null) return;
         for (int i = 0; i < PlayerManager.instance.players.Count; i++)
         {
             Sprite playerAvatar = AvatarLoader.instance.GetAvatarSprite(i);
@@ -215,7 +234,7 @@ public class WizardMiniGameManager : MonoBehaviour
     {
         while (!isAllReady)
         {
-            for(int i = 0; i < playersReadyStatus.Count; i++)
+            for (int i = 0; i < playersReadyStatus.Count; i++)
             {
                 PlayerInput playerInput = playersReadyStatus.ElementAt(i).Key;
                 if (playerInput.actions["Confirm"].triggered && !playersReadyStatus[playerInput])
@@ -232,7 +251,7 @@ public class WizardMiniGameManager : MonoBehaviour
 
         yield return new WaitForSeconds(2.5f);
         tutorialPanel.SetActive(false);
-        MusicManager.instance.PlayMusic(music);
+        MusicManager.instance?.PlayMusic(music);
 
         yield return new WaitForSeconds(1.5f);
 
@@ -282,30 +301,30 @@ public class WizardMiniGameManager : MonoBehaviour
 
     public virtual void SpawnRewardAvatar()
     {
-        FindFirstObjectByType<Light>().shadows = LightShadows.None;
+        //FindFirstObjectByType<Light>().shadows = LightShadows.None;
 
-        playerScores = playerScores
-                       .OrderByDescending(c => c.Value)
-                       .ToDictionary(c => c.Key, c => c.Value);
+        //playerScores = playerScores
+        //               .OrderByDescending(c => c.Value)
+        //               .ToDictionary(c => c.Key, c => c.Value);
 
 
-        int keyAdd = 8;
+        //int keyAdd = 8;
 
-        for (int i = 0; i < playerScores.Count; i++)
-        {
-            WizardPartyData.instance.UpdatePlayerKey(playerScores.ElementAt(i).Key, keyAdd);
-            gameOverSlots[i].keyQtyText.text = keyAdd.ToString();
-            keyAdd -= 2;
-            gameOverSlots[i].gameObject.SetActive(true);
-            var inputGo = playerObjects[playerScores.ElementAt(i).Key];
-            if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
-            else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+        //for (int i = 0; i < playerScores.Count; i++)
+        //{
+        //    WizardPartyData.instance.UpdatePlayerKey(playerScores.ElementAt(i).Key, keyAdd);
+        //    gameOverSlots[i].keyQtyText.text = keyAdd.ToString();
+        //    keyAdd -= 2;
+        //    gameOverSlots[i].gameObject.SetActive(true);
+        //    var inputGo = playerObjects[playerScores.ElementAt(i).Key];
+        //    if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
+        //    else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
 
-            inputGo.GetComponent<PlayerController>().enabled = false;
-            inputGo.GetComponent<CharacterController>().enabled = false;
-            inputGo.transform.position = rankPositions[i].position;
-            inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
-        }
+        //    inputGo.GetComponent<PlayerController>().enabled = false;
+        //    inputGo.GetComponent<CharacterController>().enabled = false;
+        //    inputGo.transform.position = rankPositions[i].position;
+        //    inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
+        //}
     }
 
     public virtual void UpdateHUD()
@@ -322,6 +341,5 @@ public class WizardMiniGameManager : MonoBehaviour
         {
             ShowGameOverPanel();
         }
-
     }
 }

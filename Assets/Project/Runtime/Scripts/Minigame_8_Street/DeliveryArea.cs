@@ -12,6 +12,8 @@ public class DeliveryArea : MonoBehaviour
 
     private void Update()
     {
+        if (PlayerManager.instance == null) return;
+
         // Quét xem có player nào trong phạm vi không
         Collider[] hits = Physics.OverlapSphere(transform.position, deliveryRadius, playerLayer);
         foreach (var hit in hits)

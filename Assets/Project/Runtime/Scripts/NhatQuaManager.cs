@@ -13,7 +13,7 @@ public class NhatQuaManager : WizardMiniGameManager
     protected override void Start()
     {
         base.Start();
-
+        if (PlayerManager.instance == null) return;
         var players = PlayerManager.instance.players;
         for(int i = 0; i < players.Count; i++)
         {

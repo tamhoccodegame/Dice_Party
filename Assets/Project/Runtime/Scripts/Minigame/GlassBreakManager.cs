@@ -188,7 +188,7 @@ public class GlassBreakManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(1f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
 
-        GetComponent<PlayerSpawner>().SpawnPlayer();
+        GetComponent<PlayerSpawner>().TrySpawnPlayer();
     }
 
     private void StartGame(PlayableDirector obj)
