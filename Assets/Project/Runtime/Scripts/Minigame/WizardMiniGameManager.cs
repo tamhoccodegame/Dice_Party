@@ -81,7 +81,6 @@ public class WizardMiniGameManager : MonoBehaviour
 
     protected virtual void Start()
     {
-
         if (isDevMode)
         {
             GameObject obj = new GameObject("PlayerManager");

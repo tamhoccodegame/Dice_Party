@@ -13,24 +13,7 @@ public class DoanTauManager : WizardMiniGameManager
 
     protected override void Awake()
     {
-        instance = this;
-        if (PlayerManager.instance == null) return;
-        var players = PlayerManager.instance.players;
-        for(int i = 0; i < players.Count; i++)
-        {
-            Sprite playerAvatar = AvatarLoader.instance.GetAvatarSprite(i);
-            if(playerAvatar != null)
-            {
-                playerAvatars.Add(players[i], playerAvatar);
-            }
-        }
-
-        foreach(var gun in gachaGuns)
-        {
-            gun.Init(playerAvatars);
-        }
-
-
+        
         base.Awake();
     }
 
@@ -95,6 +78,24 @@ public class DoanTauManager : WizardMiniGameManager
     protected override void Start()
     {
         base.Start();
+        instance = this;
+        if (PlayerManager.instance == null) return;
+        var players = PlayerManager.instance.players;
+        for (int i = 0; i < players.Count; i++)
+        {
+            Sprite playerAvatar = AvatarLoader.instance.GetAvatarSprite(i);
+            if (playerAvatar != null)
+            {
+                playerAvatars.Add(players[i], playerAvatar);
+            }
+        }
+
+        foreach (var gun in gachaGuns)
+        {
+            gun.Init(playerAvatars);
+        }
+
+
         StartCoroutine(FireGunRepeat());
     }
 
