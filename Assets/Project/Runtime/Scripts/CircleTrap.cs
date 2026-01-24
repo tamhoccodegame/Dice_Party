@@ -85,8 +85,8 @@ public class CircleTrap : MonoBehaviour
         if (state != cachedState)
         {
             cachedState = state;
-            wizardAnimator.CrossFade("Cast", 0.25f);
-            yield return new WaitForSeconds(1f);
+            //wizardAnimator.CrossFade("Cast", 0.25f);
+            yield return new WaitForSeconds(0f);
             animator.CrossFade("PhaseTransition", 0.1f);
             wizardAnimator.CrossFade("Idle", 0.25f);
             StartCoroutine(ChangeStateCoroutine());
@@ -96,7 +96,6 @@ public class CircleTrap : MonoBehaviour
             animator.CrossFade("PhaseTransition", 0.1f);
             StartCoroutine(ChangeStateCoroutine());
         }
-
     }
 
     IEnumerator ChangeStateCoroutine()

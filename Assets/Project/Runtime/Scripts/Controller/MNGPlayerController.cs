@@ -7,6 +7,7 @@ using UnityEngine.VFX;
 public class MNGPlayerController : PlayerController
 {
     public bool canJump;
+    bool canMove = true;
 
     private CharacterController controller;
     private Animator animator;
@@ -67,11 +68,14 @@ public class MNGPlayerController : PlayerController
 
         if (!isFalling)
         {
+            if(canMove)
             movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
-            move = camForward * movementInput.y + camRight * movementInput.x;
-        }
-  
 
+            if(canMove)
+            move = camForward * movementInput.y + camRight * movementInput.x;
+            else 
+            move = new Vector2(movementInput.x, movementInput.y);
+        }
 
         if (isGrounded && verticalVelocity < 0)
         {
@@ -127,10 +131,26 @@ public class MNGPlayerController : PlayerController
         bloodEffect.Play();
     }
 
+    public void MoveForward()
+    {
+        DisableInput();
+        movementInput = new Vector2(1, 0);
+    }
+
+    public void StopMove()
+    {
+        movementInput = Vector2.zero;
+        EnableInput();
+    }
+
+    void EnableInput()
+    {
+        canMove = true;
+    }
 
     void DisableInput()
     {
-        this.enabled = false;
+        canMove = false;   
     }
 
     void EnableRagdoll()
