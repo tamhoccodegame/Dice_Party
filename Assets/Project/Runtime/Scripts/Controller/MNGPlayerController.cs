@@ -7,7 +7,7 @@ using UnityEngine.VFX;
 public class MNGPlayerController : PlayerController
 {
     public bool canJump;
-    bool canMove = true;
+    bool autoRun = false;
 
     private CharacterController controller;
     private Animator animator;
@@ -17,6 +17,7 @@ public class MNGPlayerController : PlayerController
     public string currentAnim;
 
     private Vector2 movementInput;
+    public Vector3 movement;
 
     private float verticalVelocity = 0f;
     public float gravity = -20f;
@@ -42,8 +43,8 @@ public class MNGPlayerController : PlayerController
 
     public virtual void Awake()
     {
-        if(bloodEffect != null) 
-        bloodEffect.Stop();
+        if (bloodEffect != null)
+            bloodEffect.Stop();
 
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
@@ -52,7 +53,8 @@ public class MNGPlayerController : PlayerController
 
     private void Start()
     {
-
+        if (bloodEffect != null)
+            bloodEffect.Stop();
     }
 
     protected virtual void Update()
@@ -64,17 +66,17 @@ public class MNGPlayerController : PlayerController
         Vector3 camRight = Camera.main.transform.right;
         camRight.y = 0f;
 
-        Vector3 move = Vector3.zero;
+        movement = Vector3.zero;
 
         if (!isFalling)
         {
-            if(canMove)
+            if (WizardMiniGameManager.instance.isGameStarted)
             movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
 
-            if(canMove)
-            move = camForward * movementInput.y + camRight * movementInput.x;
-            else 
-            move = new Vector2(movementInput.x, movementInput.y);
+            if (!autoRun)
+                movement = camForward * movementInput.y + camRight * movementInput.x;
+            else
+                movement = transform.forward * 0.8f;
         }
 
         if (isGrounded && verticalVelocity < 0)
@@ -85,6 +87,7 @@ public class MNGPlayerController : PlayerController
         // Jump khi bấm Trigger
         if (playerInput.actions["Trigger"].triggered && isGrounded && canJump)
         {
+            if (!WizardMiniGameManager.instance.isGameStarted) return;
             verticalVelocity = jumpForce;
             ChangeAnim("Jump");
         }
@@ -93,15 +96,15 @@ public class MNGPlayerController : PlayerController
             verticalVelocity += gravity * Time.deltaTime;
         }
 
-        move.y = verticalVelocity;
+        movement.y = verticalVelocity;
 
         // Move
-        controller.Move(move * (moveSpeed * speedFactor) * Time.deltaTime);
+        controller.Move(movement * (moveSpeed * speedFactor) * Time.deltaTime);
         // Ground check
         isGrounded = controller.isGrounded;
 
         // Rotate theo hướng di chuyển (chỉ trên mặt phẳng ngang)
-        Vector3 horizontalMove = new Vector3(move.x, 0, move.z);
+        Vector3 horizontalMove = new Vector3(movement.x, 0, movement.z);
         if (horizontalMove.magnitude > 0.1f)
         {
             Quaternion newRotation = Quaternion.LookRotation(horizontalMove);
@@ -133,24 +136,12 @@ public class MNGPlayerController : PlayerController
 
     public void MoveForward()
     {
-        DisableInput();
-        movementInput = new Vector2(1, 0);
+        autoRun = true;
     }
 
     public void StopMove()
     {
-        movementInput = Vector2.zero;
-        EnableInput();
-    }
-
-    void EnableInput()
-    {
-        canMove = true;
-    }
-
-    void DisableInput()
-    {
-        canMove = false;   
+        autoRun = false;
     }
 
     void EnableRagdoll()

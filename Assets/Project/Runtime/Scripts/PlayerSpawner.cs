@@ -27,7 +27,11 @@ public class PlayerSpawner : MonoBehaviour
 
     public void TrySpawnPlayer()
     {
-        if (WizardMiniGameManager.instance != null && WizardMiniGameManager.instance.isDevMode) DevModeSpawnPlayer();
+        if (WizardMiniGameManager.instance != null && WizardMiniGameManager.instance.isDevMode)
+        {
+            for(int i = 0; i < 4; i++)
+            DevModeSpawnPlayer(i);
+        }
         else SpawnPlayer();
 
     }
@@ -68,7 +72,6 @@ public class PlayerSpawner : MonoBehaviour
         }
         List<GameObject> players = WizardMiniGameManager.instance.playerObjects.Values.ToList();
         var controllers = players.Select(p => p.GetComponent<MNGPlayerController>()).ToList();
-        Debug.Log($"Controllers found: {controllers.Count}");
         foreach (var controller in controllers)
         {
             controller.MoveForward();
@@ -86,9 +89,9 @@ public class PlayerSpawner : MonoBehaviour
         }
     }
 
-    void DevModeSpawnPlayer()
+    void DevModeSpawnPlayer(int spawnIndex)
     {
-        var player = Instantiate(playerPrefab, spawnPosition[0].position, Quaternion.identity).GetComponent<PlayerController>();
+        var player = Instantiate(playerPrefab, spawnPosition[spawnIndex].position, spawnPosition[spawnIndex].rotation).GetComponent<PlayerController>();
 
         var playerInput = player.gameObject.AddComponent<PlayerInput>();
         PlayerManager.instance.AddPlayer(playerInput);

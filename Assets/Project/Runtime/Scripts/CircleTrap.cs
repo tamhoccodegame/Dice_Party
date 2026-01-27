@@ -54,6 +54,8 @@ public class CircleTrap : MonoBehaviour
     {
         while(!VongXoayManager.instance.isGameStarted || VongXoayManager.instance.isGameOver) yield return null;
 
+        yield return new WaitForSecondsRealtime(1f);
+
         TryChangeState();
         InvokeRepeating(nameof(CountDown), 1f, 1f);
     }
