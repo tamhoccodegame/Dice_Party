@@ -1,64 +1,73 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Splines;
 using Unity.Mathematics;
+using System.Collections.Generic;
 public class TestFollowSpline : MonoBehaviour
 {
-    public SplineContainer splineContainer;
-    public float speed = 2f;
+    public SplineAnimate splineAnimate;
+    float saveT;
+    public List<float> knotTs = new();
 
-    public float t;
     public bool isMoving = false;
 
-    // Start is called before the first frame update
-    void Start()
-    {
 
+    private void Awake()
+    {
+        CacheKnotTs();
+    }
+    private void Start()
+    {
+        saveT = splineAnimate.NormalizedTime;
+        splineAnimate.Pause();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (!isMoving || splineContainer == null) return;
-
-        t += speed * Time.deltaTime;
-        t = Mathf.Clamp01(t);
-
-        UpdatePosition();
-
-        if (t >= 1f)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            isMoving = false;
+            if(isMoving)
+            {
+                splineAnimate.Pause();
+            }
+            else
+            {
+                splineAnimate.Play();
+            }
+
+                isMoving = !isMoving;
+        }
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            Getasjoaif();
         }
     }
 
-    void UpdatePosition()
+    void CacheKnotTs()
     {
-        var spline = splineContainer.Spline;
+        knotTs.Clear();
 
-        Vector3 pos = spline.EvaluatePosition(t);
-        Vector3 forward = spline.EvaluateTangent(t);
+        Spline spline = splineAnimate.Container.Spline;
+        float totalLength = spline.GetLength();
 
-        transform.position = pos;
+        float accumulatedLength = 0f;
+        knotTs.Add(0f); // knot đầu tiên luôn là t = 0
 
-        if(forward != Vector3.zero)
+        for (int i = 1; i < spline.Count; i++)
         {
-            transform.forward = forward.normalized;
+            // sample đoạn spline từ knot i-1 -> i
+            float segmentLength = spline.GetCurveLength(i - 1);
+            accumulatedLength += segmentLength;
+
+            float t = accumulatedLength / totalLength;
+            knotTs.Add(t);
         }
     }
 
-    public void Play()
+    void Getasjoaif()
     {
-        isMoving = true;
-    }
-
-    public void Pause()
-    {
+        splineAnimate.Pause();
         isMoving = false;
+        splineAnimate.NormalizedTime = knotTs[5];
     }
 
-    public void SetT(float newT)
-    {
-        t = Mathf.Clamp01(newT);
-        UpdatePosition();
-    }
 }

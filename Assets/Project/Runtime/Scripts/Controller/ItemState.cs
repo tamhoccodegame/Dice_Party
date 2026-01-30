@@ -10,22 +10,13 @@ public class ItemState : BoardState
 
     public override void Enter()
     {
-        Debug.Log("Entering ItemState");
-
-        if (controller.gun != null)
-        {
-            controller.gun.Use(controller);
-        }
-        else
-        {
-            Debug.LogWarning("No item found in controller.");
-            controller.ChangeState(controller.idleState);
-        }
+        controller.itemController.enabled = true;
+        controller.itemController.UseItem(0);
     }
 
     public override void Exit()
     {
-
+        controller.itemController.enabled = false;
     }
 
     public override void Update()

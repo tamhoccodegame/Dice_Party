@@ -4235,6 +4235,7 @@ GameObject:
   - component: {fileID: -4970366187477402676}
   - component: {fileID: 6313809305522371884}
   - component: {fileID: 2771086323349013419}
+  - component: {fileID: 8331651968720132137}
   m_Layer: 3
   m_Name: TestNew
   m_TagString: Untagged
@@ -4266,6 +4267,7 @@ Transform:
   - {fileID: 3653135278160626166}
   - {fileID: 4286866845565768158}
   - {fileID: 5339602891216914746}
+  - {fileID: 2619846152577326577}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &9105315542713420924
@@ -4387,6 +4389,7 @@ MonoBehaviour:
   currentNode: {fileID: 0}
   currentNodeId: 0
   toMoveNode: {fileID: 0}
+  itemController: {fileID: 8331651968720132137}
   dice: {fileID: 4177470746245077836}
   stepTextPrefab: {fileID: 707468990160480230, guid: 130d855179576db46ac9e965916346ee, type: 3}
   arrowDirectionPrefab: {fileID: 9035063740964656231, guid: e788408d93fc4df4c869f756e543deab, type: 3}
@@ -4394,13 +4397,24 @@ MonoBehaviour:
   hoverArrow: {fileID: 0}
   spawnedArrows: []
   rollDiceEffect: {fileID: 5714308519246576880}
-  gun: {fileID: 4085472473950053309, guid: d9192e6342fd69e4eaf198032300d6b8, type: 3}
-  gunSpawnPoint: {fileID: 3270498665513102295}
-  shitItem: {fileID: 0}
-  shitSpawnPoint: {fileID: 0}
-  horseItem: {fileID: 0}
-  horseSpawnPoint: {fileID: 0}
   readyForInput: 0
+--- !u!114 &8331651968720132137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 806cec311c4fd824a95baae77784655e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 2771086323349013419}
+  usingItem: {fileID: 0}
+  itemAndSpawnPosition:
+  - item: {fileID: 6580615750650054530, guid: 83132659afe331a4a8209d95e6311f04, type: 3}
+    spawnPosition: {fileID: 2619846152577326577}
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0
@@ -4431,6 +4445,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3516277433694920780}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2791420315466924186
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2619846152577326577}
+  m_Layer: 3
+  m_Name: Spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2619846152577326577
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2791420315466924186}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.3, y: 0.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2935424376565863942}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2791846351376459120
 GameObject:

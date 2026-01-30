@@ -10,10 +10,12 @@ public class IdleState : BoardState
     public override void Enter()
     {
         controller.ChangeAnimation("Idle");
+        controller.dice.SetActive(true);
     }
 
     public override void Exit()
     {
+        controller.dice.SetActive(false);
     }
 
     public override void Update()
@@ -22,6 +24,10 @@ public class IdleState : BoardState
         {
             isRoll = true;
             controller.RollDice();
+        }
+        else if (Input.GetKeyDown(KeyCode.Q) && !isRoll && controller.readyForInput)
+        {
+            controller.ChangeState(controller.itemState);
         }
     }
 

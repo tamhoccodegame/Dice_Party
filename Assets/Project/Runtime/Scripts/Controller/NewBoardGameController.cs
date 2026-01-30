@@ -40,13 +40,16 @@ public class NewBoardGameController : PlayerController
     public string currentNodeName { get; set; }
     public BoardNode toMoveNode;
 
+    [Header("Item Controller")]
+    public ItemController itemController;
+
     // --- Quản lý xúc xắc và UI hiển thị bước ---
-    [Header("Dice and Step")]
+    [Header("Dice And Step")]
     public GameObject dice;         // xúc xắc đang spawn trên scene
     public GameObject stepTextPrefab;     // text hiện số bước trên UI
 
     // --- Quản lý các mũi tên chọn hướng ---
-    [Header("ArrowDirection")]
+    [Header("Arrow Direction")]
     public GameObject arrowDirectionPrefab;   // prefab của mũi tên chỉ hướng
     public int currentHoverArrowIndex;
     public ArrowPointer hoverArrow;
@@ -54,18 +57,6 @@ public class NewBoardGameController : PlayerController
 
     [Header("Effect")]
     public ParticleSystem rollDiceEffect;
-
-    [Header("ItemGun")]
-    public BoardItem gun;
-    public Transform gunSpawnPoint;
-
-    [Header("ItemShit")]
-    public BoardItem shitItem;
-    public Transform shitSpawnPoint;
-
-    [Header("ItemHorse")]
-    public BoardItem horseItem;
-    public Transform horseSpawnPoint;
 
     private Rigidbody[] rigidbodies;
 
@@ -154,11 +145,6 @@ public class NewBoardGameController : PlayerController
     private void Update()
     {
         currentState?.Update();
-
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            UseSelectedItem();
-        }
 
         verticalVelocity = -5f * Time.deltaTime;
 
@@ -257,18 +243,6 @@ public class NewBoardGameController : PlayerController
     }
 
     #endregion
-
-    // Item (tạm bỏ qua inventory)
-    public void UseSelectedItem()
-    {
-        if (gun == null)
-        {
-            Debug.LogWarning("No item to use.");
-            return;
-        }
-
-        ChangeState(itemState);
-    }
 
     public void StartTurn()
     {
@@ -428,6 +402,5 @@ public class NewBoardGameController : PlayerController
         clone.GetComponent<NewBoardGameController>().enabled = false;
         Destroy(gameObject);
     }
-
 
 }
