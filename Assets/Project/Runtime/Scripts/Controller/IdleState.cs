@@ -10,7 +10,6 @@ public class IdleState : BoardState
     public override void Enter()
     {
         controller.ChangeAnimation("Idle");
-        controller.dice.SetActive(true);
     }
 
     public override void Exit()
@@ -25,7 +24,7 @@ public class IdleState : BoardState
             isRoll = true;
             controller.RollDice();
         }
-        else if (Input.GetKeyDown(KeyCode.Q) && !isRoll && controller.readyForInput)
+        else if (controller.playerInput.actions["UseItem"].triggered && !isRoll && controller.readyForInput)
         {
             controller.ChangeState(controller.itemState);
         }

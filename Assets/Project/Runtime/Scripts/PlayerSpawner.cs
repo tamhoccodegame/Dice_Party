@@ -44,6 +44,8 @@ public class PlayerSpawner : MonoBehaviour
         int spawnIndex = 0;
         foreach (var playerInput in PlayerManager.instance.players)
         {
+            if (isBoardScene) spawnIndex = 0;
+
             var player = Instantiate(playerPrefab, spawnPosition[spawnIndex].position, spawnPosition[spawnIndex].rotation);
             spawnIndex++;
             Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);

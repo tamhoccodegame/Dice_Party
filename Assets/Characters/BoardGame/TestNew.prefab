@@ -4238,7 +4238,7 @@ GameObject:
   - component: {fileID: 8331651968720132137}
   m_Layer: 3
   m_Name: TestNew
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4268,6 +4268,7 @@ Transform:
   - {fileID: 4286866845565768158}
   - {fileID: 5339602891216914746}
   - {fileID: 2619846152577326577}
+  - {fileID: 3097379412661647794}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &9105315542713420924
@@ -4413,8 +4414,10 @@ MonoBehaviour:
   controller: {fileID: 2771086323349013419}
   usingItem: {fileID: 0}
   itemAndSpawnPosition:
-  - item: {fileID: 6580615750650054530, guid: 83132659afe331a4a8209d95e6311f04, type: 3}
+  - item: {fileID: 5290577903819227449, guid: 627a446bf8ed3ab4b9439120437db855, type: 3}
     spawnPosition: {fileID: 2619846152577326577}
+  - item: {fileID: 5076309073832089842, guid: 8239f0c0750ab5249a011a8a6372c369, type: 3}
+    spawnPosition: {fileID: 3097379412661647794}
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0
@@ -4456,7 +4459,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2619846152577326577}
   m_Layer: 3
-  m_Name: Spawn
+  m_Name: GunSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4470,13 +4473,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2791420315466924186}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.3, y: 0.9, z: 0}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 0.392, y: 1.102, z: 0.868}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2935424376565863942}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &2791846351376459120
 GameObject:
   m_ObjectHideFlags: 0
@@ -14759,6 +14762,37 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000000059604645, y: 0.15025096, z: 1.4677005}
     m_Extent: {x: 0.43967134, y: 0.44266218, z: 0.4106856}
   m_DirtyAABB: 0
+--- !u!1 &7765086407754299165
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3097379412661647794}
+  m_Layer: 3
+  m_Name: HorseSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3097379412661647794
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7765086407754299165}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.0011789799, y: -1.35, z: 0.24}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 2935424376565863942}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &7823494834062480891
 GameObject:
   m_ObjectHideFlags: 0

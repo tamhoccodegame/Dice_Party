@@ -6,24 +6,17 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 public class NewBoardGameController : PlayerController
 {
+    #region === Core Components ===
     private Animator animator;
     private CharacterController _controller;
+    private Rigidbody[] rigidbodies;
+    #endregion
 
+
+    #region === State Machine ===
     private BoardState currentState;
 
-    public PlayerInput playerInput;
-    public string currentAnim { get; set; }
-
-    public IdleState idleState;
-    public MovingState movingState;
-    public ChooseDirectionState chooseDirectionState;
-    public ItemState itemState;
-    public NodeState nodeState;
-
-    float verticalVelocity;
-    Vector3 moveDir;
-
-    public enum NetworkState
+    public enum DebugState
     {
         Idle,
         Moving,
@@ -32,35 +25,79 @@ public class NewBoardGameController : PlayerController
         Node,
     }
 
-    public int StepsLeft { get; set; }
+    [Header("Debug")]
+    public DebugState debugState;
 
+    public IdleState idleState;
+    public MovingState movingState;
+    public ChooseDirectionState chooseDirectionState;
+    public ItemState itemState;
+    public NodeState nodeState;
+    #endregion
+
+
+    #region === Input ===
+    [Header("Input")]
+    public PlayerInput playerInput;
+    public bool readyForInput = false;
+    #endregion
+
+
+    #region === Animation ===
+    public string currentAnim { get; set; }
+    #endregion
+
+
+    #region === Movement ===
+    [Header("Movement")]
+    float verticalVelocity;
+    Vector3 moveDir;
+
+    public int StepsLeft { get; set; }
     public Transform feet;
+    #endregion
+
+
+    #region === Board / Node ===
+    [Header("Board")]
     public BoardNode currentNode;
-    public int currentNodeId;             //Chỉ dùng được local scene
+    public int currentNodeId;             // Chỉ dùng local scene
     public string currentNodeName { get; set; }
     public BoardNode toMoveNode;
+    #endregion
 
+
+    #region === Item ===
     [Header("Item Controller")]
     public ItemController itemController;
+    #endregion
 
-    // --- Quản lý xúc xắc và UI hiển thị bước ---
+
+    #region === Dice & Step UI ===
     [Header("Dice And Step")]
-    public GameObject dice;         // xúc xắc đang spawn trên scene
-    public GameObject stepTextPrefab;     // text hiện số bước trên UI
+    public GameObject dice;                 // xúc xắc đang spawn trên scene
+    public GameObject stepTextPrefab;       // text hiện số bước
+    #endregion
 
-    // --- Quản lý các mũi tên chọn hướng ---
+
+    #region === Direction Arrow ===
     [Header("Arrow Direction")]
-    public GameObject arrowDirectionPrefab;   // prefab của mũi tên chỉ hướng
+    public GameObject arrowDirectionPrefab;
     public int currentHoverArrowIndex;
     public ArrowPointer hoverArrow;
-    public List<GameObject> spawnedArrows = new List<GameObject>(); // danh sách các mũi tên đã spawn ra
+    public List<GameObject> spawnedArrows = new List<GameObject>();
+    #endregion
 
+
+    #region === Effect ===
     [Header("Effect")]
     public ParticleSystem rollDiceEffect;
+    #endregion
 
-    private Rigidbody[] rigidbodies;
 
-    public bool readyForInput = false;
+    #region === Events / Runtime ===
+    private System.Action onDirectionChose;
+    #endregion
 
     public void Awake()
     {
@@ -74,16 +111,36 @@ public class NewBoardGameController : PlayerController
         itemState = new ItemState(this);
         nodeState = new NodeState(this);
 
+        if (playerInput == null)
+        {
+            playerInput = gameObject.AddComponent<PlayerInput>();
+            // Load Input Action Asset
+            var asset = Resources.Load<InputActionAsset>("InputAction/DefaultInputActions");
+            playerInput.actions = asset;
+
+            // Enable toàn bộ actions
+            playerInput.actions.Enable();
+
+            // Chọn map chính
+            playerInput.defaultActionMap = "Player";
+            playerInput.SwitchCurrentActionMap("Player");
+            readyForInput = true;
+            // Mock keyboard
+            playerInput.neverAutoSwitchControlSchemes = true;
+        }
+
         ChangeState(idleState);
     }
 
     private void Start()
     {
+        if (WizardPartyData.instance == null) return;
+
         string savedNode = WizardPartyData.instance.playersNode[playerInput];
         if (savedNode != null)
         {
             BoardNode node = GameObject.Find(savedNode).GetComponent<BoardNode>();
-            _controller.enabled = false;    
+            _controller.enabled = false;
             transform.position = node.transform.position;
             currentNode = node;
             _controller.enabled = true;
@@ -94,8 +151,8 @@ public class NewBoardGameController : PlayerController
         }
 
         toMoveNode = currentNode.nextNodes[0];
-        
-        
+
+
         enabled = TurnManager.instance.playerControllers[playerInput] == this;
     }
 
@@ -117,21 +174,25 @@ public class NewBoardGameController : PlayerController
         {
             case IdleState:
                 currentState = idleState;
+                debugState = DebugState.Idle;
                 break;
             case MovingState:
                 currentState = movingState;
+                debugState = DebugState.Moving;
                 break;
             case ChooseDirectionState:
                 currentState = chooseDirectionState;
+                debugState = DebugState.ChooseDirection;
                 break;
             case ItemState:
                 currentState = itemState;
+                debugState = DebugState.Item;
                 break;
             case NodeState:
                 currentState = nodeState;
+                debugState = DebugState.Node;
                 break;
         }
-
         currentState.Enter();
     }
 
@@ -168,7 +229,6 @@ public class NewBoardGameController : PlayerController
             Quaternion newRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, 20 * Time.deltaTime);
         }
-      
     }
 
     #region Move
@@ -220,10 +280,10 @@ public class NewBoardGameController : PlayerController
             WizardPartyData.instance.UpdatePlayerNode(playerInput, currentNode);
             StepsLeft--;
 
-            if(currentNode is ChestGoldNode chest)
+            if (currentNode is ChestGoldNode chest)
             {
-                    ChangeState(nodeState);
-                    return true;
+                ChangeState(nodeState);
+                return true;
             }
 
             if (StepsLeft > 0)
@@ -324,7 +384,7 @@ public class NewBoardGameController : PlayerController
     public void PrevHoverArrow()
     {
         currentHoverArrowIndex -= 1;
-        if(currentHoverArrowIndex < 0) currentHoverArrowIndex = spawnedArrows.Count - 1;
+        if (currentHoverArrowIndex < 0) currentHoverArrowIndex = spawnedArrows.Count - 1;
 
         if (hoverArrow != null)
             hoverArrow.UnHover();

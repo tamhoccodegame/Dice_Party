@@ -11,12 +11,13 @@ public class ItemState : BoardState
     public override void Enter()
     {
         controller.itemController.enabled = true;
-        controller.itemController.UseItem(0);
+        controller.itemController.UseItem(1);
     }
 
     public override void Exit()
     {
         controller.itemController.enabled = false;
+        controller.dice.SetActive(true);
     }
 
     public override void Update()

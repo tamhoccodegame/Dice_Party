@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XInput;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
@@ -19,8 +20,21 @@ public class PlayerManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        if (Keyboard.current != null)
+        {
+            Debug.Log("Keyboard Detected!");
+        }
+
+        foreach (var pad in Gamepad.all)
+        {
+            if (pad is XInputController)
+            {
+                Debug.Log(pad.GetType().Name);
+            }
+        }
     }
- 
+
     public void AddPlayer(PlayerInput input)
     {
         players.Add(input);

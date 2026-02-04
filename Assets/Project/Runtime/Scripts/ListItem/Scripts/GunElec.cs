@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,11 +9,10 @@ public class GunElec : BoardItem
 {
     [SerializeField] float rotateSpeed = 90f;
 
+    public GameObject bulletPrefab;
+
     private Transform playerModel;
-    private GameObject currentGun;
-    private VisualEffect shootVFX;
     public LaserBeam laserBeam;
-    private bool isUsingGun = false;
     private NewBoardGameController controller;
 
     public override void Init(NewBoardGameController controller)
@@ -34,17 +34,13 @@ public class GunElec : BoardItem
         if (controller.playerInput.actions["Trigger"].triggered)
         {
             Debug.Log("Fire!!");
+            //Spawn Bullet
+            var bullet = Instantiate(bulletPrefab, laserBeam.firePoint.position, laserBeam.firePoint.rotation).GetComponent<Rigidbody>();
+            bullet.GetComponent<GunItemBullet>().Init(20);
+            bullet.transform.up = -laserBeam.transform.forward;
+            bullet.AddForce(laserBeam.firePoint.transform.forward * 150f, ForceMode.Impulse);
+
             itemEndUse?.Invoke();
-        }
-    }
-
-    void RotatePlayerToKeyboard()
-    {
-        float rotateInput = controller.playerInput.actions["Move"].ReadValue<Vector2>().x;
-
-        if (rotateInput != 0f && playerModel != null)
-        {
-            playerModel.Rotate(Vector3.up, rotateSpeed * rotateInput * Time.deltaTime);
         }
     }
 }
