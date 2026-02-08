@@ -51,9 +51,8 @@ public class NewBoardGameController : PlayerController
     #region === Movement ===
     [Header("Movement")]
     float verticalVelocity;
-    Vector3 moveDir;
+    public Vector3 moveDir;
 
-    public int StepsLeft { get; set; }
     public Transform feet;
     #endregion
 
@@ -129,7 +128,6 @@ public class NewBoardGameController : PlayerController
             playerInput.neverAutoSwitchControlSchemes = true;
         }
 
-        ChangeState(idleState);
     }
 
     private void Start()
@@ -154,6 +152,8 @@ public class NewBoardGameController : PlayerController
 
 
         enabled = TurnManager.instance.playerControllers[playerInput] == this;
+
+        ChangeState(idleState);
     }
 
     public override PlayerInput GetPlayerInput()
@@ -240,7 +240,8 @@ public class NewBoardGameController : PlayerController
 
     IEnumerator RollDiceCoroutine()
     {
-        StepsLeft = Random.Range(1, 7);
+        var step = Random.Range(1, 7);
+        movingState.stepLeft = 1;
         //StepsLeft = 99;
 
         ChangeAnimation("RollDice");
@@ -250,12 +251,14 @@ public class NewBoardGameController : PlayerController
             ChangeState(chooseDirectionState);
         }
         else
+        {
             ChangeState(movingState);
+        }
     }
 
     public void SetStepLeft(int step)
     {
-        StepsLeft = step;
+        movingState.stepLeft = step;
     }
 
     public void SetCurrentNode(BoardNode node)
@@ -263,43 +266,6 @@ public class NewBoardGameController : PlayerController
         currentNode = node;
         toMoveNode = currentNode.nextNodes[0];
         WizardPartyData.instance.UpdatePlayerNode(playerInput, currentNode);
-    }
-
-    // Di chuyển từng bước
-    public bool MoveStep()
-    {
-        if (StepsLeft <= 0 || toMoveNode == null) return false;
-
-        moveDir = (toMoveNode.transform.position - feet.position).normalized;
-        moveDir.y = 0;
-
-        if (Vector3.Distance(feet.position, toMoveNode.transform.position) < 0.3f)
-        {
-            moveDir = Vector3.zero;
-            currentNode = toMoveNode;
-            WizardPartyData.instance.UpdatePlayerNode(playerInput, currentNode);
-            StepsLeft--;
-
-            if (currentNode is ChestGoldNode chest)
-            {
-                ChangeState(nodeState);
-                return true;
-            }
-
-            if (StepsLeft > 0)
-            {
-                if (currentNode.nextNodes.Count > 1)
-                {
-                    ChangeState(chooseDirectionState);
-                    return true;
-                }
-                else
-                {
-                    toMoveNode = currentNode.nextNodes[0];
-                }
-            }
-        }
-        return true;
     }
 
     #endregion
@@ -332,74 +298,6 @@ public class NewBoardGameController : PlayerController
         this.enabled = false;
     }
 
-
-    // --- Spawn các mũi tên chọn hướng khi tới ngã ba ---
-    public void ShowDirectionChoices()
-    {
-        ClearArrow();
-        for (int i = 0; i < currentNode.nextNodes.Count; i++)
-        {
-            BoardNode next = currentNode.nextNodes[i];
-            Vector3 midPoint = (currentNode.transform.position + next.transform.position) / 2;
-            midPoint.y = arrowDirectionPrefab.transform.position.y;
-
-            ArrowPointer arrow = Instantiate(arrowDirectionPrefab, midPoint, Quaternion.identity).GetComponent<ArrowPointer>();
-            if (i == 0)
-            {
-                currentHoverArrowIndex = 0;
-                hoverArrow = arrow;
-                arrow.Hover();
-            }
-            else
-                arrow.UnHover();
-
-            arrow.transform.rotation = Quaternion.LookRotation((next.transform.position - currentNode.transform.position), Vector3.up);
-            spawnedArrows.Add(arrow.gameObject);
-
-        }
-    }
-
-    // --- Clear các mũi tên chọn hướng cũ ---
-    void ClearArrow()
-    {
-        foreach (var go in spawnedArrows)
-        {
-            Destroy(go);
-        }
-        spawnedArrows.Clear();
-    }
-
-
-    public void NextHoverArrow()
-    {
-        currentHoverArrowIndex = (currentHoverArrowIndex + 1) % spawnedArrows.Count;
-
-        if (hoverArrow != null)
-            hoverArrow.UnHover();
-
-        hoverArrow = spawnedArrows[currentHoverArrowIndex].GetComponent<ArrowPointer>();
-        hoverArrow.Hover();
-    }
-
-    public void PrevHoverArrow()
-    {
-        currentHoverArrowIndex -= 1;
-        if (currentHoverArrowIndex < 0) currentHoverArrowIndex = spawnedArrows.Count - 1;
-
-        if (hoverArrow != null)
-            hoverArrow.UnHover();
-
-        hoverArrow = spawnedArrows[currentHoverArrowIndex].GetComponent<ArrowPointer>();
-        hoverArrow.Hover();
-    }
-
-    public void ChooseDirection()
-    {
-        ClearArrow();
-        toMoveNode = currentNode.nextNodes[currentHoverArrowIndex];
-        ChangeState(movingState);
-    }
-
     private void ShowDice()
     {
         dice.SetActive(true);
@@ -415,7 +313,7 @@ public class NewBoardGameController : PlayerController
         yield return new WaitForSecondsRealtime(0.2f);
         var step = Instantiate(stepTextPrefab, dice.transform.position - new Vector3(0, 1.5f, 0), Quaternion.identity)
                    .GetComponent<StepText>();
-        step.Init(StepsLeft.ToString());
+        step.Init(movingState.stepLeft.ToString());
         rollDiceEffect.Play();
         dice.SetActive(false);
         yield return new WaitForSeconds(0.5f);

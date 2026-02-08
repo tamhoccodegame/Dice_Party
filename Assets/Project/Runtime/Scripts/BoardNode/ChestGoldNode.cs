@@ -62,7 +62,7 @@ public class ChestGoldNode : BoardNode
         this.controller.enabled = true;
         WizardPartyData.instance.isGoldChestOpened = true;
 
-        if(controller.StepsLeft > 0)
+        if(controller.movingState.stepLeft > 0)
         {
             controller.SetCurrentNode(this);
             controller.ChangeState(controller.movingState);

@@ -26,6 +26,7 @@ public class ItemController : MonoBehaviour
 
     public void UseItem(int itemIndex)
     {
+        if (usingItem != null) return;
         var _item = itemAndSpawnPosition[itemIndex];
 
         if (_item != null)
