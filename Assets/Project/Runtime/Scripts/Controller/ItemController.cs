@@ -53,6 +53,7 @@ public class ItemController : MonoBehaviour
     
     void ItemEndUse()
     {
+        Debug.Log("Item End Use");
         controller.ChangeState(controller.idleState);
         Destroy(usingItem.gameObject);
         usingItem = null;

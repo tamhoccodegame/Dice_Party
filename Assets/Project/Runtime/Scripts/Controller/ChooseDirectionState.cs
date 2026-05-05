@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ChooseDirectionState : BoardState
@@ -18,6 +16,8 @@ public class ChooseDirectionState : BoardState
 
     public override void Enter()
     {
+        CameraFollow.instance.SwitchCamera(CameraFollow.CameraState.Juction);
+        controller.splineAnimate.Pause();
         controller.ChangeAnimation("Idle");
         ShowDirectionChoices();
     }
@@ -49,6 +49,7 @@ public class ChooseDirectionState : BoardState
         if (controller.playerInput.actions["Trigger"].triggered)
         {
             ChooseDirection();
+            CameraFollow.instance.SwitchCamera(CameraFollow.CameraState.Default);
         }
     }
 
@@ -116,7 +117,14 @@ public class ChooseDirectionState : BoardState
     {
         ClearArrow();
         controller.toMoveNode = controller.currentNode.nextNodes[controller.currentHoverArrowIndex];
-        onDirectionChose?.Invoke();
+        if (onDirectionChose != null)
+        {
+            onDirectionChose.Invoke();
+        }
+        else
+        {
+            controller.ChangeState(controller.movingState);
+        }
     }
 
     public override string ToString()

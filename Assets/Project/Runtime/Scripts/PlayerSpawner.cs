@@ -39,7 +39,7 @@ public class PlayerSpawner : MonoBehaviour
     void SpawnPlayer()
     {
         BoardGameData boardGameData = BoardGameData.instance;
-        bool isBoardScene = SceneManager.GetActiveScene().name == "TuanSceneMap";
+        bool isBoardScene = SceneManager.GetActiveScene().name == "BoardMap";
 
         int spawnIndex = 0;
         foreach (var playerInput in PlayerManager.instance.players)

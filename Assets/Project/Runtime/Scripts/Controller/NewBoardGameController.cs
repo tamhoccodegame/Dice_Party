@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Splines;
 
 [RequireComponent(typeof(CharacterController))]
 public class NewBoardGameController : PlayerController
@@ -56,6 +57,10 @@ public class NewBoardGameController : PlayerController
     public Transform feet;
     #endregion
 
+    #region === New Movement ==
+    [Header("New Movement")]
+    public SplineAnimate splineAnimate;
+    #endregion
 
     #region === Board / Node ===
     [Header("Board")]
@@ -128,19 +133,25 @@ public class NewBoardGameController : PlayerController
             playerInput.neverAutoSwitchControlSchemes = true;
         }
 
+        if(TurnManager.instance == null) DisableRagdoll();
+
     }
 
     private void Start()
     {
         if (WizardPartyData.instance == null) return;
 
-        string savedNode = WizardPartyData.instance.playersNode[playerInput];
+        splineAnimate.Container = GameObject.Find("Spline Start").GetComponent<SplineContainer>();
+
+        WizardPartyData.PlayerNodeData savedNode = WizardPartyData.instance.playersNode[playerInput];
         if (savedNode != null)
         {
-            BoardNode node = GameObject.Find(savedNode).GetComponent<BoardNode>();
+            BoardNode node = GameObject.Find(savedNode.name).GetComponent<BoardNode>();
             _controller.enabled = false;
             transform.position = node.transform.position;
             currentNode = node;
+            splineAnimate.Container = node.splineContainer;
+            splineAnimate.NormalizedTime = node.normalizeTime;
             _controller.enabled = true;
         }
         else
@@ -241,9 +252,8 @@ public class NewBoardGameController : PlayerController
     IEnumerator RollDiceCoroutine()
     {
         var step = Random.Range(1, 7);
-        movingState.stepLeft = 1;
+        movingState.stepLeft = 99;
         //StepsLeft = 99;
-
         ChangeAnimation("RollDice");
         yield return new WaitForSecondsRealtime(1f);
         if (currentNode.nextNodes.Count > 1)

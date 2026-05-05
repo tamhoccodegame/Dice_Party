@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Splines;
 
 public class PlayerBoardStat
 {
@@ -54,11 +55,23 @@ public class WizardPartyData : MonoBehaviour
 
     public string wizardNode;
 
-    public Dictionary<PlayerInput, string> playersNode = new Dictionary<PlayerInput, string>();
+    public class PlayerNodeData
+    {
+        public string name;
+        public float normalizeTime;
+        public SplineContainer splineContainer;
+    }
+
+    public Dictionary<PlayerInput, PlayerNodeData> playersNode = new Dictionary<PlayerInput, PlayerNodeData>();
 
     public void UpdatePlayerNode(PlayerInput player, BoardNode node)
     {
-        playersNode[player] = node.name;
+        playersNode[player] = new PlayerNodeData
+        {
+            name = node.name,
+            normalizeTime = node.normalizeTime,
+            splineContainer = node.splineContainer,
+        };
     }
 
     public void UpdateCarNode(BoardNode node)

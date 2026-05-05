@@ -2,15 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Splines;
 
 public class BoardNode : MonoBehaviour
 {
     public bool isStartNode = false;
     public List<BoardNode> nextNodes;
 
+    public SplineContainer splineContainer;
+    public float normalizeTime;
+
     public ParticleSystem nodeEffect;
 
     protected Coroutine processCoroutine;
+
+    private void Awake()
+    {
+        splineContainer = GetComponentInParent<SplineContainer>();
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

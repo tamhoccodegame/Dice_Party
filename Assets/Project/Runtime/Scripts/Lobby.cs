@@ -38,7 +38,7 @@ public class Lobby : MonoBehaviour
     {
         yield return new WaitForSeconds(1.5f);
         //SceneManager.LoadScene("Map1");
-        LevelLoader.instance.LoadScene("TuanSceneMap");
+        LevelLoader.instance.LoadScene("BoardMap");
 
     }
 

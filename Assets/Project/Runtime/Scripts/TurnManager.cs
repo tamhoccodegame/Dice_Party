@@ -51,8 +51,8 @@ public class TurnManager : MonoBehaviour
         {
             isFirstTry = false;
             WizardPartyData.instance.isFirstTry = false;
-            if (introCutscene.gameObject.activeSelf) StartCoroutine(DelayPlayIntroCutscene());
-            else
+            //if (introCutscene.gameObject.activeSelf) StartCoroutine(DelayPlayIntroCutscene());
+            //else
             {
                 StartFirstTurn();
                 StartCoroutine(DelayUpdatePlayerUI());
