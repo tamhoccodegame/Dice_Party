@@ -486,7 +486,7 @@ namespace CartoonFX
 		}
 
 #if !DISABLE_CAMERA_SHAKE || !DISABLE_CLEAR_BEHAVIOR
-		public void Shake()
+		void Awake()
 		{
 	#if !DISABLE_CAMERA_SHAKE
 			if (cameraShake != null && cameraShake.enabled)

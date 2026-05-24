@@ -27,7 +27,7 @@ public class Lobby : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.Locked;
         foreach(var playerInput in PlayerManager.instance.players)
         {
             UpdatePlayerUI(playerInput);

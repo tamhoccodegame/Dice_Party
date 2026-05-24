@@ -9,7 +9,6 @@ public class PlayerSlotUI : MonoBehaviour
 {
     public GameObject afterJoinPanel;
     public GameObject customizePanel;
-    public GameObject adjustAppearancePanel;
     public GameObject unreadyPanel;
     public GameObject unreadyButton;
     public GameObject readyPanel;
@@ -36,18 +35,25 @@ public class PlayerSlotUI : MonoBehaviour
 
     public void InitSelector(PlayerCustom playerCustom)
     {
+        Debug.Log("Init");
         this.playerCustom = playerCustom;
         List<string> hairNames = new List<string>();
         List<string> bodyPartNames = new List<string>();
 
+        int count = 0;
+
         foreach(var hair in playerCustom.hairs)
         {
-            hairNames.Add(hair.name);
+            count++;
+            hairNames.Add($"Hair {count}");
         }
+
+        count = 0;
 
         foreach(var bodyPart in playerCustom.bodyparts)
         {
-            bodyPartNames.Add(bodyPart.name);
+            count++;
+            bodyPartNames.Add($"Body {count}");
         }
 
         colorSelector.Init(playerCustom);

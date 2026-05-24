@@ -28,6 +28,8 @@ public class CrowdAgent : MonoBehaviour
             float force = 1 - (dist / avoidRadius);
 
             velocity += away * force * avoidForce * Time.deltaTime;
+
+            player.GetComponent<TestMNGController>().SlowDown();
         }
         else
         {
