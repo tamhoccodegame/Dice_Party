@@ -57,6 +57,7 @@ public class PlayerSlotUI : MonoBehaviour
 
     public void SetReady(bool isReady)
     {
+        StopAllCoroutines();
         this.isReady = isReady;
         Lobby.instance.SetReady(playerInput, isReady);
 

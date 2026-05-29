@@ -29640,7 +29640,6 @@ GameObject:
   m_Component:
   - component: {fileID: 441871246}
   - component: {fileID: 441871245}
-  - component: {fileID: 441871244}
   - component: {fileID: 441871247}
   - component: {fileID: 441871249}
   m_Layer: 0
@@ -29650,14 +29649,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &441871244
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 441871243}
-  m_Enabled: 1
 --- !u!20 &441871245
 Camera:
   m_ObjectHideFlags: 0
@@ -33604,7 +33595,6 @@ GameObject:
   m_Component:
   - component: {fileID: 586178954}
   - component: {fileID: 586178953}
-  - component: {fileID: 586178952}
   - component: {fileID: 586178951}
   - component: {fileID: 586178955}
   m_Layer: 0
@@ -33658,14 +33648,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &586178952
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 586178949}
-  m_Enabled: 1
 --- !u!20 &586178953
 Camera:
   m_ObjectHideFlags: 0
@@ -86414,7 +86396,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1198630686}
   - component: {fileID: 1198630685}
-  - component: {fileID: 1198630684}
   - component: {fileID: 1198630683}
   - component: {fileID: 1198630687}
   m_Layer: 0
@@ -86468,14 +86449,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &1198630684
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1198630681}
-  m_Enabled: 1
 --- !u!20 &1198630685
 Camera:
   m_ObjectHideFlags: 0
@@ -133461,7 +133434,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1933557547}
   - component: {fileID: 1933557546}
-  - component: {fileID: 1933557545}
   - component: {fileID: 1933557544}
   - component: {fileID: 1933557548}
   m_Layer: 0
@@ -133515,14 +133487,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &1933557545
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1933557542}
-  m_Enabled: 1
 --- !u!20 &1933557546
 Camera:
   m_ObjectHideFlags: 0
@@ -141693,6 +141657,46 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1793605453}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2006639983
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2006639984}
+  - component: {fileID: 2006639985}
+  m_Layer: 0
+  m_Name: AudioListener
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2006639984
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006639983}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 119.067894, y: 1.7669382, z: 139.1206}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &2006639985
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006639983}
+  m_Enabled: 1
 --- !u!1001 &2008915937
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -156076,6 +156080,7 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 2006639984}
   - {fileID: 459507682}
   - {fileID: 385258171}
   - {fileID: 1204231676}
