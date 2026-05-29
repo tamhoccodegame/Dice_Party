@@ -3960,6 +3960,9 @@ GameObject:
   - component: {fileID: 2935424376565863942}
   - component: {fileID: 9105315542713420924}
   - component: {fileID: 1723543133382975127}
+  - component: {fileID: 8620240724366816552}
+  - component: {fileID: 6518821553546060222}
+  - component: {fileID: 7661778767560529866}
   m_Layer: 0
   m_Name: CustomCharacter_Update
   m_TagString: Untagged
@@ -4070,6 +4073,69 @@ MonoBehaviour:
   currentHairIndex: 0
   currentColorIndex: 0
   currentBodypartIndex: 0
+  applyButton: {fileID: 0}
+--- !u!114 &8620240724366816552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0510d4113c55aa240929995d15b15aca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 9105315542713420924}
+  rb: {fileID: 7661778767560529866}
+--- !u!65 &6518821553546060222
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Material: {fileID: 13400000, guid: 226bab53956a0d348b4e95865e2ab35c, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.7089475, y: 1.5328758, z: 1}
+  m_Center: {x: 0, y: 0.7527525, z: 0}
+--- !u!54 &7661778767560529866
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0

@@ -49,8 +49,8 @@ public class PanelSwitcher : MonoBehaviour
     public void OpenMainPanel()
     {
         mainPanel.ToggleVisibility(true);
-        //readyPanel.HideInstant();
-        //customizePanel.HideInstant();
+        readyPanel.HideInstant();
+        customizePanel.HideInstant();
 
         StartCoroutine(DelaySetSelectedButton(defaultMainButton));
     }

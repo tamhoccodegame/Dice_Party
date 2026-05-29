@@ -7,13 +7,7 @@ using UnityEngine.UI;
 
 public class PlayerSlotUI : MonoBehaviour
 {
-    public GameObject afterJoinPanel;
-    public GameObject customizePanel;
-    public GameObject unreadyPanel;
-    public GameObject unreadyButton;
-    public GameObject readyPanel;
     public Button applyButton;
-
 
     public OptionSelector colorSelector;
     public OptionSelector hairSelector;
