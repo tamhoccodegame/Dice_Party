@@ -30,7 +30,9 @@ public class WizardMiniGameManager : MonoBehaviour
     public int time;
     public TextMeshProUGUI timeText;
     public TextMeshProUGUI startText;
+    public TextMeshProUGUI finishText;
     public AudioSource startSound;
+    public AudioSource finishSound;
     public PlayableDirector introCutscene;
     public AudioClip music;
     public AudioClip winMusic;
@@ -88,7 +90,7 @@ public class WizardMiniGameManager : MonoBehaviour
         }
 
         PlayerSpawner playerSpawner = GetComponent<PlayerSpawner>();
-        playerSpawner.TrySpawnPlayer();
+        playerSpawner?.TrySpawnPlayer();
 
         MusicManager.instance?.PlayMusic(music);
 
@@ -123,6 +125,9 @@ public class WizardMiniGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// For those minigame that has a goal.
+    /// </summary>
     public void UpdatePlayerCompletedGame(PlayerInput input)
     {
         playersCompleteGame.Add(input);
@@ -155,7 +160,7 @@ public class WizardMiniGameManager : MonoBehaviour
         if (CheckGameOver())
         {
             isGameOver = true;
-            ShowGameOverPanel();
+            StartCoroutine(DelayShowGameOver());
         }
     }
 
@@ -223,12 +228,22 @@ public class WizardMiniGameManager : MonoBehaviour
         }
     }
 
+    protected IEnumerator DelayShowGameOver()
+    {
+        finishText?.gameObject.SetActive(true);
+        finishSound?.Play();
+        yield return new WaitForSeconds(3f);
+        finishSound?.gameObject.SetActive(false);
+        ShowGameOverPanel();
+    }
+
     protected virtual void TriggerAfterCutscene()
     {
         tutorialPanel.SetActive(true);
         StartCoroutine(WaitForAllReady());
     }
 
+    //Wait for all ready and start the minigame
     IEnumerator WaitForAllReady()
     {
         while (!isAllReady)

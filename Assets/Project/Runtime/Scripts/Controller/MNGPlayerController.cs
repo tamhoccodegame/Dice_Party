@@ -29,7 +29,7 @@ public class MNGPlayerController : PlayerController
     private bool isGrounded;
     public bool isFalling = false;
 
-    protected PlayerInput playerInput;
+    public PlayerInput playerInput;
 
     public override PlayerInput GetPlayerInput()
     {
@@ -46,6 +46,7 @@ public class MNGPlayerController : PlayerController
         if (bloodEffect != null)
             bloodEffect.Stop();
 
+        //WizardMiniGameManager.instance.playerObjects.Add(playerInput, gameObject);
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
@@ -63,15 +64,17 @@ public class MNGPlayerController : PlayerController
 
         Vector3 camForward = Camera.main.transform.forward;
         camForward.y = 0f;
+        camForward.Normalize();
         Vector3 camRight = Camera.main.transform.right;
         camRight.y = 0f;
+        camRight.Normalize();
 
         movement = Vector3.zero;
 
         if (!isFalling)
         {
             if (WizardMiniGameManager.instance.isGameStarted)
-            movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
+                movementInput = playerInput.actions["Move"].ReadValue<Vector2>();
 
             if (!autoRun)
                 movement = camForward * movementInput.y + camRight * movementInput.x;

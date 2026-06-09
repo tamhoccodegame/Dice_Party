@@ -22,7 +22,9 @@ public class ChairGoal : MonoBehaviour
     {
         if(other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            other.GetComponent<TestMNGController>().enabled = false;
+            MNGPlayerController p = other.GetComponent<MNGPlayerController>();
+            WizardMiniGameManager.instance.UpdatePlayerCompletedGame(p.GetPlayerInput());
+            p.enabled = false;
             other.GetComponent<CharacterController>().enabled = false;
             StartCoroutine(SmoothPositionPlayer(other.transform));
         }
