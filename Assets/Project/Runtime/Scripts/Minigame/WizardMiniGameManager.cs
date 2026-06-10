@@ -35,12 +35,10 @@ public class WizardMiniGameManager : MonoBehaviour
     public AudioSource finishSound;
     public PlayableDirector introCutscene;
     public AudioClip music;
-    public AudioClip winMusic;
 
     [Space(20)]
     [Header("Avatar Standing Position")]
     public Transform[] rankPositions;
-
     public PlayerSlotHUD[] playerHUDs;
 
     [Space(20)]
@@ -54,7 +52,6 @@ public class WizardMiniGameManager : MonoBehaviour
     [Header("Game Over Panel")]
     public GameObject gameOverPanel;
     public GameOverSlotUI[] gameOverSlots;
-    public TextMeshProUGUI whoWinsText;
     public GameObject gameOverVolume;
     public Image blackScreen;
     public float fadeDuration = 1f;
@@ -133,7 +130,8 @@ public class WizardMiniGameManager : MonoBehaviour
         playersCompleteGame.Add(input);
         if (CheckGameOver())
         {
-            ShowGameOverPanel();
+            isGameOver = true;
+            StartCoroutine(DelayShowGameOver());
         }
     }
 
@@ -146,7 +144,8 @@ public class WizardMiniGameManager : MonoBehaviour
 
         if (CheckGameOver())
         {
-            ShowGameOverPanel();
+            isGameOver = true;
+            StartCoroutine(DelayShowGameOver());
         }
     }
 
@@ -232,8 +231,8 @@ public class WizardMiniGameManager : MonoBehaviour
     {
         finishText?.gameObject.SetActive(true);
         finishSound?.Play();
-        yield return new WaitForSeconds(3f);
-        finishSound?.gameObject.SetActive(false);
+        yield return new WaitForSeconds(4f);
+        finishText?.gameObject.SetActive(false);
         ShowGameOverPanel();
     }
 

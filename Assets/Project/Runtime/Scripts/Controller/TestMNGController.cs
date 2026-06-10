@@ -61,12 +61,21 @@ public class TestMNGController : PlayerController
     {
         if (playerInput == null) return;
 
-        Vector3 camForward = Camera.main.transform.forward;
-        camForward.y = 0f;
+        Vector3 camForward = Vector3.ProjectOnPlane(
+    Camera.main.transform.forward,
+    Vector3.up
+);
+
+        if (camForward.sqrMagnitude < 0.01f)
+        {
+            // Camera đang gần như nhìn thẳng xuống
+            camForward = Camera.main.transform.up;
+            camForward.y = 0;
+        }
+
         camForward.Normalize();
-        Vector3 camRight = Camera.main.transform.right;
-        camRight.y = 0f;
-        camRight.Normalize();
+
+        Vector3 camRight = Vector3.Cross(Vector3.up, camForward).normalized;
 
         movement = Vector3.zero;
 
