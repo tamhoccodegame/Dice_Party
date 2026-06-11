@@ -132,7 +132,7 @@ public class TestMNGController : PlayerController
                 holdingObject.GetComponent<Rigidbody>().isKinematic = false;
                 holdingObject.GetComponent<Rigidbody>().AddForce(throwDirection * 50f, ForceMode.Impulse);
                 holdingObject = null;
-                ChangeAnim("Throw");
+                ChangeAnimImmidiate("Throw");
             }
         }
 
@@ -166,6 +166,14 @@ public class TestMNGController : PlayerController
         currentAnim = animName;
 
         animator.CrossFade(animName, blendTime);
+    }
+
+    public void ChangeAnimImmidiate(string animName)
+    {
+        if(animName == currentAnim) return;
+        currentAnim = animName;
+
+        animator.Play(animName);
     }
 
     public void BloodEffect()
