@@ -9,6 +9,11 @@ public class TestMNGController : PlayerController
     public bool canJump;
     bool autoRun = false;
 
+    public Transform handTransform;
+    public Transform holdingObject;
+    public LayerMask objectMask;
+
+
     private CharacterController controller;
     private Animator animator;
 
@@ -105,6 +110,32 @@ public class TestMNGController : PlayerController
         }
 
         movement.y = verticalVelocity;
+
+        if (playerInput.actions["Interact"].triggered)
+        {
+            if (holdingObject == null)
+            {
+                if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 10f, objectMask))
+                {
+                    holdingObject = hit.transform;
+                    holdingObject.SetParent(handTransform);
+                    holdingObject.transform.localPosition = Vector3.zero;
+                    holdingObject.transform.localEulerAngles = Vector3.zero;
+                    holdingObject.GetComponent<Rigidbody>().isKinematic = true;
+                    ChangeAnim("GrabIdle");
+                }
+            }
+            else
+            {
+                holdingObject.SetParent(null);
+                Vector3 throwDirection = (transform.forward * 3f + Vector3.up * 4f).normalized;
+                holdingObject.GetComponent<Rigidbody>().isKinematic = false;
+                holdingObject.GetComponent<Rigidbody>().AddForce(throwDirection * 50f, ForceMode.Impulse);
+                holdingObject = null;
+                ChangeAnim("Throw");
+            }
+        }
+
 
         // Move
         controller.Move(movement * (moveSpeed * speedFactor) * Time.deltaTime);

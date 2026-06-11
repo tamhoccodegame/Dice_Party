@@ -23,8 +23,8 @@ RenderSettings:
   m_AmbientSkyColor: {r: 1, g: 0.9324589, b: 0.5641509, a: 1}
   m_AmbientEquatorColor: {r: 0, g: 0, b: 0, a: 1}
   m_AmbientGroundColor: {r: 1, g: 1, b: 1, a: 1}
-  m_AmbientIntensity: 1
-  m_AmbientMode: 1
+  m_AmbientIntensity: 2
+  m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: ffd1c6952d5d33a4fb34fd2f52cdd120, type: 2}
   m_HaloStrength: 0.5
@@ -4512,7 +4512,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -5062,10 +5062,11 @@ MonoBehaviour:
   time: 40
   timeText: {fileID: 101082769}
   startText: {fileID: 984960534}
+  finishText: {fileID: 0}
   startSound: {fileID: 1690086821}
+  finishSound: {fileID: 0}
   introCutscene: {fileID: 1480459386}
   music: {fileID: 8300000, guid: 95467ef7526f6d34b8b78a74cc2a4bce, type: 3}
-  winMusic: {fileID: 8300000, guid: 6ef8c37c46751314f8e441ff0bbc9254, type: 3}
   rankPositions:
   - {fileID: 2088806693}
   - {fileID: 606636576}
@@ -5097,7 +5098,6 @@ MonoBehaviour:
   - {fileID: 2604349239528468751}
   - {fileID: 2604349239528468750}
   - {fileID: 2604349239528468749}
-  whoWinsText: {fileID: 0}
   gameOverVolume: {fileID: 0}
   blackScreen: {fileID: 2604349239528468748}
   fadeDuration: 1
@@ -5126,6 +5126,7 @@ MonoBehaviour:
   - {fileID: 2133163947}
   - {fileID: 118632817}
   - {fileID: 1200134951}
+  cinemachineCameras: []
 --- !u!82 &1690086821
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5684,7 +5685,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

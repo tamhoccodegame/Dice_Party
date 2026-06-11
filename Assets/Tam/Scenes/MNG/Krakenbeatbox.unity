@@ -23,8 +23,8 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.4339623, g: 0.4339623, b: 0.4339623, a: 1}
   m_AmbientEquatorColor: {r: 1, g: 1, b: 1, a: 1}
   m_AmbientGroundColor: {r: 0, g: 0, b: 0, a: 1}
-  m_AmbientIntensity: 1
-  m_AmbientMode: 1
+  m_AmbientIntensity: 2
+  m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 1, g: 1, b: 1, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: 97dad49c43ceb694e81969acec898d9f, type: 2}
   m_HaloStrength: 0.5
@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 792895384}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3302,10 +3302,11 @@ MonoBehaviour:
   time: 80
   timeText: {fileID: 4531977635870704151}
   startText: {fileID: 4531977635870704150}
+  finishText: {fileID: 0}
   startSound: {fileID: 386616875}
+  finishSound: {fileID: 0}
   introCutscene: {fileID: 214025}
   music: {fileID: 8300000, guid: cd4d3a1a66b50fc4ba59c6c4cff17fd6, type: 3}
-  winMusic: {fileID: 0}
   rankPositions:
   - {fileID: 1881842987}
   - {fileID: 299651165}
@@ -3337,7 +3338,6 @@ MonoBehaviour:
   - {fileID: 4531977635870704155}
   - {fileID: 4531977635870704154}
   - {fileID: 4531977635870704153}
-  whoWinsText: {fileID: 0}
   gameOverVolume: {fileID: 0}
   blackScreen: {fileID: 4531977635870704152}
   fadeDuration: 1
@@ -3458,6 +3458,7 @@ MonoBehaviour:
   - {fileID: 488001627}
   - {fileID: 1724597334}
   - {fileID: 2000053945}
+  cinemachineCameras: []
 --- !u!4 &388080924 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2259888663970686225, guid: dc1f5762b3f030b4092bad4a71b60422, type: 3}
@@ -5532,7 +5533,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 3
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -5571,12 +5572,12 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 2
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 0
   m_ColorTemperature: 7034
-  m_UseColorTemperature: 1
+  m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
@@ -5590,13 +5591,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 792895382}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.8699109, y: -0.11249649, z: 0.23309188, w: 0.41984266}
+  m_LocalRotation: {x: 0.41857865, y: -0.23325503, z: 0.11215779, w: 0.87051976}
   m_LocalPosition: {x: -94.40098, y: 12.851194, z: -107.62532}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 128.474, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 51.36, y: -30, z: 0}
 --- !u!1001 &795616856
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6680,7 +6681,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

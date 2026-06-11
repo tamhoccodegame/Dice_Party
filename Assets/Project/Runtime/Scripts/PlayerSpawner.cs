@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -11,6 +12,8 @@ public class PlayerSpawner : MonoBehaviour
     public GameObject boardCarPrefab;
     public GameObject playerPrefab;
     public Transform[] spawnPosition;
+
+    public CinemachineCamera[] cinemachineCameras;
 
     public Dictionary<int, int> spawnedCharacters => default;
 
@@ -44,9 +47,14 @@ public class PlayerSpawner : MonoBehaviour
         int spawnIndex = 0;
         foreach (var playerInput in PlayerManager.instance.players)
         {
+            //Board Map chỉ có 1 spawnPosition nên luôn reset = 0
             if (isBoardScene) spawnIndex = 0;
 
             var player = Instantiate(playerPrefab, spawnPosition[spawnIndex].position, spawnPosition[spawnIndex].rotation);
+            if (cinemachineCameras.Count() > 0)
+            {
+                cinemachineCameras[spawnIndex].Follow = player.transform;
+            }
             spawnIndex++;
             Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
             PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
@@ -62,6 +70,8 @@ public class PlayerSpawner : MonoBehaviour
                 TurnManager.instance.playerControllers.Add(playerInput, controller as NewBoardGameController);
             else
                 WizardMiniGameManager.instance.playerObjects.Add(playerInput, player.gameObject);
+
+           
         }
     }
 
