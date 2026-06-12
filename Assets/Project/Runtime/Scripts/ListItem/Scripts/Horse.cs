@@ -23,10 +23,13 @@ public class Horse : BoardItem
 
         _controller = controller;
         stepRemain = step;
+
+        _controller.ChangeAnimation("Sit");
     }
 
     void OnDirectionChose()
     {
+        _controller.ChangeAnimation("Sit");
         _controller.ChangeState(_controller.itemState);
         _controller.chooseDirectionState.onDirectionChose -= OnDirectionChose;
         if (_controller.currentHoverArrowIndex == 1)

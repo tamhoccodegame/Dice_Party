@@ -1,29 +1,39 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AnimationHandler : MonoBehaviour
 {
-    public Animator animator;
-    public string animToPlay;
+    public Animation anima;
+    public int animToPlay;
+    public bool isRandom = false;
 
-    public string[] anims;
+    private AnimationState[] states;
 
-    // Start is called before the first frame update
     void Start()
     {
-        if(!string.IsNullOrEmpty(animToPlay))
-            animator.Play(animToPlay);
+        // Lấy tất cả state trong Animation component
+        states = new AnimationState[anima.GetClipCount()];
+        Debug.Log(states.Length);
+
+        int i = 0;
+        foreach (AnimationState state in anima)
+        {
+            states[i] = state;
+            i++;
+        }
+
+        if (!isRandom)
+        {
+            if (animToPlay >= 0 && animToPlay < states.Length)
+            {
+                anima.Play(states[animToPlay].name);
+            }
+        }
         else
         {
-            int randomAnim = Random.Range(0, anims.Length);
-            animator.Play(anims[randomAnim]);
+            int randomAnim = Random.Range(0, states.Length);
+            anima.Play(states[randomAnim].name);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

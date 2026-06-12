@@ -9166,10 +9166,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6447901525307199401}
-  - component: {fileID: 133339900608915107}
   - component: {fileID: 4193481873568805536}
-  - component: {fileID: -2418160569760800105}
   - component: {fileID: 5395623448514586934}
+  - component: {fileID: 8537747408025117706}
   m_Layer: 3
   m_Name: Waiter
   m_TagString: Player
@@ -9216,27 +9215,6 @@ Transform:
   - {fileID: 3264073239557728680}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &133339900608915107
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4556679103574379875}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 503415fc3fea44f7bb0eebf41e58e8be, type: 3}
-  m_Controller: {fileID: 9100000, guid: 8b07dffaccb64524b8e95c6a7f8cc5b1, type: 2}
-  m_CullingMode: 1
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &4193481873568805536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9253,28 +9231,13 @@ MonoBehaviour:
   m_PlayOnAwake: 1
   m_LoopMode: 1
   m_Method: 1
-  m_Duration: 4.982121
+  m_Duration: 5.633043
   m_MaxSpeed: 50
   m_EasingMode: 0
   m_AlignmentMode: 1
   m_ObjectForwardAxis: 2
   m_ObjectUpAxis: 1
   m_StartOffset: 0
---- !u!114 &-2418160569760800105
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4556679103574379875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2fee5d44a14b8e4b9fa535e80580e2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 133339900608915107}
-  animToPlay: Run 02
-  anims: []
 --- !u!136 &5395623448514586934
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -9298,6 +9261,22 @@ CapsuleCollider:
   m_Height: 1.7399232
   m_Direction: 1
   m_Center: {x: 0, y: 0.8492433, z: 0}
+--- !u!111 &8537747408025117706
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4556679103574379875}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: -203655887218126122, guid: 664fc5b7766534a4ab8592a523b9e5ba, type: 3}
+  m_Animations:
+  - {fileID: -203655887218126122, guid: 664fc5b7766534a4ab8592a523b9e5ba, type: 3}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &4558029716194509552
 GameObject:
   m_ObjectHideFlags: 0
