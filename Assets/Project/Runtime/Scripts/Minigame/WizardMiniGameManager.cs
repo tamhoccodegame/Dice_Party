@@ -331,7 +331,8 @@ public class WizardMiniGameManager : MonoBehaviour
             gameOverSlots[i].gameObject.SetActive(true);
             var inputGo = playerObjects[playerScores.ElementAt(i).Key];
             if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
-            else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+            //else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+            else inputGo.GetComponent<Animator>().Play("TurnUp");
 
             inputGo.GetComponent<PlayerController>().enabled = false;
             inputGo.GetComponent<CharacterController>().enabled = false;

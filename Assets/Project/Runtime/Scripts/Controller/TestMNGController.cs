@@ -119,7 +119,12 @@ public class TestMNGController : PlayerController
                 {
                     holdingObject = hit.transform;
                     holdingObject.SetParent(handTransform);
-                    holdingObject.transform.localPosition = Vector3.zero;
+
+                    Bounds bounds = holdingObject.GetComponent<Collider>().bounds;
+
+                    Vector3 offset = bounds.center - holdingObject.transform.position;
+
+                    holdingObject.transform.position = handTransform.position - offset;
                     holdingObject.transform.localEulerAngles = Vector3.zero;
                     holdingObject.GetComponent<Rigidbody>().isKinematic = true;
                     ChangeAnim("GrabIdle");
