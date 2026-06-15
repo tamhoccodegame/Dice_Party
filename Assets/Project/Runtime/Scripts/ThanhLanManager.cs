@@ -24,9 +24,9 @@ public class ThanhLanManager : WizardMiniGameManager
         base.ShowGameOverPanel();
     }
 
-    public override void SpawnRewardAvatar()
+    public override void SpawnRewardAvatar(bool isAscending)
     {
-        base.SpawnRewardAvatar();
+        base.SpawnRewardAvatar(false);
     }
 
     protected override void TriggerAfterCutscene()

@@ -33,7 +33,7 @@ public class PickUpItem : MonoBehaviour
                 Collider[] cols = Physics.OverlapSphere(interactArea.position, interactRange, objectMask);
                 if (cols.Length <= 0) return;
 
-                if (cols[0].gameObject.layer == LayerMask.NameToLayer("Trash"))
+                if (cols[0].gameObject.layer == LayerMask.NameToLayer("Trash") && cols[0].transform.childCount > 0)
                 {
                     holdingObject = Instantiate(trashBagPrefab, handTransform).transform;
                     Destroy(cols[0].gameObject);

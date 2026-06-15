@@ -28,7 +28,7 @@ public class HungBapManager : WizardMiniGameManager
         base.TriggerAfterCutscene();
     }
 
-    public override void SpawnRewardAvatar()
+    public override void SpawnRewardAvatar(bool isAscending)
     {
         FindFirstObjectByType<Light>().shadows = LightShadows.None;
 

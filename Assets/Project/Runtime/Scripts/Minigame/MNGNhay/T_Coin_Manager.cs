@@ -36,9 +36,9 @@ public class T_Coin_Manager : WizardMiniGameManager
         base.TriggerAfterCutscene();
     }
 
-    public override void SpawnRewardAvatar()
+    public override void SpawnRewardAvatar(bool isAscending)
     {
-        base.SpawnRewardAvatar();
+        base.SpawnRewardAvatar(false);
     }
 
     public override void ShowGameOverPanel()

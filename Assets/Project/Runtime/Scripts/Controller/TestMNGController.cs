@@ -61,10 +61,7 @@ public class TestMNGController : PlayerController
     {
         if (playerInput == null) return;
 
-        Vector3 camForward = Vector3.ProjectOnPlane(
-    Camera.main.transform.forward,
-    Vector3.up
-);
+        Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up);
 
         if (camForward.sqrMagnitude < 0.01f)
         {

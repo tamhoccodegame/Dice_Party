@@ -109,9 +109,9 @@ public class DoanTauManager : WizardMiniGameManager
         base.ShowGameOverPanel();
     }
 
-    public override void SpawnRewardAvatar()
+    public override void SpawnRewardAvatar(bool isAscending)
     {
-        base.SpawnRewardAvatar();
+        base.SpawnRewardAvatar(false);
     }
 
     public override void UpdateHUD()

@@ -291,7 +291,7 @@ public class WizardMiniGameManager : MonoBehaviour
         //Volume active
         //gameOverVolume.SetActive(true);
         yield return new WaitForSeconds(1.5f);
-        SpawnRewardAvatar();
+        SpawnRewardAvatar(false);
         yield return null;
         gameOverPanel.SetActive(true);
         //gameOverVolume.SetActive(false);
@@ -312,14 +312,18 @@ public class WizardMiniGameManager : MonoBehaviour
         StartCoroutine(ReturnToBoard());
     }
 
-    public virtual void SpawnRewardAvatar()
+    public virtual void SpawnRewardAvatar(bool isAscending)
     {
         FindFirstObjectByType<Light>().shadows = LightShadows.None;
 
-        playerScores = playerScores
+        if(!isAscending)
+            playerScores = playerScores
                        .OrderByDescending(c => c.Value)
                        .ToDictionary(c => c.Key, c => c.Value);
-
+        else
+            playerScores = playerScores
+                       .OrderBy(c => c.Value)
+                       .ToDictionary(c => c.Key, c => c.Value);
 
         int keyAdd = 8;
 

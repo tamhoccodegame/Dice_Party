@@ -27,7 +27,7 @@ public class DapXeManager : WizardMiniGameManager
         base.ShowGameOverPanel();
     }
 
-    public override void SpawnRewardAvatar()
+    public override void SpawnRewardAvatar(bool isAscending)
     {
         FindFirstObjectByType<Light>().shadows = LightShadows.None;
 

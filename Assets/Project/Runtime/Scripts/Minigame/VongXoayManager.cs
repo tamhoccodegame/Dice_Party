@@ -27,19 +27,4 @@ public class VongXoayManager : WizardMiniGameManager
     {
         return time <= 0;
     }
-
-    public override void ShowGameOverPanel()
-    {
-        base.ShowGameOverPanel();
-    }
-
-    public override void SpawnRewardAvatar()
-    {
-        base.SpawnRewardAvatar();
-    }
-
-    public override void UpdateHUD()
-    {
-        base.UpdateHUD();
-    }
 }
