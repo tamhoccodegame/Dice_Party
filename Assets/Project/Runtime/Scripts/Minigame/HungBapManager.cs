@@ -44,17 +44,18 @@ public class HungBapManager : WizardMiniGameManager
             gameOverSlots[i].keyQtyText.text = keyAdd.ToString();
             keyAdd -= 2;
             gameOverSlots[i].gameObject.SetActive(true);
-            var inputGo = playerObjects[playerScores.ElementAt(i).Key];
-            inputGo.GetComponent<CyclingIKController>().enabled = false;
 
-            if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
-            else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+            //var inputGo = playerObjects[playerScores.ElementAt(i).Key];
+            //inputGo.GetComponent<CyclingIKController>().enabled = false;
 
-            inputGo.GetComponent<PlayerController>().enabled = false;
-            inputGo.GetComponent<CharacterController>().enabled = false;
-            inputGo.transform.Find("CUP").gameObject.SetActive(false);
-            inputGo.transform.position = rankPositions[i].position;
-            inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
+            //if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
+            //else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+
+            //inputGo.GetComponent<PlayerController>().enabled = false;
+            //inputGo.GetComponent<CharacterController>().enabled = false;
+            //inputGo.transform.Find("CUP").gameObject.SetActive(false);
+            //inputGo.transform.position = rankPositions[i].position;
+            //inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
         }
     }
 

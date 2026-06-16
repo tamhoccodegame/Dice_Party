@@ -48,7 +48,7 @@ public class DeliveryArea : MonoBehaviour
             GameObject.Destroy(player.carriedBagInstance);
 
         PlayerInput playerInput = player.GetComponent<MNGPlayerController>().GetPlayerInput();
-        WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, player.carriedBags.Count);
+        //WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, player.carriedBags.Count);
 
         // --- Xoá danh sách bag logic ---
         if (player.carriedBags != null)

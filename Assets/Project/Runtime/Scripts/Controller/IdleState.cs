@@ -11,7 +11,7 @@ public class IdleState : BoardState
     {
         controller.ChangeAnimation("Idle");
         controller.splineAnimate.Pause();
-        if (controller == TurnManager.instance.playerControllers[controller.playerInput])
+        if (controller == TurnManager.instance.playerControllers[controller.gameObject])
             controller.dice.SetActive(true);
     }
 

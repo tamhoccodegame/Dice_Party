@@ -17,7 +17,7 @@ public class House_Area : MonoBehaviour
     private Vector3[] slotPositions;  // vị trí cố định của từng slot
     private BoxCollider areaCollider;
 
-    public PlayerInput houseOwner;
+    public GameObject houseOwner;
     public SpriteRenderer houseOwnerAvatar;
 
     void Awake()

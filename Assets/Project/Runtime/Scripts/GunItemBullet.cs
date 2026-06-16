@@ -17,7 +17,7 @@ public class GunItemBullet : MonoBehaviour
         Debug.Log(other.gameObject.name + " " + damage);
         if (other.TryGetComponent<NewBoardGameController>(out var t))
         {
-            WizardPartyData.instance.UpdatePlayerHealth(t.playerInput, -damage);
+            WizardPartyData.instance.UpdatePlayerHealth(t.gameObject, -damage);
             TurnManager.instance.UpdatePlayerDataUI();
         }
     }

@@ -115,35 +115,37 @@ public class NewBoardGameController : PlayerController
         itemState = new ItemState(this);
         nodeState = new NodeState(this);
 
-        if (playerInput == null)
-        {
-            playerInput = gameObject.AddComponent<PlayerInput>();
-            // Load Input Action Asset
-            var asset = Resources.Load<InputActionAsset>("InputAction/DefaultInputActions");
-            playerInput.actions = asset;
 
-            // Enable toàn bộ actions
-            playerInput.actions.Enable();
+        //if (playerInput == null)
+        //{
+        //    playerInput = gameObject.AddComponent<PlayerInput>();
+        //    // Load Input Action Asset
+        //    var asset = Resources.Load<InputActionAsset>("InputAction/DefaultInputActions");
+        //    playerInput.actions = asset;
 
-            // Chọn map chính
-            playerInput.defaultActionMap = "Player";
-            playerInput.SwitchCurrentActionMap("Player");
-            readyForInput = true;
-            // Mock keyboard
-            playerInput.neverAutoSwitchControlSchemes = true;
-        }
+        //    // Enable toàn bộ actions
+        //    playerInput.actions.Enable();
 
-        if(TurnManager.instance == null) DisableRagdoll();
+        //    // Chọn map chính
+        //    playerInput.defaultActionMap = "Player";
+        //    playerInput.SwitchCurrentActionMap("Player");
+        //    readyForInput = true;
+        //    // Mock keyboard
+        //    playerInput.neverAutoSwitchControlSchemes = true;
+        //}
+
+        //if (TurnManager.instance == null) DisableRagdoll();
 
     }
 
-    private void Start()
+    private void OnEnable()
     {
         if (WizardPartyData.instance == null) return;
 
+        splineAnimate.enabled = true;
         splineAnimate.Container = GameObject.Find("Spline Start").GetComponent<SplineContainer>();
 
-        WizardPartyData.PlayerNodeData savedNode = WizardPartyData.instance.playersNode[playerInput];
+       WizardPartyData.instance.playersNode.TryGetValue(gameObject, out var savedNode);
         if (savedNode != null)
         {
             BoardNode node = GameObject.Find(savedNode.name).GetComponent<BoardNode>();
@@ -156,13 +158,13 @@ public class NewBoardGameController : PlayerController
         }
         else
         {
-            currentNode = PlayerSpawner.instance.spawnPosition[0].GetComponent<BoardNode>();
+            currentNode = PlayerSetupPosition.instance.spawnPosition[0].GetComponent<BoardNode>();
         }
 
         toMoveNode = currentNode.nextNodes[0];
 
 
-        enabled = TurnManager.instance.playerControllers[playerInput] == this;
+        //enabled = TurnManager.instance.playerControllers[gameObject] == this;
 
         ChangeState(idleState);
     }
@@ -275,7 +277,7 @@ public class NewBoardGameController : PlayerController
     {
         currentNode = node;
         toMoveNode = currentNode.nextNodes[0];
-        WizardPartyData.instance.UpdatePlayerNode(playerInput, currentNode);
+        WizardPartyData.instance.UpdatePlayerNode(gameObject, currentNode);
     }
 
     #endregion
@@ -290,7 +292,7 @@ public class NewBoardGameController : PlayerController
     {
         AvatarTurnManager.instance.gameObject.SetActive(true);
         AvatarTurnManager.instance.Appear();
-        AvatarTurnManager.instance.HighlightTurn(PlayerManager.instance.players.IndexOf(playerInput));
+        //AvatarTurnManager.instance.HighlightTurn(PlayerManager.instance.players.IndexOf(playerInput));
         yield return new WaitForSeconds(3f);
         readyForInput = true;
         _controller.enabled = true;
@@ -361,7 +363,7 @@ public class NewBoardGameController : PlayerController
 
     IEnumerator DelayDestroy(GameObject clone)
     {
-        TurnManager.instance.UpdateController(playerInput, clone.GetComponent<NewBoardGameController>());
+        TurnManager.instance.UpdateController(gameObject, clone.GetComponent<NewBoardGameController>());
         yield return new WaitForSeconds(2.5f);
         clone.GetComponent<NewBoardGameController>().enabled = true;
         clone.GetComponent<CharacterController>().enabled = true;

@@ -5,14 +5,14 @@ using UnityEngine.InputSystem;
 
 public class ChestNode : BoardNode
 {
-    public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
+    public override void ProcessNode(GameObject player, Transform playerTransform)
     {
-        StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
+        StartCoroutine(ProcessCoroutine(player, playerTransform));
     }
 
-    IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform)
+    IEnumerator ProcessCoroutine(GameObject player, Transform playerTransform)
     {
         yield return new WaitForSeconds(0.5f);
-        base.EndTurn(playerInput);
+        base.EndTurn(player);
     }
 }

@@ -28,10 +28,10 @@ public class Lobby : MonoBehaviour
     private void Start()
     {
         //Cursor.lockState = CursorLockMode.Locked;
-        foreach(var playerInput in PlayerManager.instance.players)
-        {
-            UpdatePlayerUI(playerInput);
-        }
+        //foreach(var playerInput in PlayerManager.instance.players)
+        //{
+        //    UpdatePlayerUI(playerInput);
+        //}
     }
 
     IEnumerator StartGame()
@@ -69,9 +69,6 @@ public class Lobby : MonoBehaviour
 
     void UpdatePlayerUI(PlayerInput playerInput)
     {
-        if(!PlayerManager.instance.players.Contains(playerInput))
-        PlayerManager.instance.AddPlayer(playerInput);
-
         playerInput.uiInputModule = playerSlots[playerCount].GetComponent<PlayerSlotUI>()
                                     .inputSystemUIInputModule;
 
@@ -86,6 +83,9 @@ public class Lobby : MonoBehaviour
             var model = Instantiate(playerPrefab,
                                     avatarStandingPosition[playerCount].position,
                                     Quaternion.Euler(0, 180, 0));
+
+            PlayerManager.instance.players.Add(model);
+
             spawnedAvatars.Add(playerInput, model);
             playerSlots[playerCount].gameObject.SetActive(true);
             playerSlots[playerCount].GetComponent<PlayerSlotUI>().playerInput = playerInput;
@@ -93,6 +93,11 @@ public class Lobby : MonoBehaviour
             playerSlots[playerCount].GetComponent<PlayerSlotUI>().InitSelector(model.GetComponent<PlayerCustom>());
             playerCount++;
             model.GetComponent<PlayerCustom>().Init(playerInput);
+
+            playerInput.transform.SetParent(model.transform);
+            model.GetComponent<NewBoardGameController>().SetInput(playerInput);
+
+            DontDestroyOnLoad(model);
         }
 
         readyStatus.Add(playerInput, false);

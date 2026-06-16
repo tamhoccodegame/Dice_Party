@@ -6,14 +6,14 @@ using UnityEngine.InputSystem;
 public class PlusNode : BoardNode
 {
     //Hàm này tất cả client đều chạy
-    public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
+    public override void ProcessNode(GameObject player, Transform playerTransform)
     {
-        StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
+        StartCoroutine(ProcessCoroutine(player, playerTransform));
     }
 
-    IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform)
+    IEnumerator ProcessCoroutine(GameObject player, Transform playerTransform)
     {
-        NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
+        NewBoardGameController controller = TurnManager.instance.playerControllers[player];
         if(nodeEffect != null) 
         nodeEffect.Play();
         yield return new WaitForSeconds(0.2f);

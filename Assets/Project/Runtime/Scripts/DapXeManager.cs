@@ -44,14 +44,15 @@ public class DapXeManager : WizardMiniGameManager
             gameOverSlots[i].keyQtyText.text = keyAdd.ToString();
             keyAdd -= 2;
             gameOverSlots[i].gameObject.SetActive(true);
-            var inputGo = playerObjects[playerScores.ElementAt(i).Key];
-            //if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
-            //else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
 
-            inputGo.GetComponent<PlayerController>().enabled = false;
-            inputGo.GetComponent<CharacterController>().enabled = false;
-            inputGo.transform.position = rankPositions[i].position;
-            inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
+            //var inputGo = playerObjects[playerScores.ElementAt(i).Key];
+            ////if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
+            ////else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+
+            //inputGo.GetComponent<PlayerController>().enabled = false;
+            //inputGo.GetComponent<CharacterController>().enabled = false;
+            //inputGo.transform.position = rankPositions[i].position;
+            //inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
         }
     }
 
@@ -60,7 +61,7 @@ public class DapXeManager : WizardMiniGameManager
         base.TriggerAfterCutscene();
         for(int i = 0; i < playerObjects.Count; i++)
         {
-            Camera cam = playerObjects.ElementAt(i).Value.GetComponentInChildren<Camera>();
+            Camera cam = playerObjects[i].GetComponentInChildren<Camera>();
             cam.gameObject.SetActive(true);
             cam.rect = playersCamRect[i];
 

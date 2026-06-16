@@ -5,11 +5,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public class PlayerSpawner : MonoBehaviour
+public class PlayerSetupPosition : MonoBehaviour
 {
-    public static PlayerSpawner instance;
+    public static PlayerSetupPosition instance;
 
-    public GameObject boardCarPrefab;
     public GameObject playerPrefab;
     public Transform[] spawnPosition;
 
@@ -44,34 +43,43 @@ public class PlayerSpawner : MonoBehaviour
         BoardGameData boardGameData = BoardGameData.instance;
         bool isBoardScene = SceneManager.GetActiveScene().name == "BoardMap";
 
-        int spawnIndex = 0;
-        foreach (var playerInput in PlayerManager.instance.players)
+        int posIndex = 0;
+        foreach (var player in PlayerManager.instance.players)
         {
             //Board Map chỉ có 1 spawnPosition nên luôn reset = 0
-            if (isBoardScene) spawnIndex = 0;
+            if (isBoardScene) posIndex = 0;
 
-            var player = Instantiate(playerPrefab, spawnPosition[spawnIndex].position, spawnPosition[spawnIndex].rotation);
             if (cinemachineCameras.Count() > 0)
             {
-                cinemachineCameras[spawnIndex].Follow = player.transform;
+                cinemachineCameras[posIndex].Follow = player.transform;
             }
-            spawnIndex++;
-            Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
-            PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
-            playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
 
-            PlayerController controller = player.GetComponent<PlayerController>();
-            controller.SetInput(playerInput);
+            NewBoardGameController controller = player.GetComponent<NewBoardGameController>();
 
-            if (controller is NewBoardGameController newController)
-                newController.DisableRagdoll();
+            //spawnIndex++;
+            //Custom customData = PlayerManager.instance.GetComponentInChildren<CustomData>().GetCustom(playerInput);
+            //PlayerSetup playerSetup = player.GetComponent<PlayerSetup>();
+            //playerSetup.UpdateCustom(customData.hairIndex, customData.colorIndex, customData.bodyPartIndex);
+
+            
+            //controller.SetInput(playerInput);
+
+            //if (controller is NewBoardGameController newController)
+            //    newController.DisableRagdoll();
 
             if (isBoardScene)
-                TurnManager.instance.playerControllers.Add(playerInput, controller as NewBoardGameController);
-            else
-                WizardMiniGameManager.instance.playerObjects.Add(playerInput, player.gameObject);
+                TurnManager.instance.playerControllers.Add(player, controller);
 
-           
+            player.transform.position = spawnPosition[posIndex].position;
+
+            WizardPartyData.instance.playersStat.Add(player, new PlayerBoardStat
+            {
+                cupQty = 0,
+                health = 0,
+                keyQty = 0,
+            });
+            //else
+            //    WizardMiniGameManager.instance.playerObjects.Add(player, player.gameObject);
         }
     }
 
@@ -82,7 +90,7 @@ public class PlayerSpawner : MonoBehaviour
             Debug.Log("Can't find player");
             return;
         }
-        List<GameObject> players = WizardMiniGameManager.instance.playerObjects.Values.ToList();
+        List<GameObject> players = WizardMiniGameManager.instance.playerObjects.ToList();
         var controllers = players.Select(p => p.GetComponent<MNGPlayerController>()).ToList();
         foreach (var controller in controllers)
         {
@@ -93,7 +101,7 @@ public class PlayerSpawner : MonoBehaviour
     public void PlayerStop()
     {
         if (WizardMiniGameManager.instance.playerObjects.Count == 0) return;
-        List<GameObject> players = WizardMiniGameManager.instance.playerObjects.Values.ToList();
+        List<GameObject> players = WizardMiniGameManager.instance.playerObjects.ToList();
         var controllers = players.Select(p => p.GetComponent<MNGPlayerController>()).ToList();
         foreach (var controller in controllers)
         {
@@ -106,7 +114,7 @@ public class PlayerSpawner : MonoBehaviour
         var player = Instantiate(playerPrefab, spawnPosition[spawnIndex].position, spawnPosition[spawnIndex].rotation).GetComponent<PlayerController>();
 
         var playerInput = player.gameObject.AddComponent<PlayerInput>();
-        PlayerManager.instance.AddPlayer(playerInput);
+        //PlayerManager.instance.AddPlayer(playerInput);
         // Load Input Action Asset
         var asset = Resources.Load<InputActionAsset>("InputAction/DefaultInputActions");
         playerInput.actions = asset;
@@ -122,7 +130,7 @@ public class PlayerSpawner : MonoBehaviour
         playerInput.neverAutoSwitchControlSchemes = true;
 
         player.SetInput(playerInput);
-        WizardMiniGameManager.instance.playerObjects.Add(playerInput, player.gameObject);
+        WizardMiniGameManager.instance.playerObjects.Add(player.gameObject);
     }
 
 

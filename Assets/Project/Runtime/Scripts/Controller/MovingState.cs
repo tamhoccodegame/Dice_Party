@@ -49,7 +49,7 @@ public class MovingState : BoardState
             {
                 controller.currentNode = controller.toMoveNode;
                 stepLeft--;
-                WizardPartyData.instance.UpdatePlayerNode(controller.playerInput, controller.currentNode);
+                WizardPartyData.instance.UpdatePlayerNode(controller.gameObject, controller.currentNode);
                 Debug.Log(stepLeft);
 
                 if(controller.currentNode.nextNodes.Count > 1)

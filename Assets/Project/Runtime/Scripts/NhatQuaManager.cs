@@ -18,7 +18,7 @@ public class NhatQuaManager : WizardMiniGameManager
         for(int i = 0; i < players.Count; i++)
         {
             houses[i].gameObject.SetActive(true);
-            houses[i].houseOwner = players[i];
+            //houses[i].houseOwner = players[i];
 
             Sprite avatar = AvatarLoader.instance.GetAvatarSprite(i);
 

@@ -11,7 +11,7 @@ public class TurnManager : MonoBehaviour
 {
     public AudioClip music;
     public static TurnManager instance;
-    public Dictionary<PlayerInput, NewBoardGameController> playerControllers = new Dictionary<PlayerInput, NewBoardGameController>();
+    public Dictionary<GameObject, NewBoardGameController> playerControllers = new Dictionary<GameObject, NewBoardGameController>();
     public int currentPlayerIndex { get; set; }
     public bool isFirstTry { get; set; } = true;
 
@@ -38,7 +38,8 @@ public class TurnManager : MonoBehaviour
 
     private void Start()
     {
-        GetComponent<PlayerSpawner>().TrySpawnPlayer();
+        GetComponent<PlayerSetupPosition>().TrySpawnPlayer();
+
         AvatarTurnManager.instance.gameObject.SetActive(false);
         MusicManager.instance?.PlayMusic(music);
         StartCoroutine(FadeBlackScreen(1, 0));
@@ -67,9 +68,9 @@ public class TurnManager : MonoBehaviour
         }
     }
 
-    public void UpdateController(PlayerInput playerInput, NewBoardGameController controller)
+    public void UpdateController(GameObject player, NewBoardGameController controller)
     {
-        playerControllers[playerInput] = controller;
+        playerControllers[player] = controller;
     }
 
     IEnumerator DelayPlayIntroCutscene()
@@ -142,7 +143,7 @@ public class TurnManager : MonoBehaviour
         }
 
         #region UpdatePlayerBoardStatUI
-        Dictionary<PlayerInput, PlayerBoardStat> dictCopy = WizardPartyData.instance.playersStat;
+        Dictionary<GameObject, PlayerBoardStat> dictCopy = WizardPartyData.instance.playersStat;
         dictCopy.OrderByDescending(d => d.Value.cupQty);
 
         int index = 1;
@@ -195,6 +196,7 @@ public class TurnManager : MonoBehaviour
 
         currentPlayerIndex = 0;
         var player = playerControllers.ElementAt(currentPlayerIndex).Value;
+        Debug.Log(player.name);
         player.enabled = true;
         player.StartTurn();
         UpdateTurnUI();

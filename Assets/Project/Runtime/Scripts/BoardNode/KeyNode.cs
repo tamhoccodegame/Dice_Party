@@ -8,16 +8,16 @@ public class KeyNode : BoardNode
     public GameObject keyPrefab;
 
     //Hàm này tất cả client đều chạy
-    public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
+    public override void ProcessNode(GameObject player, Transform playerTransform)
     {
         {
             int keyQty = Random.Range(1, 4); // 1 -> 3 chìa
 
-           StartCoroutine(ProcessCoroutine(playerInput, playerTransform, keyQty));
+           StartCoroutine(ProcessCoroutine(player, playerTransform, keyQty));
         }
     }
 
-    IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform, int keyQty)
+    IEnumerator ProcessCoroutine(GameObject player, Transform playerTransform, int keyQty)
     {
         List<bool> collected = new List<bool>();
 
@@ -51,7 +51,7 @@ public class KeyNode : BoardNode
 
             mover.Init(playerTransform, () =>
             {
-                WizardPartyData.instance.UpdatePlayerKey(playerInput, 1);
+                WizardPartyData.instance.UpdatePlayerKey(player, 1);
                 TurnManager.instance.UpdatePlayerDataUI();
                 collected.Add(true);
             });
@@ -61,6 +61,6 @@ public class KeyNode : BoardNode
 
 
         yield return new WaitForSeconds(0.3f); // Delay nhẹ cho mượt
-        EndTurn(playerInput);
+        EndTurn(player);
     }
 }

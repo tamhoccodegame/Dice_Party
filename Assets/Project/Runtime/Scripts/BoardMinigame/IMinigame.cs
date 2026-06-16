@@ -1,13 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+//using System;
+//using System.Collections;
+//using System.Collections.Generic;
+//using UnityEngine;
 
-public interface IMinigame
-{
-    void Init(BoardCar car);
-    void StartMinigame();
-    void EndMinigame();
-    bool IsFinished { get; set; }
-    event Action OnMinigameFinished;
-}
+//public interface IMinigame
+//{
+//    void Init(BoardCar car);
+//    void StartMinigame();
+//    void EndMinigame();
+//    bool IsFinished { get; set; }
+//    event Action OnMinigameFinished;
+//}

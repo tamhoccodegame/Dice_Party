@@ -16,7 +16,7 @@ public class ChestGoldNode : BoardNode
         audioSource = GetComponent<AudioSource>();
     }
 
-    public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
+    public override void ProcessNode(GameObject player, Transform playerTransform)
     {
         //if (TurnManager.instance.chestGolds[WizardPartyData.instance.currentChestIndex] != transform)
         //{
@@ -25,13 +25,13 @@ public class ChestGoldNode : BoardNode
         //}
 
         if(processCoroutine == null)
-        processCoroutine = StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
+        processCoroutine = StartCoroutine(ProcessCoroutine(player, playerTransform));
     }
 
-    IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform)
+    IEnumerator ProcessCoroutine(GameObject player, Transform playerTransform)
     {
         if (nodeEffect != null) nodeEffect.Play();
-        NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
+        NewBoardGameController controller = TurnManager.instance.playerControllers[player];
         this.controller = controller.GetComponent<CharacterController>(); 
         yield return new WaitForSecondsRealtime(0.5f);
 
@@ -55,7 +55,7 @@ public class ChestGoldNode : BoardNode
         yield return new WaitForSecondsRealtime(1.5f);
         chest.Play("FlyUp");
         yield return new WaitForSecondsRealtime(1f);
-        WizardPartyData.instance.UpdatePlayerCup(playerInput, 1);
+        WizardPartyData.instance.UpdatePlayerCup(player, 1);
         TurnManager.instance.UpdatePlayerDataUI();
 
         yield return new WaitForSecondsRealtime(3f);
@@ -69,7 +69,7 @@ public class ChestGoldNode : BoardNode
         }
         else
         {
-            EndTurn(playerInput);
+            EndTurn(player);
         }
         processCoroutine = null;
     }

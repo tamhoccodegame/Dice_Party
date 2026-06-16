@@ -10,6 +10,14 @@ public class AnimationHandler : MonoBehaviour
 
     private AnimationState[] states;
 
+    private void Awake()
+    {
+        if(anima == null)
+        {
+            anima = GetComponent<Animation>();
+        }
+    }
+
     void Start()
     {
         // Lấy tất cả state trong Animation component

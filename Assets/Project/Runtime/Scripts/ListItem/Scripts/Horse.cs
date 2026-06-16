@@ -76,7 +76,7 @@ public class Horse : BoardItem
             _controller.currentNode = _controller.toMoveNode;
             _controller.toMoveNode = _controller.currentNode.nextNodes[0];
             stepRemain--;
-            WizardPartyData.instance.UpdatePlayerNode(_controller.playerInput, _controller.currentNode);
+            WizardPartyData.instance.UpdatePlayerNode(_controller.gameObject, _controller.currentNode);
             Debug.Log(stepRemain);
 
 

@@ -27,7 +27,7 @@ public class Wizard : MonoBehaviour
     public GameObject dice;
     public ParticleSystem diceVFX;
 
-    public BoardCar player;
+    //public BoardCar player;
 
     public Volume volume;
     private LensDistortion lens;
@@ -116,51 +116,52 @@ public class Wizard : MonoBehaviour
 
     IEnumerator MoveToNextNode()
     {
-        if(currentNode.nextNodes.Count > 1 && playerChoseNodeQueue.Count > 0)
-        {
-            toMoveNode = playerChoseNodeQueue.Dequeue();
-        }
-        else
-        {
-            toMoveNode = currentNode.nextNodes[0];
-        }
-
-        animator.CrossFade("Run", 0.25f);
-        while(stepLeft > 0)
-        {
-            while(Vector3.Distance(transform.position, toMoveNode.transform.position) > 0.4f)
-            {
-                Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
-                controller.Move(direction * 8f * Time.deltaTime);
-                yield return null;
-            }
-
-            stepLeft--;
-
-            currentNode = toMoveNode;
-            WizardPartyData.instance.UpdateWizardNode(currentNode);
-
-            if (currentNode.nextNodes.Count > 1 && playerChoseNodeQueue.Count > 0)
-            {
-                toMoveNode = playerChoseNodeQueue.Dequeue();
-            }
-            else
-            {
-                toMoveNode = currentNode.nextNodes[0];
-            }
-
-            if (toMoveNode == player.currentNode)
-            {
-                StartCoroutine(CastSpell()); //Chuyển vào minigame
-                yield break;
-            }
-
-            yield return null;
-        }
         yield return null;
-        canMove = false;
-        player.SetCanMove(true);
-        animator.CrossFade("Idle", 0.25f);
+        //if(currentNode.nextNodes.Count > 1 && playerChoseNodeQueue.Count > 0)
+        //{
+        //    toMoveNode = playerChoseNodeQueue.Dequeue();
+        //}
+        //else
+        //{
+        //    toMoveNode = currentNode.nextNodes[0];
+        //}
+
+        //animator.CrossFade("Run", 0.25f);
+        //while(stepLeft > 0)
+        //{
+        //    while(Vector3.Distance(transform.position, toMoveNode.transform.position) > 0.4f)
+        //    {
+        //        Vector3 direction = (toMoveNode.transform.position - transform.position).normalized;
+        //        controller.Move(direction * 8f * Time.deltaTime);
+        //        yield return null;
+        //    }
+
+        //    stepLeft--;
+
+        //    currentNode = toMoveNode;
+        //    WizardPartyData.instance.UpdateWizardNode(currentNode);
+
+        //    if (currentNode.nextNodes.Count > 1 && playerChoseNodeQueue.Count > 0)
+        //    {
+        //        toMoveNode = playerChoseNodeQueue.Dequeue();
+        //    }
+        //    else
+        //    {
+        //        toMoveNode = currentNode.nextNodes[0];
+        //    }
+
+        //    if (toMoveNode == player.currentNode)
+        //    {
+        //        StartCoroutine(CastSpell()); //Chuyển vào minigame
+        //        yield break;
+        //    }
+
+        //    yield return null;
+        //}
+        //yield return null;
+        //canMove = false;
+        //player.SetCanMove(true);
+        //animator.CrossFade("Idle", 0.25f);
     }
 
     IEnumerator CastSpell()

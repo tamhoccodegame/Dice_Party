@@ -10,7 +10,7 @@ public class GachaGun : MonoBehaviour
     public GameObject bulletPrefab;
     public Transform bulletSpawnPoint;
 
-    public Dictionary<PlayerInput, Sprite> playerAvatars = new Dictionary<PlayerInput, Sprite>();
+    public Dictionary<GameObject, Sprite> playerAvatars = new Dictionary<GameObject, Sprite>();
     public SpriteRenderer avatarRenderer;
 
     public bool readyToFire = false;
@@ -23,7 +23,7 @@ public class GachaGun : MonoBehaviour
     public GameObject lockSign;
     public ParticleSystem fireEffect;
 
-    public void Init(Dictionary<PlayerInput, Sprite> _playerAvatars)
+    public void Init(Dictionary<GameObject, Sprite> _playerAvatars)
     {
         playerAvatars = _playerAvatars;
         FitSpriteToOriginalSize(playerAvatars.ElementAt(0).Value);
@@ -75,10 +75,9 @@ public class GachaGun : MonoBehaviour
 
         // Chọn avatar thật sự
         var randomIndex = Random.Range(0, playerAvatars.Count);
-        PlayerInput playerInput = playerAvatars.ElementAt(randomIndex).Key;
         Sprite newSprite = playerAvatars.ElementAt(randomIndex).Value;
 
-        currentTarget = DoanTauManager.instance.playerObjects[playerInput].transform;
+        currentTarget = DoanTauManager.instance.playerObjects[randomIndex].transform;
         FitSpriteToOriginalSize(newSprite);
 
         readyToFire = true;

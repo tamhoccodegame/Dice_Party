@@ -8,14 +8,14 @@ public class HomeNode : BoardNode
     public GameObject portalVFX;
 
     //Hàm này tất cả client đều chạy
-    public override void ProcessNode(PlayerInput playerInput, Transform playerTransform)
+    public override void ProcessNode(GameObject player, Transform playerTransform)
     {
-        StartCoroutine(ProcessCoroutine(playerInput, playerTransform));
+        StartCoroutine(ProcessCoroutine(player, playerTransform));
     }
 
-    IEnumerator ProcessCoroutine(PlayerInput playerInput, Transform playerTransform)
+    IEnumerator ProcessCoroutine(GameObject player, Transform playerTransform)
     {
-        NewBoardGameController controller = TurnManager.instance.playerControllers[playerInput];
+        NewBoardGameController controller = TurnManager.instance.playerControllers[player];
         yield return new WaitForSeconds(0.8f); // Delay nhẹ cho mượt
         portalVFX.SetActive(true);
         controller.gameObject.GetComponent<CharacterController>().enabled = false;
@@ -31,6 +31,6 @@ public class HomeNode : BoardNode
         CameraFollow.instance.StartFollowTarget(controller.transform);
         yield return new WaitForSeconds(2.5f);
 
-        EndTurn(playerInput);
+        EndTurn(player);
     }
 }

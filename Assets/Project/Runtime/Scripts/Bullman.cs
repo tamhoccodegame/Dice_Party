@@ -45,7 +45,7 @@ public class Bullman : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
         foreach (var p in WizardMiniGameManager.instance.playerObjects)
         {
-            availabeTargets.Add(p.Value.transform);
+            availabeTargets.Add(p.transform);
         }
 
         while (true)

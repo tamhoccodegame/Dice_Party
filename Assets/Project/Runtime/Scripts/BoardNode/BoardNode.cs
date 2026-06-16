@@ -32,26 +32,19 @@ public class BoardNode : MonoBehaviour
     {
 
     }
-    public virtual void ProcessNode(PlayerInput playerInput, Transform playerTransform)
+    public virtual void ProcessNode(GameObject player, Transform playerTransform)
     {
-        StartCoroutine(DelayEndTurn(playerInput));
+        StartCoroutine(DelayEndTurn(player));
     }
 
-    IEnumerator DelayEndTurn(PlayerInput playerInput)
+    IEnumerator DelayEndTurn(GameObject player)
     {
         yield return new WaitForSeconds(0.5f);
-        EndTurn(playerInput);
+        EndTurn(player);
     }
 
-    protected void EndTurn(PlayerInput playerInput)
+    protected void EndTurn(GameObject player)
     {
-        NewBoardGameController[] players = FindObjectsByType<NewBoardGameController>(FindObjectsSortMode.None);
-
-        foreach (var p in players)
-        {
-            if(p.playerInput == playerInput)
-            p.EndTurn();
-            else continue;
-        }
+        player.GetComponent<NewBoardGameController>().EndTurn();
     }
 }

@@ -7,7 +7,7 @@ public class DoanTauManager : WizardMiniGameManager
 {
     public static DoanTauManager instance;
 
-    public Dictionary<PlayerInput, Sprite> playerAvatars = new Dictionary<PlayerInput, Sprite>();
+    public Dictionary<GameObject, Sprite> playerAvatars = new Dictionary<GameObject, Sprite>();
 
     public List<GachaGun> gachaGuns;
 
@@ -86,7 +86,7 @@ public class DoanTauManager : WizardMiniGameManager
             Sprite playerAvatar = AvatarLoader.instance.GetAvatarSprite(i);
             if (playerAvatar != null)
             {
-                playerAvatars.Add(players[i], playerAvatar);
+                //playerAvatars.Add(players[i], playerAvatar);
             }
         }
 

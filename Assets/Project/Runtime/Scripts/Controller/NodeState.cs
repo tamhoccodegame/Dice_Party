@@ -11,7 +11,7 @@ public class NodeState : BoardState
     public override void Enter()
     {
         controller.ChangeAnimation("Idle");
-        controller.currentNode.ProcessNode(controller.playerInput, controller.transform);
+        controller.currentNode.ProcessNode(controller.gameObject, controller.transform);
     }
 
     public override void Exit()

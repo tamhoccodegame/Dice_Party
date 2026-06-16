@@ -7,7 +7,7 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager instance;
 
-    public List<PlayerInput> players = new List<PlayerInput>();
+    public List<GameObject> players = new List<GameObject>();
 
     private void Awake()
     {
@@ -35,17 +35,17 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    public void AddPlayer(PlayerInput input)
+    public void AddPlayer(GameObject player)
     {
-        players.Add(input);
-        input.transform.SetParent(transform);
+        players.Add(player);
+        player.transform.SetParent(transform);
     }
 
-    public void RemovePlayer(PlayerInput input)
+    public void RemovePlayer(GameObject player)
     {
-        if (players.Contains(input))
+        if (players.Contains(player))
         {
-            players.Remove(input);
+            players.Remove(player);
         }
     }
 }

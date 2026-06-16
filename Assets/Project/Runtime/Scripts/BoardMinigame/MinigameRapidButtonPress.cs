@@ -1,167 +1,167 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Cinemachine;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Playables;
+﻿//using System;
+//using System.Collections;
+//using System.Collections.Generic;
+//using Unity.Cinemachine;
+//using UnityEngine;
+//using UnityEngine.InputSystem;
+//using UnityEngine.Playables;
 
-public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
-{
-    public PlayableDirector introCutscene;
-    public Transform capy;
-    private BoardCar car;
-    private PlayerInput input;
-    public Transform playerTransform;
-    public Vector3 startPosition;
-    public Transform targetPosition;
+//public class MinigameRapidButtonPress : MonoBehaviour, IMinigame
+//{
+//    public PlayableDirector introCutscene;
+//    public Transform capy;
+//    private BoardCar car;
+//    private PlayerInput input;
+//    public Transform playerTransform;
+//    public Vector3 startPosition;
+//    public Transform targetPosition;
 
-    public float moveSpeed = 2.5f;        // tốc độ tiến
-    public float fallbackSpeed = 0.2f;  // tốc độ lùi khi không bấm
-    public float inputDecayTime = 0.3f; // sau bao lâu không bấm thì lùi
+//    public float moveSpeed = 2.5f;        // tốc độ tiến
+//    public float fallbackSpeed = 0.2f;  // tốc độ lùi khi không bấm
+//    public float inputDecayTime = 0.3f; // sau bao lâu không bấm thì lùi
 
-    private float progress = 0f; // 0: start, 1: target
-    private float lastPressTime;
-    private bool isRunning = false;
+//    private float progress = 0f; // 0: start, 1: target
+//    private float lastPressTime;
+//    private bool isRunning = false;
 
-    public event Action OnMinigameFinished;
-    public bool IsFinished { get; set; }
+//    public event Action OnMinigameFinished;
+//    public bool IsFinished { get; set; }
 
-    public float bounceAmplitude = 0.5f; // độ cao dao động
-    public float bounceFrequency = 5f;   // tần số dao động
+//    public float bounceAmplitude = 0.5f; // độ cao dao động
+//    public float bounceFrequency = 5f;   // tần số dao động
 
-    public AudioClip music;
+//    public AudioClip music;
 
-    public void Init(BoardCar player)
-    {
-        playerTransform = player.transform;
-        input = player.GetInput();
-        car = player;
-        car.GetComponent<CharacterController>().enabled = false;
-        car.SetCurrentNode(GetComponentInParent<BoardNode>());
-        car.StopAllCoroutines();
-        startPosition = playerTransform.position;
-        progress = 0f;
-        lastPressTime = Time.time;
-        IsFinished = false;
-        introCutscene.Play();
-        introCutscene.stopped += IntroCutscene_stopped;
-        MusicManager.instance.PlayMusic(music);
-        CinecameraManager.instance.TriggerCamera(GetComponentInChildren<CinemachineCamera>());
-    }
+//    public void Init(BoardCar player)
+//    {
+//        playerTransform = player.transform;
+//        input = player.GetInput();
+//        car = player;
+//        car.GetComponent<CharacterController>().enabled = false;
+//        car.SetCurrentNode(GetComponentInParent<BoardNode>());
+//        car.StopAllCoroutines();
+//        startPosition = playerTransform.position;
+//        progress = 0f;
+//        lastPressTime = Time.time;
+//        IsFinished = false;
+//        introCutscene.Play();
+//        introCutscene.stopped += IntroCutscene_stopped;
+//        MusicManager.instance.PlayMusic(music);
+//        CinecameraManager.instance.TriggerCamera(GetComponentInChildren<CinemachineCamera>());
+//    }
 
-    private void IntroCutscene_stopped(PlayableDirector obj)
-    {
-        StartMinigame();
-    }
+//    private void IntroCutscene_stopped(PlayableDirector obj)
+//    {
+//        StartMinigame();
+//    }
 
-    public void StartMinigame()
-    {
-        isRunning = true;
-        capy.transform.SetParent(playerTransform);
-        capy.transform.localPosition = Vector3.zero;    
+//    public void StartMinigame()
+//    {
+//        isRunning = true;
+//        capy.transform.SetParent(playerTransform);
+//        capy.transform.localPosition = Vector3.zero;
 
-        capy.transform.localPosition -= new Vector3(0, 1, 0);
-        capy.GetComponentInChildren<Animator>().Play("Carry");
-        capy.GetComponentInChildren<Animator>().enabled = false;
-        capy.transform.GetChild(0).transform.localPosition = Vector3.zero;
-        capy.transform.localRotation = Quaternion.Euler(0, 0, 0);
-    }
+//        capy.transform.localPosition -= new Vector3(0, 1, 0);
+//        capy.GetComponentInChildren<Animator>().Play("Carry");
+//        capy.GetComponentInChildren<Animator>().enabled = false;
+//        capy.transform.GetChild(0).transform.localPosition = Vector3.zero;
+//        capy.transform.localRotation = Quaternion.Euler(0, 0, 0);
+//    }
 
-    public void EndMinigame()
-    {
-        isRunning = false;
-        Destroy(capy.gameObject);
-        StartCoroutine(DelayEndMinigame());
-    }
+//    public void EndMinigame()
+//    {
+//        isRunning = false;
+//        Destroy(capy.gameObject);
+//        StartCoroutine(DelayEndMinigame());
+//    }
 
-    IEnumerator DelayEndMinigame()
-    {
-        CinecameraManager.instance.TriggerCamera(car.closeCam);
-        Animator[] anims = car.animators;
-        car.SetCurrentNode(null);
-        car.transform.rotation = Quaternion.Euler(0, -90, 0);
+//    IEnumerator DelayEndMinigame()
+//    {
+//        CinecameraManager.instance.TriggerCamera(car.closeCam);
+//        Animator[] anims = car.animators;
+//        car.SetCurrentNode(null);
+//        car.transform.rotation = Quaternion.Euler(0, -90, 0);
 
-        int lastAnimationIndex = -1;
+//        int lastAnimationIndex = -1;
 
-        for (int i = 0; i < anims.Length; i++)
-        {
-            if(i > 2)
-            {
-                int randomIndex = -1;
+//        for (int i = 0; i < anims.Length; i++)
+//        {
+//            if (i > 2)
+//            {
+//                int randomIndex = -1;
 
-                do
-                    randomIndex = UnityEngine.Random.Range(1, 7);
-                while (lastAnimationIndex != -1 && randomIndex == lastAnimationIndex);
+//                do
+//                    randomIndex = UnityEngine.Random.Range(1, 7);
+//                while (lastAnimationIndex != -1 && randomIndex == lastAnimationIndex);
 
-                lastAnimationIndex = randomIndex;
-                anims[i].Play($"Win{randomIndex}");
-            }
-            else
-            {
-                anims[i].Play("SitWin");
-            }
-        }
+//                lastAnimationIndex = randomIndex;
+//                anims[i].Play($"Win{randomIndex}");
+//            }
+//            else
+//            {
+//                anims[i].Play("SitWin");
+//            }
+//        }
 
-        yield return new WaitForSeconds(2.5f);
-        yield return new WaitForSeconds(4f);
-        // Ẩn UI, gọi animation thành công, v.v.
-        car.SetCurrentNode(targetPosition.GetComponent<BoardNode>());
-        car.GetComponent<CharacterController>().enabled = true;
+//        yield return new WaitForSeconds(2.5f);
+//        yield return new WaitForSeconds(4f);
+//        // Ẩn UI, gọi animation thành công, v.v.
+//        car.SetCurrentNode(targetPosition.GetComponent<BoardNode>());
+//        car.GetComponent<CharacterController>().enabled = true;
 
-        for(int i = 0; i < anims.Length; i++)
-        {
-            if(i > 2)
-            {
-                anims[i].Play("Idle");
-            }
-            else
-            {
-                anims[i].Play("Sit");
-            }
-        }
+//        for (int i = 0; i < anims.Length; i++)
+//        {
+//            if (i > 2)
+//            {
+//                anims[i].Play("Idle");
+//            }
+//            else
+//            {
+//                anims[i].Play("Sit");
+//            }
+//        }
 
-        CinecameraManager.instance.ResetCamera();
-        car.TryMove();
-    }
+//        CinecameraManager.instance.ResetCamera();
+//        car.TryMove();
+//    }
 
-    private void Update()
-    {
-        if (!isRunning || IsFinished) return;
+//    private void Update()
+//    {
+//        if (!isRunning || IsFinished) return;
 
-        // Check input
-        if (input.actions["Trigger"].triggered)
-        {
-            progress += Time.deltaTime * moveSpeed;
-            lastPressTime = Time.time;
-        }
-        else
-        {
-            if (Time.time - lastPressTime > inputDecayTime)
-            {
-                progress -= Time.deltaTime * fallbackSpeed;
-            }
-        }
+//        // Check input
+//        if (input.actions["Trigger"].triggered)
+//        {
+//            progress += Time.deltaTime * moveSpeed;
+//            lastPressTime = Time.time;
+//        }
+//        else
+//        {
+//            if (Time.time - lastPressTime > inputDecayTime)
+//            {
+//                progress -= Time.deltaTime * fallbackSpeed;
+//            }
+//        }
 
-        // Clamp
-        progress = Mathf.Clamp01(progress);
+//        // Clamp
+//        progress = Mathf.Clamp01(progress);
 
-        // Move player theo progress
-        Vector3 flatPosition = Vector3.Lerp(startPosition, targetPosition.position, progress);
+//        // Move player theo progress
+//        Vector3 flatPosition = Vector3.Lerp(startPosition, targetPosition.position, progress);
 
-        // Tính noise sóng sine
-        float bounceOffset = Mathf.Sin(Time.time * bounceFrequency) * bounceAmplitude;
+//        // Tính noise sóng sine
+//        float bounceOffset = Mathf.Sin(Time.time * bounceFrequency) * bounceAmplitude;
 
-        // Thêm vào trục Y
-        playerTransform.position = flatPosition + new Vector3(0, bounceOffset, 0);
+//        // Thêm vào trục Y
+//        playerTransform.position = flatPosition + new Vector3(0, bounceOffset, 0);
 
-        // Check xong
-        if (progress >= 1f)
-        {
-            IsFinished = true;
-            EndMinigame();
-            OnMinigameFinished?.Invoke();
-        }
-    }
+//        // Check xong
+//        if (progress >= 1f)
+//        {
+//            IsFinished = true;
+//            EndMinigame();
+//            OnMinigameFinished?.Invoke();
+//        }
+//    }
 
-}
+//}

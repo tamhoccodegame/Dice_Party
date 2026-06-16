@@ -13,10 +13,10 @@ public class MatchAwardSystem : MonoBehaviour
         instance = this;
     }
 
-    public Dictionary<PlayerInput, int> killsCount = new Dictionary<PlayerInput, int>();
-    public Dictionary<PlayerInput, int> keysCount = new Dictionary<PlayerInput, int>();
-    public Dictionary<PlayerInput, int> healthLose = new Dictionary<PlayerInput, int>();
-    public Dictionary<PlayerInput, int> minigameWinCount = new Dictionary<PlayerInput, int>();
+    public Dictionary<GameObject, int> killsCount = new Dictionary<GameObject, int>();
+    public Dictionary<GameObject, int> keysCount = new Dictionary<GameObject, int>();
+    public Dictionary<GameObject, int> healthLose = new Dictionary<GameObject, int>();
+    public Dictionary<GameObject, int> minigameWinCount = new Dictionary<GameObject, int>();
     
     public enum MatchTitle
     {
@@ -29,7 +29,7 @@ public class MatchAwardSystem : MonoBehaviour
     }
    
 
-    public PlayerInput GetPlayerByMatchTitle(MatchTitle matchTitle)
+    public GameObject GetPlayerByMatchTitle(MatchTitle matchTitle)
     {
         switch (matchTitle)
         {
@@ -48,10 +48,10 @@ public class MatchAwardSystem : MonoBehaviour
         return null;
     }
 
-    public Dictionary<PlayerInput, MatchTitle> GetAllMatchTitles()
+    public Dictionary<GameObject, MatchTitle> GetAllMatchTitles()
     {
-        var result = new Dictionary<PlayerInput, MatchTitle>();
-        var usedPlayers = new HashSet<PlayerInput>();
+        var result = new Dictionary<GameObject, MatchTitle>();
+        var usedPlayers = new HashSet<GameObject>();
 
         // 1. RealKiller
         var killer = killsCount.OrderByDescending(p => p.Value)

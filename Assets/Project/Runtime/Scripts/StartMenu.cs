@@ -12,7 +12,7 @@ public class StartMenu : MonoBehaviour
 
     public void OnPlayerJoined(PlayerInput playerInput)
     {
-        PlayerManager.instance.AddPlayer(playerInput);
+        //PlayerManager.instance.AddPlayer(playerInput);
         playerInput.uiInputModule = uiInputModule;
         playerInput.SwitchCurrentActionMap("UI");
         EventSystem.current.SetSelectedGameObject(gameObject);

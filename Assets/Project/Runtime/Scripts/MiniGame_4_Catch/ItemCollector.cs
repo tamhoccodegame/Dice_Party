@@ -66,7 +66,7 @@ public class ItemCollector : MonoBehaviour
 
             if (!isGroundHit) // Chỉ trừ điểm nếu bomb trúng ly
             {
-                WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, -3);
+                WizardMiniGameManager.instance.UpdatePlayerScore(gameObject, -3);
                 Debug.Log("⚠️ Bomb hit CUP! Trừ điểm!");
                 for (int i = 0; i < penaltyCount && collectedItems.Count > 0; i++)
                 {
@@ -82,7 +82,7 @@ public class ItemCollector : MonoBehaviour
             return;
         }
 
-        WizardMiniGameManager.instance.UpdatePlayerScore(playerInput, 1);
+        WizardMiniGameManager.instance.UpdatePlayerScore(gameObject, 1);
 
         // Item thường
         if (vfxPrefab != null)

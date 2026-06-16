@@ -15,7 +15,7 @@ public class WizardPartyData : MonoBehaviour
 {
     public static WizardPartyData instance;
     public List<string> minigames;
-    public Dictionary<PlayerInput, PlayerBoardStat> playersStat = new Dictionary<PlayerInput, PlayerBoardStat>();
+    public Dictionary<GameObject, PlayerBoardStat> playersStat = new Dictionary<GameObject, PlayerBoardStat>();
 
     public bool isGoldChestOpened = true;
     public int chestToWin;
@@ -25,7 +25,7 @@ public class WizardPartyData : MonoBehaviour
 
     public bool isFirstTry = true;
 
-    public PlayerInput winner;
+    public GameObject winner;
 
     private void Awake()
     {
@@ -41,8 +41,8 @@ public class WizardPartyData : MonoBehaviour
 
         foreach (var player in PlayerManager.instance.players)
         {
-            playersNode.Add(player, null);
-            playersStat.Add(player, new PlayerBoardStat { cupQty = 0, keyQty = 0, health = 30 }); 
+            //playersNode.Add(player, null);
+            //playersStat.Add(player, new PlayerBoardStat { cupQty = 0, keyQty = 0, health = 30 }); 
         }
     }
 
@@ -62,9 +62,9 @@ public class WizardPartyData : MonoBehaviour
         public SplineContainer splineContainer;
     }
 
-    public Dictionary<PlayerInput, PlayerNodeData> playersNode = new Dictionary<PlayerInput, PlayerNodeData>();
+    public Dictionary<GameObject, PlayerNodeData> playersNode = new Dictionary<GameObject, PlayerNodeData>();
 
-    public void UpdatePlayerNode(PlayerInput player, BoardNode node)
+    public void UpdatePlayerNode(GameObject player, BoardNode node)
     {
         playersNode[player] = new PlayerNodeData
         {
@@ -84,21 +84,21 @@ public class WizardPartyData : MonoBehaviour
         wizardNode = node.name;
     }
 
-    public void UpdatePlayerHealth(PlayerInput input, int qty)
+    public void UpdatePlayerHealth(GameObject player, int qty)
     {
-        playersStat[input].health += qty;
-        playersStat[input].health = Mathf.Min(playersStat[input].health, 30);
-        if (playersStat[input].health <= 0)
+        playersStat[player].health += qty;
+        playersStat[player].health = Mathf.Min(playersStat[player].health, 30);
+        if (playersStat[player].health <= 0)
         {
-            playersStat[input].health = 30;
-            playersStat[input].keyQty = 0;
-            MatchAwardSystem.instance.keysCount[input] = playersStat[input].keyQty;
+            playersStat[player].health = 30;
+            playersStat[player].keyQty = 0;
+            MatchAwardSystem.instance.keysCount[player] = playersStat[player].keyQty;
         }
     }
-    public void UpdatePlayerCup(PlayerInput input, int qty)
+    public void UpdatePlayerCup(GameObject player, int qty)
     {
-        Debug.Log($"Update cup for {input.name} at {Time.time}");
-        playersStat[input].cupQty += qty;
+        Debug.Log($"Update cup for {player.name} at {Time.time}");
+        playersStat[player].cupQty += qty;
         CheckWin();
     }
 
@@ -116,10 +116,10 @@ public class WizardPartyData : MonoBehaviour
         }
     }
 
-    public void UpdatePlayerKey(PlayerInput input, int qty)
+    public void UpdatePlayerKey(GameObject player, int qty)
     {
-        playersStat[input].keyQty += qty;
-        MatchAwardSystem.instance.keysCount[input] = playersStat[input].keyQty;
+        playersStat[player].keyQty += qty;
+        MatchAwardSystem.instance.keysCount[player] = playersStat[player].keyQty;
     }
 
     public string GetMinigame()

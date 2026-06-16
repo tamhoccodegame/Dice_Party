@@ -107,7 +107,7 @@ public class GlassBreakManager : MonoBehaviour
     {
         if(time <= 0)
         {
-            foreach (var p in PlayerSpawner.instance.GetSpawnedCharacters())
+            foreach (var p in PlayerSetupPosition.instance.GetSpawnedCharacters())
             {
             }
         }
@@ -188,7 +188,7 @@ public class GlassBreakManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(1f);
         yield return StartCoroutine(FadeBlackScreen(1, 0));
 
-        GetComponent<PlayerSpawner>().TrySpawnPlayer();
+        GetComponent<PlayerSetupPosition>().TrySpawnPlayer();
     }
 
     private void StartGame(PlayableDirector obj)

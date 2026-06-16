@@ -58,10 +58,10 @@ public class WizardMiniGameManager : MonoBehaviour
 
     [Space(20)]
     [Header("Players Condition")]
-    public Dictionary<PlayerInput, int> playerScores = new Dictionary<PlayerInput, int>();
+    public Dictionary<GameObject, int> playerScores = new Dictionary<GameObject, int>();
 
     //Từng player tự đăng ký vô
-    public Dictionary<PlayerInput, GameObject> playerObjects = new Dictionary<PlayerInput, GameObject>();
+    public List<GameObject> playerObjects = new List<GameObject>();
 
     public List<PlayerInput> playersCompleteGame = new List<PlayerInput>();
 
@@ -86,7 +86,7 @@ public class WizardMiniGameManager : MonoBehaviour
             PlayerManager playerManager = obj.AddComponent<PlayerManager>();
         }
 
-        PlayerSpawner playerSpawner = GetComponent<PlayerSpawner>();
+        PlayerSetupPosition playerSpawner = GetComponent<PlayerSetupPosition>();
         playerSpawner?.TrySpawnPlayer();
 
         MusicManager.instance?.PlayMusic(music);
@@ -104,7 +104,7 @@ public class WizardMiniGameManager : MonoBehaviour
             timeText.transform.parent.gameObject.SetActive(false);
         }
 
-        foreach (var player in playerObjects.Keys)
+        foreach (var player in playerObjects)
         {
             playerScores.Add(player, 1000); //Mỗi player khởi đầu 1k điểm
         }
@@ -118,7 +118,7 @@ public class WizardMiniGameManager : MonoBehaviour
         for (int i = 0; i < players.Count; i++)
         {
             playerReadyText[i].gameObject.SetActive(false);
-            playersReadyStatus.Add(players[i], false);
+            //playersReadyStatus.Add(players[i], false);
         }
     }
 
@@ -135,11 +135,11 @@ public class WizardMiniGameManager : MonoBehaviour
         }
     }
 
-    public void UpdatePlayerScore(PlayerInput input, int ammount)
+    public void UpdatePlayerScore(GameObject player, int ammount)
     {
-        playerScores[input] += ammount;
+        playerScores[player] += ammount;
 
-        playerScores[input] = Mathf.Max(0, playerScores[input]);
+        playerScores[player] = Mathf.Max(0, playerScores[player]);
         UpdateHUD();
 
         if (CheckGameOver())
@@ -333,31 +333,32 @@ public class WizardMiniGameManager : MonoBehaviour
             gameOverSlots[i].keyQtyText.text = keyAdd.ToString();
             keyAdd -= 2;
             gameOverSlots[i].gameObject.SetActive(true);
-            var inputGo = playerObjects[playerScores.ElementAt(i).Key];
-            if (i > 1) inputGo.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
-            //else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
-            else inputGo.GetComponent<Animator>().Play("TurnUp");
 
-            inputGo.GetComponent<PlayerController>().enabled = false;
-            inputGo.GetComponent<CharacterController>().enabled = false;
-            inputGo.transform.position = rankPositions[i].position;
-            inputGo.transform.rotation = Quaternion.Euler(0, -90, 0);
+
+            //if (i > 1) player.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
+            ////else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+            //else player.GetComponent<Animator>().Play("TurnUp");
+
+            //player.GetComponent<PlayerController>().enabled = false;
+            //player.GetComponent<CharacterController>().enabled = false;
+            //player.transform.position = rankPositions[i].position;
+            //player.transform.rotation = Quaternion.Euler(0, -90, 0);
         }
     }
 
     public virtual void UpdateHUD()
     {
-        List<PlayerInput> inputs = PlayerManager.instance.players;
+        //List<PlayerInput> inputs = PlayerManager.instance.players;
 
-        for (int i = 0; i < inputs.Count; i++)
-        {
-            int score = playerScores[inputs[i]];
-            playerHUDs[i].textUI.text = score.ToString();
-        }
+        //for (int i = 0; i < inputs.Count; i++)
+        //{
+        //    int score = playerScores[inputs[i]];
+        //    playerHUDs[i].textUI.text = score.ToString();
+        //}
 
-        if (CheckGameOver())
-        {
-            ShowGameOverPanel();
-        }
+        //if (CheckGameOver())
+        //{
+        //    ShowGameOverPanel();
+        //}
     }
 }
