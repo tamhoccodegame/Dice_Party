@@ -46,7 +46,7 @@ public class WizardMiniGameManager : MonoBehaviour
     public GameObject tutorialPanel;
     public Image[] playerAvatarReady;
     public TextMeshProUGUI[] playerReadyText;
-    public Dictionary<PlayerInput, bool> playersReadyStatus = new Dictionary<PlayerInput, bool>();
+    public Dictionary<GameObject, bool> playersReadyStatus = new Dictionary<GameObject, bool>();
 
     [Space(20)]
     [Header("Game Over Panel")]
@@ -63,7 +63,7 @@ public class WizardMiniGameManager : MonoBehaviour
     //Từng player tự đăng ký vô
     public List<GameObject> playerObjects = new List<GameObject>();
 
-    public List<PlayerInput> playersCompleteGame = new List<PlayerInput>();
+    public List<GameObject> playersCompleteGame = new List<GameObject>();
 
     public bool isDevMode = false;
 
@@ -80,6 +80,7 @@ public class WizardMiniGameManager : MonoBehaviour
 
     protected virtual void Start()
     {
+        Debug.Log("Start Wizard");
         if (isDevMode)
         {
             GameObject obj = new GameObject("PlayerManager");
@@ -114,20 +115,20 @@ public class WizardMiniGameManager : MonoBehaviour
 
     protected void InitReadyStatus()
     {
-        var players = PlayerManager.instance.players;
+        var players = playerObjects;
         for (int i = 0; i < players.Count; i++)
         {
             playerReadyText[i].gameObject.SetActive(false);
-            //playersReadyStatus.Add(players[i], false);
+            playersReadyStatus.Add(players[i], false);
         }
     }
 
     /// <summary>
     /// For those minigame that has a goal.
     /// </summary>
-    public void UpdatePlayerCompletedGame(PlayerInput input)
+    public void UpdatePlayerCompletedGame(GameObject player)
     {
-        playersCompleteGame.Add(input);
+        playersCompleteGame.Add(player);
         if (CheckGameOver())
         {
             isGameOver = true;
@@ -249,10 +250,11 @@ public class WizardMiniGameManager : MonoBehaviour
         {
             for (int i = 0; i < playersReadyStatus.Count; i++)
             {
-                PlayerInput playerInput = playersReadyStatus.ElementAt(i).Key;
-                if (playerInput.actions["Confirm"].triggered && !playersReadyStatus[playerInput])
+                GameObject player = playersReadyStatus.ElementAt(i).Key;
+                PlayerInput playerInput = player.GetComponent<MNGPlayerController>().GetPlayerInput();
+                if (playerInput.actions["Confirm"].triggered && !playersReadyStatus[player])
                 {
-                    playersReadyStatus[playerInput] = true;
+                    playersReadyStatus[player] = true;
                     playerReadyText[i].gameObject.SetActive(true);
                 }
             }
@@ -334,31 +336,31 @@ public class WizardMiniGameManager : MonoBehaviour
             keyAdd -= 2;
             gameOverSlots[i].gameObject.SetActive(true);
 
+            var player = playerObjects[i];
 
-            //if (i > 1) player.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
-            ////else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
-            //else player.GetComponent<Animator>().Play("TurnUp");
+            if (i > 1) player.GetComponent<Animator>().Play($"Lose{Random.Range(1, 4)}");
+            //else inputGo.GetComponent<Animator>().Play($"Win{Random.Range(1, 6)}");
+            else player.GetComponent<Animator>().Play("TurnUp");
 
-            //player.GetComponent<PlayerController>().enabled = false;
-            //player.GetComponent<CharacterController>().enabled = false;
-            //player.transform.position = rankPositions[i].position;
-            //player.transform.rotation = Quaternion.Euler(0, -90, 0);
+            player.GetComponent<PlayerController>().enabled = false;
+            player.GetComponent<CharacterController>().enabled = false;
+            player.transform.position = rankPositions[i].position;
+            player.transform.rotation = Quaternion.Euler(0, -90, 0);
         }
     }
 
     public virtual void UpdateHUD()
     {
-        //List<PlayerInput> inputs = PlayerManager.instance.players;
 
-        //for (int i = 0; i < inputs.Count; i++)
-        //{
-        //    int score = playerScores[inputs[i]];
-        //    playerHUDs[i].textUI.text = score.ToString();
-        //}
+        for (int i = 0; i < playerObjects.Count; i++)
+        {
+            int score = playerScores[playerObjects[i]];
+            playerHUDs[i].textUI.text = score.ToString();
+        }
 
-        //if (CheckGameOver())
-        //{
-        //    ShowGameOverPanel();
-        //}
+        if (CheckGameOver())
+        {
+            ShowGameOverPanel();
+        }
     }
 }

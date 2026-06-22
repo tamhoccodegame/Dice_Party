@@ -4,11 +4,13 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.Splines;
 
 public class PlayerSetupPosition : MonoBehaviour
 {
     public static PlayerSetupPosition instance;
 
+    public CharSetup charSetup;
     public GameObject playerPrefab;
     public Transform[] spawnPosition;
 
@@ -43,6 +45,9 @@ public class PlayerSetupPosition : MonoBehaviour
         BoardGameData boardGameData = BoardGameData.instance;
         bool isBoardScene = SceneManager.GetActiveScene().name == "BoardMap";
 
+        Debug.Log("Player count: " + PlayerManager.instance.players.Count);
+
+
         int posIndex = 0;
         foreach (var player in PlayerManager.instance.players)
         {
@@ -68,18 +73,45 @@ public class PlayerSetupPosition : MonoBehaviour
             //    newController.DisableRagdoll();
 
             if (isBoardScene)
-                TurnManager.instance.playerControllers.Add(player, controller);
+            {
+               TurnManager.instance.playerControllers.Add(player, controller);
+            }
+            else
+            {
+                player.transform.localScale = new Vector3(2f, 2f, 2f);
+                WizardMiniGameManager.instance.playerObjects.Add(player);
+                player.GetComponent<MNGPlayerController>().enabled = true;
+
+                Debug.Log("Minigame players: "
+                + WizardMiniGameManager.instance.playerObjects.Count);
+            }
+
+            player.transform.localScale = charSetup.scale;
+            player.GetComponent<NewBoardGameController>().enabled = charSetup.BoardGameController;
+            player.GetComponent<MNGPlayerController>().enabled = charSetup.MNGPlayerController;
+            player.GetComponent<CharacterController>().enabled = charSetup.CharacterController;
+            Debug.Log(charSetup.CharacterController);
+            player.GetComponent<ItemController>().enabled = charSetup.ItemController;
+            //player.GetComponent<PickUpItem>().enabled = charSetup.PickUpItem;
+            player.GetComponent<SplineAnimate>().enabled = charSetup.SplineAnimate;
+            player.GetComponent<Rigidbody>().isKinematic = !charSetup.Rigidbody;
+
+            foreach (var col in player.GetComponents<Collider>())
+            {
+                if(col is not CharacterController)
+                col.enabled = charSetup.Colliders;
+            }
 
             player.transform.position = spawnPosition[posIndex].position;
 
+            if(!WizardPartyData.instance.playersStat.ContainsKey(player))
             WizardPartyData.instance.playersStat.Add(player, new PlayerBoardStat
             {
                 cupQty = 0,
                 health = 0,
                 keyQty = 0,
             });
-            //else
-            //    WizardMiniGameManager.instance.playerObjects.Add(player, player.gameObject);
+            
         }
     }
 

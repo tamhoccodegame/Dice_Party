@@ -8,7 +8,7 @@ public class MNGGoal : MonoBehaviour
     {
         if(other.TryGetComponent<MNGPlayerController>(out var player))
         {
-            WizardMiniGameManager.instance.UpdatePlayerCompletedGame(player.GetPlayerInput());
+            WizardMiniGameManager.instance.UpdatePlayerCompletedGame(player.gameObject);
         }
     }
 }

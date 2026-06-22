@@ -38,6 +38,7 @@ public class Lobby : MonoBehaviour
     {
         yield return new WaitForSeconds(1.5f);
         //SceneManager.LoadScene("Map1");
+
         LevelLoader.instance.LoadScene("BoardMap");
 
     }
@@ -96,6 +97,8 @@ public class Lobby : MonoBehaviour
 
             playerInput.transform.SetParent(model.transform);
             model.GetComponent<NewBoardGameController>().SetInput(playerInput);
+            model.GetComponent<MNGPlayerController>().SetInput(playerInput);
+            //model.GetComponent<PickUpItem>().playerInput = playerInput;
 
             DontDestroyOnLoad(model);
         }

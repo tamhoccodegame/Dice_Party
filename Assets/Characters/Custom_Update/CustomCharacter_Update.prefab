@@ -3999,6 +3999,7 @@ GameObject:
   - component: {fileID: -5505403584410936176}
   - component: {fileID: -6845242819512287900}
   - component: {fileID: -6370566140387614066}
+  - component: {fileID: -2194648311320318227}
   m_Layer: 0
   m_Name: CustomCharacter_Update
   m_TagString: Untagged
@@ -4016,7 +4017,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8536833452002015234}
@@ -4172,8 +4173,8 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
@@ -4297,6 +4298,28 @@ MonoBehaviour:
     spawnPosition: {fileID: 6685306917155818761}
   - item: {fileID: 5076309073832089842, guid: 8239f0c0750ab5249a011a8a6372c369, type: 3}
     spawnPosition: {fileID: 8770950722626115469}
+--- !u!114 &-2194648311320318227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591654762118859964}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a02aaeb4f73f041b6bf63f55e65a99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canJump: 0
+  bloodEffect: {fileID: 0}
+  currentAnim: 
+  movement: {x: 0, y: 0, z: 0}
+  gravity: -20
+  jumpForce: 10
+  moveSpeed: 8
+  speedFactor: 1
+  isFalling: 0
+  playerInput: {fileID: 0}
 --- !u!1 &2713937601389622726
 GameObject:
   m_ObjectHideFlags: 0

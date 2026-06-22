@@ -28,7 +28,12 @@ public class LevelLoader : MonoBehaviour
     IEnumerator WaitToLoad(string sceneName)
     {
         yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene(sceneName);
+
+        yield return SceneManager.LoadSceneAsync(sceneName);
+
+        yield return Resources.UnloadUnusedAssets();
+
+        System.GC.Collect();
     }
 
 

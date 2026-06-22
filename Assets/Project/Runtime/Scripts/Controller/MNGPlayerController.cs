@@ -47,6 +47,13 @@ public class MNGPlayerController : PlayerController
             bloodEffect.Stop();
 
         //WizardMiniGameManager.instance.playerObjects.Add(playerInput, gameObject);
+        
+    }
+
+    private void OnEnable()
+    {
+        if (bloodEffect != null)
+            bloodEffect.Stop();
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
@@ -54,8 +61,7 @@ public class MNGPlayerController : PlayerController
 
     private void Start()
     {
-        if (bloodEffect != null)
-            bloodEffect.Stop();
+        
     }
 
     protected virtual void Update()

@@ -105,7 +105,7 @@ public class MNGChayTruongController : PlayerController
         if (isGoal) return;
         isGoal = true;
 
-        WizardMiniGameManager.instance.UpdatePlayerCompletedGame(playerInput);
+        WizardMiniGameManager.instance.UpdatePlayerCompletedGame(gameObject);
     }
 
     public override PlayerInput GetPlayerInput()
