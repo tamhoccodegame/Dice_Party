@@ -91,11 +91,14 @@ public class PlayerSetupPosition : MonoBehaviour
             player.GetComponent<NewBoardGameController>().enabled = charSetup.BoardGameController;
             player.GetComponent<MNGPlayerController>().enabled = charSetup.MNGPlayerController;
             player.GetComponent<CharacterController>().enabled = charSetup.CharacterController;
+            player.TryGetComponent<LobbyCharacterAnimation>(out var lobbyCharacterAnimation);
+            if (lobbyCharacterAnimation != null) Destroy(lobbyCharacterAnimation);
             Debug.Log(charSetup.CharacterController);
             player.GetComponent<ItemController>().enabled = charSetup.ItemController;
             //player.GetComponent<PickUpItem>().enabled = charSetup.PickUpItem;
             player.GetComponent<SplineAnimate>().enabled = charSetup.SplineAnimate;
             player.GetComponent<Rigidbody>().isKinematic = !charSetup.Rigidbody;
+            player.GetComponent<Rigidbody>().useGravity = charSetup.Rigidbody;
 
             foreach (var col in player.GetComponents<Collider>())
             {

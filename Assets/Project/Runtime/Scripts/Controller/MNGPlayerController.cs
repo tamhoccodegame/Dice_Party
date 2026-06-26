@@ -30,6 +30,7 @@ public class MNGPlayerController : PlayerController
     public bool isFalling = false;
 
     public PlayerInput playerInput;
+    public Camera mainCamera;
 
     public override PlayerInput GetPlayerInput()
     {
@@ -57,6 +58,7 @@ public class MNGPlayerController : PlayerController
         controller = GetComponent<CharacterController>();
         controller.enabled = true;
         animator = GetComponent<Animator>();
+        mainCamera = Camera.main;
     }
 
     private void Start()
@@ -68,12 +70,12 @@ public class MNGPlayerController : PlayerController
     {
         if (playerInput == null) return;
 
-        Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up);
+        Vector3 camForward = Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up);
 
         if (camForward.sqrMagnitude < 0.01f)
         {
             // Camera đang gần như nhìn thẳng xuống
-            camForward = Camera.main.transform.up;
+            camForward = mainCamera.transform.up;
             camForward.y = 0;
         }
 
@@ -96,7 +98,7 @@ public class MNGPlayerController : PlayerController
 
         if (isGrounded && verticalVelocity < 0)
         {
-            verticalVelocity = -2f; // giữ cho player dính mặt đất
+            verticalVelocity = 0; // giữ cho player dính mặt đất
         }
 
         // Jump khi bấm Trigger
