@@ -37,7 +37,6 @@ public class PlayerSetupPosition : MonoBehaviour
             DevModeSpawnPlayer(i);
         }
         else SpawnPlayer();
-
     }
 
     void SpawnPlayer()
@@ -57,6 +56,8 @@ public class PlayerSetupPosition : MonoBehaviour
             if (cinemachineCameras.Count() > 0)
             {
                 cinemachineCameras[posIndex].Follow = player.transform;
+                Debug.Log($"Assigned cine {posIndex} to Player {posIndex}");
+                posIndex++;
             }
 
             NewBoardGameController controller = player.GetComponent<NewBoardGameController>();

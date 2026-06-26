@@ -31,9 +31,9 @@ public class LevelLoader : MonoBehaviour
 
         yield return SceneManager.LoadSceneAsync(sceneName);
 
-        yield return Resources.UnloadUnusedAssets();
+        //yield return Resources.UnloadUnusedAssets();
 
-        System.GC.Collect();
+        //System.GC.Collect();
     }
 
 

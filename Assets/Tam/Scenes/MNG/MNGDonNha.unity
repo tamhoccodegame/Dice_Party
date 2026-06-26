@@ -854,6 +854,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 874fb63113a0c2d46ac8d82a07ac4cc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &292205657 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1445796594940297226, guid: 4c494ca001b1f3b4fbdf4f3c91ca47e0, type: 3}
+  m_PrefabInstance: {fileID: 292205652}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &318376917
 GameObject:
   m_ObjectHideFlags: 0
@@ -1828,6 +1833,7 @@ MonoBehaviour:
   gameOverVolume: {fileID: 0}
   blackScreen: {fileID: 199441526}
   fadeDuration: 1
+  playerObjects: []
   playersCompleteGame: []
   isDevMode: 1
 --- !u!82 &1072135085
@@ -1935,16 +1941,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1072135082}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a82aa8e7d01a8824b9b44584b925ec8b, type: 3}
+  m_Script: {fileID: 11500000, guid: 21ddb9ed1b89a5d42882cecbf12343a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardCarPrefab: {fileID: 0}
-  playerPrefab: {fileID: 2591654762118859964, guid: fca935c52d2e2fb46a2a909e1999d049, type: 3}
+  charSetup: {fileID: 11400000, guid: 9beef22a4f26a8c4dbd001dcd770a467, type: 2}
+  playerPrefab: {fileID: 0}
   spawnPosition:
-  - {fileID: 240792718}
-  - {fileID: 69449347}
-  - {fileID: 1445532406}
-  - {fileID: 1085119206}
+  - {fileID: 1016826913}
+  - {fileID: 1518322049}
+  - {fileID: 1184813361}
+  - {fileID: 292205657}
   cinemachineCameras: []
 --- !u!1 &1085119205
 GameObject:
@@ -2166,6 +2172,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 874fb63113a0c2d46ac8d82a07ac4cc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &1184813361 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1445796594940297226, guid: 4c494ca001b1f3b4fbdf4f3c91ca47e0, type: 3}
+  m_PrefabInstance: {fileID: 1184813356}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1189114001
 GameObject:
   m_ObjectHideFlags: 0
@@ -2550,6 +2561,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 874fb63113a0c2d46ac8d82a07ac4cc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &1518322049 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1445796594940297226, guid: 4c494ca001b1f3b4fbdf4f3c91ca47e0, type: 3}
+  m_PrefabInstance: {fileID: 1518322044}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1563337931 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5762314859972311875, guid: 4c494ca001b1f3b4fbdf4f3c91ca47e0, type: 3}
