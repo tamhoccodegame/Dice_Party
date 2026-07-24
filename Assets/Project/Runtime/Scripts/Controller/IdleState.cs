@@ -9,6 +9,7 @@ public class IdleState : BoardState
 
     public override void Enter()
     {
+        isRoll = false;
         controller.ChangeAnimation("Idle");
         controller.splineAnimate.Pause();
         if (controller == TurnManager.instance.playerControllers[controller.gameObject])

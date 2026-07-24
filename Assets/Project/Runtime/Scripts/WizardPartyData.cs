@@ -39,11 +39,11 @@ public class WizardPartyData : MonoBehaviour
             Destroy(gameObject);
         }
 
-        foreach (var player in PlayerManager.instance.players)
-        {
-            //playersNode.Add(player, null);
-            //playersStat.Add(player, new PlayerBoardStat { cupQty = 0, keyQty = 0, health = 30 }); 
-        }
+        //foreach (var player in PlayerManager.instance.players)
+        //{
+        //    //playersNode.Add(player, null);
+        //    //playersStat.Add(player, new PlayerBoardStat { cupQty = 0, keyQty = 0, health = 30 }); 
+        //}
     }
 
     private void Start()

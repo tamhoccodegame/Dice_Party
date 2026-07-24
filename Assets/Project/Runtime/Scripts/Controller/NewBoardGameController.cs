@@ -4,12 +4,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Splines;
 
-[RequireComponent(typeof(CharacterController))]
 public class NewBoardGameController : PlayerController
 {
     #region === Core Components ===
     private Animator animator;
-    private CharacterController _controller;
     private Rigidbody[] rigidbodies;
     #endregion
 
@@ -50,10 +48,6 @@ public class NewBoardGameController : PlayerController
 
 
     #region === Movement ===
-    [Header("Movement")]
-    float verticalVelocity;
-    public Vector3 moveDir;
-
     public Transform feet;
     #endregion
 
@@ -107,7 +101,7 @@ public class NewBoardGameController : PlayerController
     {
         rigidbodies = GetComponentsInChildren<Rigidbody>();
         animator = GetComponent<Animator>();
-        _controller = GetComponent<CharacterController>();
+        //_controller = GetComponent<CharacterController>();
 
         idleState = new IdleState(this);
         movingState = new MovingState(this);
@@ -142,6 +136,14 @@ public class NewBoardGameController : PlayerController
     {
         if (WizardPartyData.instance == null) return;
 
+        WizardPartyData.instance.playersStat.Add(gameObject, new PlayerBoardStat
+        {
+            cupQty = 0,
+            health = 0,
+            keyQty = 0,
+        });
+        TurnManager.instance.playerControllers.Add(gameObject, this);
+
         splineAnimate.enabled = true;
         splineAnimate.Container = GameObject.Find("Spline Start").GetComponent<SplineContainer>();
 
@@ -149,16 +151,16 @@ public class NewBoardGameController : PlayerController
         if (savedNode != null)
         {
             BoardNode node = GameObject.Find(savedNode.name).GetComponent<BoardNode>();
-            _controller.enabled = false;
+            //_controller.enabled = false;
             transform.position = node.transform.position;
             currentNode = node;
             splineAnimate.Container = node.splineContainer;
             splineAnimate.NormalizedTime = node.normalizeTime;
-            _controller.enabled = true;
+            //_controller.enabled = true;
         }
         else
         {
-            currentNode = PlayerSetupPosition.instance.spawnPosition[0].GetComponent<BoardNode>();
+            //currentNode = PlayerSetupPosition.instance.spawnPosition[0].GetComponent<BoardNode>();
         }
 
         toMoveNode = currentNode.nextNodes[0];
@@ -220,20 +222,20 @@ public class NewBoardGameController : PlayerController
     {
         currentState?.Update();
 
-        verticalVelocity = -5f * Time.deltaTime;
+        //verticalVelocity = -5f * Time.deltaTime;
 
-        Vector3 move = Vector3.zero;
+        //Vector3 move = Vector3.zero;
 
-        if (moveDir.sqrMagnitude > 0.01f)
-        {
-            move = moveDir * 6f * Time.deltaTime;
-        }
-        else moveDir = Vector3.zero;
+        //if (moveDir.sqrMagnitude > 0.01f)
+        //{
+        //    move = moveDir * 6f * Time.deltaTime;
+        //}
+        //else moveDir = Vector3.zero;
 
-        move.y += verticalVelocity;
+        //move.y += verticalVelocity;
 
 
-        _controller.Move(move); // tốc độ di chuyển
+        //_controller.Move(move); // tốc độ di chuyển
 
         if (toMoveNode != null && currentState != itemState)
         {
@@ -295,7 +297,7 @@ public class NewBoardGameController : PlayerController
         //AvatarTurnManager.instance.HighlightTurn(PlayerManager.instance.players.IndexOf(playerInput));
         yield return new WaitForSeconds(3f);
         readyForInput = true;
-        _controller.enabled = true;
+        //_controller.enabled = true;
         ShowDice();
         AvatarTurnManager.instance.Disappear();
         yield return new WaitForSeconds(1f);
@@ -305,9 +307,10 @@ public class NewBoardGameController : PlayerController
     // --- Hàm kết thúc lượt ---
     public void EndTurn()
     {
-        TurnManager.instance.NextTurn();
-        readyForInput = false;
-        this.enabled = false;
+        ChangeState(idleState);
+        //TurnManager.instance.NextTurn();
+        //readyForInput = false;
+        //this.enabled = false;
     }
 
     private void ShowDice()
@@ -351,7 +354,7 @@ public class NewBoardGameController : PlayerController
         clone.transform.position += new Vector3(0, 25, 0);
 
 
-        _controller.enabled = false;
+        //_controller.enabled = false;
         animator.enabled = false;
         foreach (var rigid in rigidbodies)
         {
@@ -372,5 +375,4 @@ public class NewBoardGameController : PlayerController
         clone.GetComponent<NewBoardGameController>().enabled = false;
         Destroy(gameObject);
     }
-
 }

@@ -38,7 +38,7 @@ public class TurnManager : MonoBehaviour
 
     private void Start()
     {
-        GetComponent<PlayerSetupPosition>().TrySpawnPlayer();
+        //GetComponent<PlayerSetupPosition>().TrySpawnPlayer();
 
         AvatarTurnManager.instance.gameObject.SetActive(false);
         MusicManager.instance?.PlayMusic(music);
@@ -217,7 +217,6 @@ public class TurnManager : MonoBehaviour
         {
             LoadScene(WizardPartyData.instance.GetMinigame());
         }
-        //CameraFollow.instance.RPC_StartFollowTarget(playerController[currentPlayerIndex].Object.Id);
         if (currentPlayerIndex != 0)
         {
             playerControllers.ElementAt(currentPlayerIndex).Value.enabled = true;
